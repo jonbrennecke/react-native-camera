@@ -13,6 +13,9 @@ class HSCameraManager: NSObject {
   private var audioCaptureDeviceInput: AVCaptureDeviceInput?
   private let sessionQueue = DispatchQueue(label: "session queue")
 
+  @objc(sharedInstance)
+  public static let shared = HSCameraManager()
+
   @objc
   public var delegate: HSCameraManagerDelegate?
 
@@ -27,6 +30,7 @@ class HSCameraManager: NSObject {
     super.init()
   }
 
+  @objc
   public static func requestCameraPermissions(_ callback: @escaping (Bool) -> Void) {
     requestPermissions(for: [
       .captureDevice(mediaType: .video),
