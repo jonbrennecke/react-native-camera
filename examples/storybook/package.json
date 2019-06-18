@@ -18,7 +18,7 @@
     "rename": "react-native-rename"
   },
   "dependencies": {
-    "@jonbrennecke/react-native-media": "../../",
+    "@jonbrennecke/react-native-camera": "../../",
     "lodash": "4.17.11",
     "react": "16.6.3",
     "react-native": "0.58.6",

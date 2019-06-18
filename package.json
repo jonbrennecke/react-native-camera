@@ -1,6 +1,6 @@
 {
-  "name": "@jonbrennecke/react-native-media",
-  "version": "1.0.9",
+  "name": "@jonbrennecke/react-native-camera",
+  "version": "1.0.0",
   "description": "",
   "main": "build/index.js",
   "scripts": {
@@ -31,7 +31,7 @@
     "redux": "^3.7.2"
   },
   "repository": {
-    "url": "https://github.com/jonbrennecke/farrago",
+    "url": "https://github.com/jonbrennecke/react-native-camera",
     "type": "git"
   },
   "devDependencies": {
