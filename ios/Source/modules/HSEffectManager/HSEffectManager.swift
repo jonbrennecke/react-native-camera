@@ -21,7 +21,7 @@ class HSEffectManager: NSObject {
     return layer
   }()
   
-  private let colorSpace = CGColorSpaceCreateDeviceRGB()
+  private let colorSpace = CGColorSpaceCreateDeviceGray()
 
   @objc(sharedInstance)
   public static let shared = HSEffectManager()
@@ -34,11 +34,11 @@ class HSEffectManager: NSObject {
     
     let pixelSize = sizeOf(buffer: depthBuffer)
     let pixelBufferBytesPerRow = CVPixelBufferGetBytesPerRow(depthBuffer)
-    let ptr = unsafeBitCast(CVPixelBufferGetBaseAddress(depthBuffer), to: UnsafeMutablePointer<Float32>.self)
+    let pixelBufferPtr = unsafeBitCast(CVPixelBufferGetBaseAddress(depthBuffer), to: UnsafeMutablePointer<Float32>.self)
     let ptrLength = Int(pixelSize.height) * pixelBufferBytesPerRow / MemoryLayout<Float32>.size + Int(pixelSize.width)
-    let maxDepth = max(ptr: ptr, count: ptrLength)
+    let maxDepth = max(ptr: pixelBufferPtr, count: ptrLength)
     
-    let bytesPerRow = Int(pixelSize.width) * MemoryLayout<Float32>.size
+    let bytesPerRow = Int(pixelSize.width) * MemoryLayout<UInt8>.size
     let dataByteLength = Int(pixelSize.height) * bytesPerRow
     
     guard
@@ -50,42 +50,43 @@ class HSEffectManager: NSObject {
     CFDataSetLength(data, dataByteLength)
     
     let byteIndex = { (x: Int, y: Int) -> Int in
-      return (y * bytesPerRow) + x * MemoryLayout<Float32>.size
+      return (y * bytesPerRow) + x * MemoryLayout<UInt8>.size
     }
     
     let pixelBufferIndex = { (x: Int, y: Int) -> Int in
       return y * (pixelBufferBytesPerRow / MemoryLayout<Float32>.size) + x
     }
+    
 
     for y in 0 ..< Int(pixelSize.height) {
       for x in 0 ..< Int(pixelSize.width) {
-        let value = ptr[pixelBufferIndex(x, y)]
+        let value = pixelBufferPtr[pixelBufferIndex(x, y)]
         let depth = UInt8((min(value, maxDepth) / maxDepth) * 255)
         
         // byte value at index
         let i = byteIndex(x, y)
-        bytes[i] = 255
-        bytes[i + 1] = depth
-        bytes[i + 2] = depth
-        bytes[i + 3] = depth
+        bytes[i] = depth
+//        bytes[i + 1] = depth
+//        bytes[i + 2] = depth
+//        bytes[i + 3] = depth
       }
     }
 
-    updateImage(pixelSize: pixelSize, data: data)
+    updateImage(pixelSize: pixelSize, data: data, byteSize: MemoryLayout<UInt8>.size)
     CVPixelBufferUnlockBaseAddress(depthBuffer, .readOnly)
   }
 
-  private func updateImage(pixelSize: CGSize, data: CFData) {
+  private func updateImage(pixelSize: CGSize, data: CFData, byteSize: Int) {
     guard let provider = CGDataProvider(data: data) else {
       return
     }
-    let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue)
+    let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.none.rawValue)
     effectLayer.contents = CGImage(
       width: Int(pixelSize.width),
       height: Int(pixelSize.height),
       bitsPerComponent: Int(8),
-      bitsPerPixel: MemoryLayout<Float32>.size * 8,
-      bytesPerRow: Int(pixelSize.width) * MemoryLayout<Float32>.size,
+      bitsPerPixel: byteSize * 8,
+      bytesPerRow: Int(pixelSize.width) * byteSize,
       space: colorSpace,
       bitmapInfo: bitmapInfo,
       provider: provider,
