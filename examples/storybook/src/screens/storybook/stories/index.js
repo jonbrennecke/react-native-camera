@@ -1,2 +1,3 @@
 // @flow
-import './CameraPreview';
+import './Camera';
+import './CameraEffect';

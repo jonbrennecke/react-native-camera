@@ -1,16 +1,19 @@
 import AVFoundation
 import Photos
 
-@available(iOS 10.0, *)
+@available(iOS 11.1, *)
 @objc
 class HSCameraManager: NSObject {
-  private var captureSession: AVCaptureSession
-  private var videoOutput: AVCaptureVideoDataOutput
-  private var videoFileOutput: AVCaptureMovieFileOutput = AVCaptureMovieFileOutput()
+  internal var captureSession = AVCaptureSession()
+
+  private var videoOutput = AVCaptureVideoDataOutput()
+  private var videoFileOutput = AVCaptureMovieFileOutput()
+  private var depthOutput = AVCaptureDepthDataOutput()
   private var videoCaptureDevice: AVCaptureDevice?
   private var videoCaptureDeviceInput: AVCaptureDeviceInput?
   private var audioCaptureDevice: AVCaptureDevice?
   private var audioCaptureDeviceInput: AVCaptureDeviceInput?
+  private var outputSynchronizer: AVCaptureDataOutputSynchronizer?
   private let sessionQueue = DispatchQueue(label: "session queue")
 
   @objc(sharedInstance)
@@ -20,15 +23,7 @@ class HSCameraManager: NSObject {
   public var delegate: HSCameraManagerDelegate?
 
   @objc
-  public var previewLayer: AVCaptureVideoPreviewLayer
-
-  override init() {
-    captureSession = AVCaptureSession()
-    previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-    previewLayer.videoGravity = .resizeAspectFill
-    videoOutput = AVCaptureVideoDataOutput()
-    super.init()
-  }
+  public var depthDelegate: HSCameraManagerDepthDataDelegate?
 
   @objc
   public static func requestCameraPermissions(_ callback: @escaping (Bool) -> Void) {
@@ -100,16 +95,10 @@ class HSCameraManager: NSObject {
       return
     }
     captureSession.beginConfiguration()
-    NotificationCenter.default.addObserver(self, selector: #selector(captureSessionRuntimeError), name: .AVCaptureSessionRuntimeError, object: captureSession)
     if case .failure = attemptToSetupCameraCaptureSession() {
       // TODO:
     }
     captureSession.commitConfiguration()
-  }
-
-  @objc
-  private func captureSessionRuntimeError(error _: Error) {
-    // TODO:
   }
 
   private func attemptToSetupCameraCaptureSession() -> HSCameraSetupResult {
@@ -137,16 +126,33 @@ class HSCameraManager: NSObject {
       return .failure
     }
 
-    if case .failure = setupAudioInput() {
+    if case .failure = setupVideoOutput() {
       return .failure
     }
 
-    // setup videoOutput
+    if case .failure = setupDepthOutput() {
+      return .failure
+    }
+
+    outputSynchronizer = AVCaptureDataOutputSynchronizer(dataOutputs: [depthOutput, videoOutput])
+    outputSynchronizer?.setDelegate(self, queue: sessionQueue)
+
+    // setup videoFileOutput
+    if captureSession.canAddOutput(videoFileOutput) {
+      captureSession.addOutput(videoFileOutput)
+    } else {
+      return .failure
+    }
+    return .success
+  }
+
+  private func setupVideoOutput() -> HSCameraSetupResult {
     videoOutput.alwaysDiscardsLateVideoFrames = true
     videoOutput.setSampleBufferDelegate(self, queue: sessionQueue)
     if captureSession.canAddOutput(videoOutput) {
       captureSession.addOutput(videoOutput)
       if let connection = videoOutput.connection(with: .video) {
+        connection.isEnabled = true
         if connection.isVideoStabilizationSupported {
           connection.preferredVideoStabilizationMode = .auto
         }
@@ -157,10 +163,24 @@ class HSCameraManager: NSObject {
     } else {
       return .failure
     }
+    return .success
+  }
 
-    // setup videoFileOutput
-    if captureSession.canAddOutput(videoFileOutput) {
-      captureSession.addOutput(videoFileOutput)
+  private func setupDepthOutput() -> HSCameraSetupResult {
+    depthOutput.alwaysDiscardsLateDepthData = true
+    depthOutput.isFilteringEnabled = true
+    depthOutput.setDelegate(self, callbackQueue: sessionQueue)
+    if captureSession.canAddOutput(depthOutput) {
+      captureSession.addOutput(depthOutput)
+      if let connection = depthOutput.connection(with: .depthData) {
+        connection.isEnabled = true
+        if connection.isVideoStabilizationSupported {
+          connection.preferredVideoStabilizationMode = .auto
+        }
+        if connection.isVideoOrientationSupported {
+          connection.videoOrientation = .portrait
+        }
+      }
     } else {
       return .failure
     }
@@ -184,14 +204,6 @@ class HSCameraManager: NSObject {
       return .failure
     }
     return .success
-  }
-
-  private func captureDevice(withPosition position: AVCaptureDevice.Position) -> AVCaptureDevice? {
-    if let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: position) {
-      return device
-    }
-    let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: .video, position: position)
-    return discoverySession.devices.first
   }
 
   @objc
@@ -225,42 +237,37 @@ class HSCameraManager: NSObject {
     videoCaptureDeviceInput = deviceInput
     return .success
   }
+}
 
-  @objc
-  public func focusOnPoint(_ focusPointInLayerCoords: CGPoint) {
-    guard let device = videoCaptureDevice else {
+@available(iOS 11.1, *)
+extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
+  func dataOutputSynchronizer(_: AVCaptureDataOutputSynchronizer, didOutput synchronizedDataCollection: AVCaptureSynchronizedDataCollection) {
+    guard
+      let delegate = depthDelegate,
+      let depthData = synchronizedDataCollection.synchronizedData(for: depthOutput) as? AVCaptureSynchronizedDepthData
+    // TODO: let videoData = synchronizedDataCollection.synchronizedData(for: videoOutput) as? AVCaptureSynchronizedSampleBufferData
+    else {
       return
     }
-    let focusPointInDeviceCoords = previewLayer.captureDevicePointConverted(fromLayerPoint: focusPointInLayerCoords)
-    do {
-      try device.lockForConfiguration()
-      if device.isFocusModeSupported(.autoFocus) {
-        device.focusMode = .autoFocus
-      }
-      if device.isFocusPointOfInterestSupported {
-        device.focusPointOfInterest = focusPointInDeviceCoords
-      }
-      if device.isExposureModeSupported(.continuousAutoExposure) {
-        device.exposureMode = .continuousAutoExposure
-      }
-      if device.isExposurePointOfInterestSupported {
-        device.exposurePointOfInterest = focusPointInDeviceCoords
-      }
-      device.unlockForConfiguration()
-    } catch {
-      // TODO: handle error
-    }
+    delegate.cameraManagerDidOutput(depthData: depthData.depthData)
   }
 }
 
-@available(iOS 10.0, *)
+@available(iOS 11.1, *)
+extension HSCameraManager: AVCaptureDepthDataOutputDelegate {
+  func depthDataOutput(_: AVCaptureDepthDataOutput, didOutput depthData: AVDepthData, timestamp _: CMTime, connection _: AVCaptureConnection) {
+    depthDelegate?.cameraManagerDidOutput(depthData: depthData)
+  }
+}
+
+@available(iOS 11.1, *)
 extension HSCameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
   func captureOutput(_: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from _: AVCaptureConnection) {
     delegate?.cameraManagerDidReceiveCameraDataOutput(videoData: sampleBuffer)
   }
 }
 
-@available(iOS 10.0, *)
+@available(iOS 11.1, *)
 extension HSCameraManager: AVCaptureFileOutputRecordingDelegate {
   func fileOutput(_: AVCaptureFileOutput, didStartRecordingTo fileURL: URL, from _: [AVCaptureConnection]) {
     delegate?.cameraManagerDidBeginFileOutput(toFileURL: fileURL)

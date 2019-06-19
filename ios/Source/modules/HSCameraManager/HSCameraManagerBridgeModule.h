@@ -4,6 +4,7 @@
 #import <React/RCTBridgeModule.h>
 #import <React/RCTEventEmitter.h>
 
+@class HSCameraManagerBridgeModule;
 @interface HSCameraManagerBridgeModule
     : RCTEventEmitter <RCTBridgeModule, HSCameraManagerDelegate>
 - (void)cameraManagerDidBeginFileOutputToFileURL:(NSURL *)fileURL;

@@ -4,7 +4,7 @@ import { storiesOf } from '@storybook/react-native';
 import { SafeAreaView } from 'react-native';
 
 import {
-  CameraPreview,
+  Camera,
   requestCameraPermissions,
   startCameraPreview
 } from '@jonbrennecke/react-native-camera';
@@ -15,19 +15,28 @@ const styles = {
   flex: {
     flex: 1,
   },
+  camera: {
+    flex: 1
+  }
 };
 
 const loadAsync = async () => {
-  await requestCameraPermissions();
-  startCameraPreview();
+  try {
+    await requestCameraPermissions();
+    startCameraPreview();
+  }
+  catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+  }
 };
 
-storiesOf('Camera', module).add('Camera Preview', () => (
+storiesOf('Camera', module).add('Camera', () => (
   <SafeAreaView style={styles.flex}>
     <StorybookAsyncWrapper
       loadAsync={loadAsync}
       render={() => (
-        <CameraPreview style={styles.flex} />
+        <Camera style={styles.camera} />
       )}
     />
   </SafeAreaView>

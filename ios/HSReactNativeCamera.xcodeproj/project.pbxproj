@@ -12,9 +12,14 @@
 		FC7B9EAF22B97EED0012D8D6 /* HSCameraSetupResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7B9EAE22B97EED0012D8D6 /* HSCameraSetupResult.swift */; };
 		FC7B9EB222B980F60012D8D6 /* permissionsUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7B9EB122B980F60012D8D6 /* permissionsUtils.swift */; };
 		FC845E1622B98A3D00522016 /* cameraUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E1522B98A3D00522016 /* cameraUtils.swift */; };
-		FC845E1822B98D6300522016 /* HSCameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E1722B98D6300522016 /* HSCameraPreviewView.swift */; };
-		FC845E1A22B98E5600522016 /* HSCameraPreviewViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FC845E1922B98E5600522016 /* HSCameraPreviewViewManager.m */; };
+		FC845E1822B98D6300522016 /* HSCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E1722B98D6300522016 /* HSCameraView.swift */; };
+		FC845E1A22B98E5600522016 /* HSCameraViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FC845E1922B98E5600522016 /* HSCameraViewManager.m */; };
 		FC845E1E22B992B200522016 /* HSCameraManagerBridgeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = FC845E1D22B992B200522016 /* HSCameraManagerBridgeModule.m */; };
+		FC845E5F22B9ABF600522016 /* HSEffectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E5E22B9ABF600522016 /* HSEffectManager.swift */; };
+		FC845E6222B9AEED00522016 /* HSEffectManagerBridgeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = FC845E6122B9AEED00522016 /* HSEffectManagerBridgeModule.m */; };
+		FC845E6522B9B0B700522016 /* HSCameraEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E6422B9B0B700522016 /* HSCameraEffectView.swift */; };
+		FC845E6822B9B1BC00522016 /* HSCameraEffectViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FC845E6722B9B1BC00522016 /* HSCameraEffectViewManager.m */; };
+		FC845E6B22B9B30000522016 /* HSCameraManagerDepthDataDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E6A22B9B30000522016 /* HSCameraManagerDepthDataDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -35,12 +40,19 @@
 		FC7B9EAC22B97EB90012D8D6 /* HSCameraManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSCameraManagerDelegate.swift; sourceTree = "<group>"; };
 		FC7B9EAE22B97EED0012D8D6 /* HSCameraSetupResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSCameraSetupResult.swift; sourceTree = "<group>"; };
 		FC7B9EB122B980F60012D8D6 /* permissionsUtils.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = permissionsUtils.swift; sourceTree = "<group>"; tabWidth = 2; };
-		FC845E1522B98A3D00522016 /* cameraUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = cameraUtils.swift; sourceTree = "<group>"; };
-		FC845E1722B98D6300522016 /* HSCameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSCameraPreviewView.swift; sourceTree = "<group>"; };
-		FC845E1922B98E5600522016 /* HSCameraPreviewViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HSCameraPreviewViewManager.m; sourceTree = "<group>"; };
-		FC845E1B22B98E5F00522016 /* HSCameraPreviewViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSCameraPreviewViewManager.h; sourceTree = "<group>"; };
+		FC845E1522B98A3D00522016 /* cameraUtils.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = cameraUtils.swift; sourceTree = "<group>"; tabWidth = 2; };
+		FC845E1722B98D6300522016 /* HSCameraView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSCameraView.swift; sourceTree = "<group>"; tabWidth = 2; };
+		FC845E1922B98E5600522016 /* HSCameraViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HSCameraViewManager.m; sourceTree = "<group>"; };
+		FC845E1B22B98E5F00522016 /* HSCameraViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSCameraViewManager.h; sourceTree = "<group>"; };
 		FC845E1D22B992B200522016 /* HSCameraManagerBridgeModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HSCameraManagerBridgeModule.m; sourceTree = "<group>"; };
 		FC845E1F22B992BB00522016 /* HSCameraManagerBridgeModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSCameraManagerBridgeModule.h; sourceTree = "<group>"; };
+		FC845E5E22B9ABF600522016 /* HSEffectManager.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSEffectManager.swift; sourceTree = "<group>"; tabWidth = 2; };
+		FC845E6122B9AEED00522016 /* HSEffectManagerBridgeModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HSEffectManagerBridgeModule.m; sourceTree = "<group>"; };
+		FC845E6322B9AEF500522016 /* HSEffectManagerBridgeModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSEffectManagerBridgeModule.h; sourceTree = "<group>"; };
+		FC845E6422B9B0B700522016 /* HSCameraEffectView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSCameraEffectView.swift; sourceTree = "<group>"; tabWidth = 2; };
+		FC845E6722B9B1BC00522016 /* HSCameraEffectViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HSCameraEffectViewManager.m; sourceTree = "<group>"; };
+		FC845E6922B9B1C500522016 /* HSCameraEffectViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSCameraEffectViewManager.h; sourceTree = "<group>"; };
+		FC845E6A22B9B30000522016 /* HSCameraManagerDepthDataDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSCameraManagerDepthDataDelegate.swift; sourceTree = "<group>"; };
 		FCFC983A22AC7CD20089D452 /* HSReactNativeCamera-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HSReactNativeCamera-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -75,7 +87,8 @@
 		FC73F2F522B02C20009B6D9F /* views */ = {
 			isa = PBXGroup;
 			children = (
-				FC845E1C22B98F2100522016 /* HSCameraPreviewView */,
+				FC845E6622B9B10E00522016 /* HSCameraEffectView */,
+				FC845E1C22B98F2100522016 /* HSCameraView */,
 			);
 			path = views;
 			sourceTree = "<group>";
@@ -83,6 +96,7 @@
 		FC73F2F622B02D56009B6D9F /* modules */ = {
 			isa = PBXGroup;
 			children = (
+				FC845E6022B9AC4B00522016 /* HSEffectManager */,
 				FC7B9EB022B97EF40012D8D6 /* HSCameraManager */,
 			);
 			path = modules;
@@ -93,6 +107,7 @@
 			children = (
 				FC7B9EAA22B97DB40012D8D6 /* HSCameraManager.swift */,
 				FC7B9EAC22B97EB90012D8D6 /* HSCameraManagerDelegate.swift */,
+				FC845E6A22B9B30000522016 /* HSCameraManagerDepthDataDelegate.swift */,
 				FC7B9EAE22B97EED0012D8D6 /* HSCameraSetupResult.swift */,
 				FC845E1D22B992B200522016 /* HSCameraManagerBridgeModule.m */,
 				FC845E1F22B992BB00522016 /* HSCameraManagerBridgeModule.h */,
@@ -100,14 +115,34 @@
 			path = HSCameraManager;
 			sourceTree = "<group>";
 		};
-		FC845E1C22B98F2100522016 /* HSCameraPreviewView */ = {
+		FC845E1C22B98F2100522016 /* HSCameraView */ = {
 			isa = PBXGroup;
 			children = (
-				FC845E1722B98D6300522016 /* HSCameraPreviewView.swift */,
-				FC845E1B22B98E5F00522016 /* HSCameraPreviewViewManager.h */,
-				FC845E1922B98E5600522016 /* HSCameraPreviewViewManager.m */,
+				FC845E1722B98D6300522016 /* HSCameraView.swift */,
+				FC845E1B22B98E5F00522016 /* HSCameraViewManager.h */,
+				FC845E1922B98E5600522016 /* HSCameraViewManager.m */,
 			);
-			path = HSCameraPreviewView;
+			path = HSCameraView;
+			sourceTree = "<group>";
+		};
+		FC845E6022B9AC4B00522016 /* HSEffectManager */ = {
+			isa = PBXGroup;
+			children = (
+				FC845E5E22B9ABF600522016 /* HSEffectManager.swift */,
+				FC845E6122B9AEED00522016 /* HSEffectManagerBridgeModule.m */,
+				FC845E6322B9AEF500522016 /* HSEffectManagerBridgeModule.h */,
+			);
+			path = HSEffectManager;
+			sourceTree = "<group>";
+		};
+		FC845E6622B9B10E00522016 /* HSCameraEffectView */ = {
+			isa = PBXGroup;
+			children = (
+				FC845E6422B9B0B700522016 /* HSCameraEffectView.swift */,
+				FC845E6722B9B1BC00522016 /* HSCameraEffectViewManager.m */,
+				FC845E6922B9B1C500522016 /* HSCameraEffectViewManager.h */,
+			);
+			path = HSCameraEffectView;
 			sourceTree = "<group>";
 		};
 		FCA0A4C122ACC92700A93C32 /* utils */ = {
@@ -187,14 +222,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC845E6222B9AEED00522016 /* HSEffectManagerBridgeModule.m in Sources */,
+				FC845E6B22B9B30000522016 /* HSCameraManagerDepthDataDelegate.swift in Sources */,
+				FC845E6822B9B1BC00522016 /* HSCameraEffectViewManager.m in Sources */,
 				FC7B9EAD22B97EB90012D8D6 /* HSCameraManagerDelegate.swift in Sources */,
 				FC7B9EAF22B97EED0012D8D6 /* HSCameraSetupResult.swift in Sources */,
 				FC845E1E22B992B200522016 /* HSCameraManagerBridgeModule.m in Sources */,
+				FC845E6522B9B0B700522016 /* HSCameraEffectView.swift in Sources */,
 				FC845E1622B98A3D00522016 /* cameraUtils.swift in Sources */,
-				FC845E1A22B98E5600522016 /* HSCameraPreviewViewManager.m in Sources */,
+				FC845E5F22B9ABF600522016 /* HSEffectManager.swift in Sources */,
+				FC845E1A22B98E5600522016 /* HSCameraViewManager.m in Sources */,
 				FC7B9EB222B980F60012D8D6 /* permissionsUtils.swift in Sources */,
 				FC7B9EAB22B97DB40012D8D6 /* HSCameraManager.swift in Sources */,
-				FC845E1822B98D6300522016 /* HSCameraPreviewView.swift in Sources */,
+				FC845E1822B98D6300522016 /* HSCameraView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -239,7 +279,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -277,7 +317,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;

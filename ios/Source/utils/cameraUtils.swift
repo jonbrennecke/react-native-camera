@@ -1,7 +1,19 @@
 import AVFoundation
 
+@available(iOS 11.1, *)
+internal func captureDevice(withPosition position: AVCaptureDevice.Position) -> AVCaptureDevice? {
+  if let device = AVCaptureDevice.default(.builtInDualCamera, for: .video, position: position) {
+    return device
+  }
+  if let device = AVCaptureDevice.default(.builtInTrueDepthCamera, for: .video, position: position) {
+    return device
+  }
+  let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: .video, position: position)
+  return discoverySession.devices.first
+}
+
 @available(iOS 10.0, *)
-func getOppositeCamera(session: AVCaptureSession) -> AVCaptureDevice? {
+internal func getOppositeCamera(session: AVCaptureSession) -> AVCaptureDevice? {
   let position = getOppositeCameraPosition(session: session)
   return AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: position)
 }

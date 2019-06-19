@@ -19,9 +19,9 @@
 RCT_EXPORT_MODULE(HSCameraManager)
 
 RCT_EXPORT_METHOD(requestCameraPermissions : (RCTResponseSenderBlock)callback) {
-    [HSCameraManager requestCameraPermissions:^(BOOL success) {
-        callback(@[ [NSNull null], @(success) ]);
-    }];
+  [HSCameraManager requestCameraPermissions:^(BOOL success) {
+    callback(@[ [NSNull null], @(success) ]);
+  }];
 }
 
 RCT_EXPORT_METHOD(startCameraPreview) {
