@@ -25,9 +25,17 @@ class HSEffectManager: NSObject {
 
   @objc(sharedInstance)
   public static let shared = HSEffectManager()
+  
+  private static let queue = DispatchQueue(label: "effect queue")
 
   @objc(applyEffectWithDepthData:)
-  public func applyEffect(with originalDepthData: AVDepthData) {
+  public func applyEffect(with depthData: AVDepthData) {
+    HSEffectManager.queue.async {
+      self.applyEffectOnBackgroundQueue(with: depthData)
+    }
+  }
+  
+  private func applyEffectOnBackgroundQueue(with originalDepthData: AVDepthData) {
     let depthData = originalDepthData.converting(toDepthDataType: kCVPixelFormatType_DepthFloat32)
     let depthBuffer = depthData.depthDataMap
     CVPixelBufferLockBaseAddress(depthBuffer, .readOnly)
@@ -57,18 +65,12 @@ class HSEffectManager: NSObject {
       return y * (pixelBufferBytesPerRow / MemoryLayout<Float32>.size) + x
     }
     
-
     for y in 0 ..< Int(pixelSize.height) {
       for x in 0 ..< Int(pixelSize.width) {
         let value = pixelBufferPtr[pixelBufferIndex(x, y)]
         let depth = UInt8((min(value, maxDepth) / maxDepth) * 255)
-        
-        // byte value at index
         let i = byteIndex(x, y)
         bytes[i] = depth
-//        bytes[i + 1] = depth
-//        bytes[i + 2] = depth
-//        bytes[i + 3] = depth
       }
     }
 
@@ -81,7 +83,7 @@ class HSEffectManager: NSObject {
       return
     }
     let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.none.rawValue)
-    effectLayer.contents = CGImage(
+    let image = CGImage(
       width: Int(pixelSize.width),
       height: Int(pixelSize.height),
       bitsPerComponent: Int(8),
@@ -94,6 +96,9 @@ class HSEffectManager: NSObject {
       shouldInterpolate: true,
       intent: .defaultIntent
     )
+    DispatchQueue.main.async {
+      self.effectLayer.contents = image
+    }
   }
 }
 
