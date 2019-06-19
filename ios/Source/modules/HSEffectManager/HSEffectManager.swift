@@ -14,11 +14,14 @@ class HSEffectManager: NSObject {
     static let transparent = Pixel(a: 0, r: 0, g: 0, b: 0)
   }
 
-  internal let effectLayer = CALayer()
+  internal lazy var effectLayer: CALayer = {
+    let layer = CALayer()
+    layer.contentsGravity = .resizeAspectFill
+    layer.isGeometryFlipped = true
+    return layer
+  }()
   
   private let colorSpace = CGColorSpaceCreateDeviceRGB()
-
-  private var image: CGImage?
 
   @objc(sharedInstance)
   public static let shared = HSEffectManager()
@@ -28,49 +31,61 @@ class HSEffectManager: NSObject {
     let depthData = originalDepthData.converting(toDepthDataType: kCVPixelFormatType_DepthFloat32)
     let depthBuffer = depthData.depthDataMap
     CVPixelBufferLockBaseAddress(depthBuffer, .readOnly)
-    let size = sizeOf(buffer: depthBuffer)
-    let length = Int(size.width * size.height)
+    
+    let pixelSize = sizeOf(buffer: depthBuffer)
+    let pixelBufferBytesPerRow = CVPixelBufferGetBytesPerRow(depthBuffer)
+    let ptr = unsafeBitCast(CVPixelBufferGetBaseAddress(depthBuffer), to: UnsafeMutablePointer<Float32>.self)
+    let ptrLength = Int(pixelSize.height) * pixelBufferBytesPerRow / MemoryLayout<Float32>.size + Int(pixelSize.width)
+    let maxDepth = max(ptr: ptr, count: ptrLength)
+    
+    let bytesPerRow = Int(pixelSize.width) * MemoryLayout<Float32>.size
+    let dataByteLength = Int(pixelSize.height) * bytesPerRow
+    
+    guard
+      let data = CFDataCreateMutable(kCFAllocatorDefault, dataByteLength),
+      let bytes = CFDataGetMutableBytePtr(data)
+      else {
+        return
+    }
+    CFDataSetLength(data, dataByteLength)
+    
+    let byteIndex = { (x: Int, y: Int) -> Int in
+      return (y * bytesPerRow) + x * MemoryLayout<Float32>.size
+    }
+    
+    let pixelBufferIndex = { (x: Int, y: Int) -> Int in
+      return y * (pixelBufferBytesPerRow / MemoryLayout<Float32>.size) + x
+    }
 
-//    guard
-//      let data = CFDataCreateMutable(kCFAllocatorDefault, length),
-//      let bytes = CFDataGetMutableBytePtr(data)
-//    else {
-//      return
-//    }
-//    CFDataSetLength(data, length)
-
-    let bytesPerRow = CVPixelBufferGetBytesPerRow(depthBuffer)
-    let floatBuffer = unsafeBitCast(CVPixelBufferGetBaseAddress(depthBuffer), to: UnsafeMutablePointer<Float32>.self)
-    let maxDepth = max(data: floatBuffer, count: Int(size.height) * bytesPerRow / 4 + Int(size.width))
-    var pixels = Array<Pixel>(repeating: .transparent, count: length)
-
-    for x in 0 ..< Int(size.width) {
-      for y in 0 ..< Int(size.height) {
-        let arrayIndex = (y * Int(size.width)) + x
-        let bufferIndex = y * (bytesPerRow / 4) + x
-        let value = floatBuffer[bufferIndex]
+    for y in 0 ..< Int(pixelSize.height) {
+      for x in 0 ..< Int(pixelSize.width) {
+        let value = ptr[pixelBufferIndex(x, y)]
         let depth = UInt8((min(value, maxDepth) / maxDepth) * 255)
-        pixels[arrayIndex] = Pixel(a: 255, r: depth, g: depth, b: depth)
+        
+        // byte value at index
+        let i = byteIndex(x, y)
+        bytes[i] = 255
+        bytes[i + 1] = depth
+        bytes[i + 2] = depth
+        bytes[i + 3] = depth
       }
     }
 
-    let data = NSData(bytes: &pixels, length: length * MemoryLayout<Int>.size)
-    updateImage(size: size, data: data)
+    updateImage(pixelSize: pixelSize, data: data)
     CVPixelBufferUnlockBaseAddress(depthBuffer, .readOnly)
   }
 
-  private func updateImage(size: CGSize, data: CFData) {
+  private func updateImage(pixelSize: CGSize, data: CFData) {
     guard let provider = CGDataProvider(data: data) else {
       return
     }
     let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue)
-//    let imageSource = CGImageSourceCreateWithDataProvider(provider, nil)
-    image = CGImage(
-      width: Int(size.width),
-      height: Int(size.height),
+    effectLayer.contents = CGImage(
+      width: Int(pixelSize.width),
+      height: Int(pixelSize.height),
       bitsPerComponent: Int(8),
-      bitsPerPixel: Int(32),
-      bytesPerRow: Int(size.width) * 4, // Int(MemoryLayout<Int>.size * 4),
+      bitsPerPixel: MemoryLayout<Float32>.size * 8,
+      bytesPerRow: Int(pixelSize.width) * MemoryLayout<Float32>.size,
       space: colorSpace,
       bitmapInfo: bitmapInfo,
       provider: provider,
@@ -78,16 +93,13 @@ class HSEffectManager: NSObject {
       shouldInterpolate: true,
       intent: .defaultIntent
     )
-    effectLayer.contents = image
-    effectLayer.contentsGravity = .resizeAspectFill
-    effectLayer.isGeometryFlipped = true
   }
 }
 
-fileprivate func max(data: UnsafeMutablePointer<Float32>, count: Int) -> Float32 {
+fileprivate func max(ptr: UnsafeMutablePointer<Float32>, count: Int) -> Float32 {
   var currentMax = Float32(0)
   for i in 0 ..< count {
-    let value = data[i]
+    let value = ptr[i]
     if value > currentMax {
       currentMax = value
     }
