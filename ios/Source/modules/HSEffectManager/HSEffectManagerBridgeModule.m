@@ -14,15 +14,19 @@ RCT_EXPORT_MODULE(HSEffectManager)
 - (instancetype)init {
   self = [super init];
   if (self) {
-    HSCameraManager.sharedInstance.depthDelegate = self;
+      if (@available(iOS 11.1, *)) {
+          HSCameraManager.sharedInstance.depthDelegate = self;
+      } else {
+          // Fallback on earlier versions
+      }
   }
   return self;
 }
 
 RCT_EXPORT_METHOD(startEffects) { NSLog(@"starting effects"); }
 
-- (void)cameraManagerDidOutputDepthData:(AVDepthData *)depthData {
-  [HSEffectManager.sharedInstance applyEffectWithDepthData:depthData];
+- (void)cameraManagerDidOutputDepthData:(AVDepthData *)depthData videoData:(CMSampleBufferRef*)videoData {
+    [HSEffectManager.sharedInstance applyEffectWithDepthData:depthData videoData:videoData];
 }
 
 @end

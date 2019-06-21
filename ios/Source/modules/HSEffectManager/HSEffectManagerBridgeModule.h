@@ -6,5 +6,5 @@
 @class HSEffectManagerBridgeModule;
 @interface HSEffectManagerBridgeModule
     : NSObject <RCTBridgeModule, HSCameraManagerDepthDataDelegate>
-- (void)cameraManagerDidOutputDepthData:(AVDepthData *)depthData;
+- (void)cameraManagerDidOutputDepthData:(AVDepthData *)depthData videoData:(CMSampleBufferRef*)videoData;
 @end

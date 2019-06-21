@@ -6,15 +6,17 @@ import Photos
 class HSCameraManager: NSObject {
   internal var captureSession = AVCaptureSession()
 
-  private var videoOutput = AVCaptureVideoDataOutput()
-  private var videoFileOutput = AVCaptureMovieFileOutput()
-  private var depthOutput = AVCaptureDepthDataOutput()
+  private let sessionQueue = DispatchQueue(label: "session queue")
+  private let videoOutput = AVCaptureVideoDataOutput()
+  private let videoFileOutput = AVCaptureMovieFileOutput()
+  private let depthOutput = AVCaptureDepthDataOutput()
+  
+  private lazy var outputSynchronizer = AVCaptureDataOutputSynchronizer(dataOutputs: [depthOutput, videoOutput])
+  
   private var videoCaptureDevice: AVCaptureDevice?
   private var videoCaptureDeviceInput: AVCaptureDeviceInput?
   private var audioCaptureDevice: AVCaptureDevice?
   private var audioCaptureDeviceInput: AVCaptureDeviceInput?
-  private var outputSynchronizer: AVCaptureDataOutputSynchronizer?
-  private let sessionQueue = DispatchQueue(label: "session queue")
 
   @objc(sharedInstance)
   public static let shared = HSCameraManager()
@@ -111,9 +113,6 @@ class HSCameraManager: NSObject {
     guard let videoCaptureDevice = videoCaptureDevice else {
       return .failure
     }
-    if videoCaptureDevice.isFocusModeSupported(.autoFocus) {
-      videoCaptureDevice.focusMode = .autoFocus
-    }
 
     // setup videoCaptureDeviceInput
     videoCaptureDeviceInput = try? AVCaptureDeviceInput(device: videoCaptureDevice)
@@ -134,15 +133,16 @@ class HSCameraManager: NSObject {
       return .failure
     }
 
-    outputSynchronizer = AVCaptureDataOutputSynchronizer(dataOutputs: [depthOutput, videoOutput])
-    outputSynchronizer?.setDelegate(self, queue: sessionQueue)
+    outputSynchronizer.setDelegate(self, queue: sessionQueue)
 
-    // setup videoFileOutput
-    if captureSession.canAddOutput(videoFileOutput) {
-      captureSession.addOutput(videoFileOutput)
-    } else {
-      return .failure
-    }
+//    TODO adding this breaks the depth output synchronizer
+// setup videoFileOutput
+//    if captureSession.canAddOutput(videoFileOutput) {
+//      captureSession.addOutput(videoFileOutput)
+//    } else {
+//      return .failure
+//    }
+
     return .success
   }
 
@@ -168,7 +168,7 @@ class HSCameraManager: NSObject {
 
   private func setupDepthOutput() -> HSCameraSetupResult {
     depthOutput.alwaysDiscardsLateDepthData = true
-    depthOutput.isFilteringEnabled = true
+    depthOutput.isFilteringEnabled = false // Don't filter depth data; the built in filter is not very good
     depthOutput.setDelegate(self, callbackQueue: sessionQueue)
     if captureSession.canAddOutput(depthOutput) {
       captureSession.addOutput(depthOutput)
@@ -241,22 +241,28 @@ class HSCameraManager: NSObject {
 
 @available(iOS 11.1, *)
 extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
-  func dataOutputSynchronizer(_: AVCaptureDataOutputSynchronizer, didOutput synchronizedDataCollection: AVCaptureSynchronizedDataCollection) {
+  func dataOutputSynchronizer(_: AVCaptureDataOutputSynchronizer, didOutput collection: AVCaptureSynchronizedDataCollection) {
     guard
       let delegate = depthDelegate,
-      let depthData = synchronizedDataCollection.synchronizedData(for: depthOutput) as? AVCaptureSynchronizedDepthData
-    // TODO: let videoData = synchronizedDataCollection.synchronizedData(for: videoOutput) as? AVCaptureSynchronizedSampleBufferData
+      let depthData = collection.synchronizedData(for: depthOutput) as? AVCaptureSynchronizedDepthData,
+      let videoData = collection.synchronizedData(for: videoOutput) as? AVCaptureSynchronizedSampleBufferData
     else {
       return
     }
-    delegate.cameraManagerDidOutput(depthData: depthData.depthData)
+    
+    // Check if data was dropped for any reason
+    if depthData.depthDataWasDropped || videoData.sampleBufferWasDropped {
+      return
+    }
+
+    delegate.cameraManagerDidOutput(depthData: depthData.depthData, videoData: videoData.sampleBuffer)
   }
 }
 
 @available(iOS 11.1, *)
 extension HSCameraManager: AVCaptureDepthDataOutputDelegate {
   func depthDataOutput(_: AVCaptureDepthDataOutput, didOutput depthData: AVDepthData, timestamp _: CMTime, connection _: AVCaptureConnection) {
-    depthDelegate?.cameraManagerDidOutput(depthData: depthData)
+//    Unused
   }
 }
 
