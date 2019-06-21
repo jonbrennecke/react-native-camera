@@ -4,6 +4,6 @@ struct Size<T> {
 }
 
 struct Index<T> {
-    let x: T
-    let y: T
+  let x: T
+  let y: T
 }

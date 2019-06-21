@@ -9,7 +9,7 @@ class HSEffectManager: NSObject {
     let layer = CALayer()
     layer.contentsGravity = .resizeAspectFill
     layer.isGeometryFlipped = false
-//    layer.opacity = 0.9
+    layer.opacity = 0.9
     return layer
   }()
 
@@ -23,13 +23,13 @@ class HSEffectManager: NSObject {
   private static let queue = DispatchQueue(label: "effect queue")
 
   @objc(applyEffectWithDepthData:videoData:)
-  public func applyEffect(with depthData: AVDepthData, videoData: CMSampleBuffer) {
+  public func applyEffect(with depthData: AVDepthData, videoSampleBuffer: CMSampleBuffer) {
     HSEffectManager.queue.async {
-      self.applyEffectOnBackgroundQueue(with: depthData, videoData: videoData)
+      self.applyEffectOnBackgroundQueue(with: depthData, videoSampleBuffer: videoSampleBuffer)
     }
   }
 
-  private func applyEffectOnBackgroundQueue(with originalDepthData: AVDepthData, videoData: CMSampleBuffer) {
+  private func applyEffectOnBackgroundQueue(with originalDepthData: AVDepthData, videoSampleBuffer: CMSampleBuffer) {
     let depthData = originalDepthData.converting(toDepthDataType: kCVPixelFormatType_DisparityFloat32)
     let depthBuffer = depthData.depthDataMap
     CVPixelBufferLockBaseAddress(depthBuffer, .readOnly)
@@ -44,27 +44,7 @@ class HSEffectManager: NSObject {
     let length = pixelSize.width * pixelSize.height
     var pixelValues = [UInt8](repeating: 0, count: length)
 
-//    let partialDerivativeX = { (x: Int, y: Int) -> Float32 in
-//      symmetricDerivative(x, 8) { x in
-//        let pixel = pixelBufferPtr[pixelBufferIndex(clamp(x, min: 0, max: pixelSize.width), y)]
-//        return normalize(pixel, min: minDepth, max: maxDepth)
-//      }
-//    }
-//
-//    let partialDerivativeY = { (x: Int, y: Int) -> Float32 in
-//      symmetricDerivative(y, 8) { y in
-//        let pixel = pixelBufferPtr[pixelBufferIndex(x, clamp(y, min: 0, max: pixelSize.height))]
-//        return normalize(pixel, min: minDepth, max: maxDepth)
-//      }
-//    }
-//
-//    let derivative = { (x: Int, y: Int) -> Float32 in
-//      let pdX = partialDerivativeX(x, y)
-//      let pdY = partialDerivativeY(x, y)
-//      return abs((pdX - pdY) / 2)
-//    })
-    
-    // TODO: find average of area
+    // TODO: find average of area + use face tracking to estimate subject
     let depthAtRegionOfInterest = { () -> Float32 in
       let center = Index(x: pixelSize.width / 2, y: pixelSize.height / 2)
       let pixelBufferIndex = arrayIndex(for: pixelBufferBytesPerRow, x: center.x, y: center.y)
@@ -74,9 +54,9 @@ class HSEffectManager: NSObject {
       }
       return normalize(depthValue, min: minDepth, max: maxDepth)
     }
-    
+
     let regionDepth = depthAtRegionOfInterest()
-    let regionRange = regionDepth-0.15 ... regionDepth+0.15
+    let regionRange = regionDepth - 0.15 ... regionDepth + 0.15
 
     loop(size: pixelSize) { x, y in
       let pixelBufferIndex = arrayIndex(for: pixelBufferBytesPerRow, x: x, y: y)
@@ -87,43 +67,58 @@ class HSEffectManager: NSObject {
       }
       let depth = normalize(depthValue, min: minDepth, max: maxDepth)
       if depth < regionRange.lowerBound {
-        pixelValues[arrayIndex(for: pixelSize.width, x: x, y: y)] = 0
+        pixelValues[arrayIndex(for: pixelSize.width, x: x, y: y)] = 0 // background
+        return
+      } else if depth > regionRange.upperBound {
+        pixelValues[arrayIndex(for: pixelSize.width, x: x, y: y)] = 255 // foreground
         return
       }
-      else if depth > regionRange.upperBound {
-        pixelValues[arrayIndex(for: pixelSize.width, x: x, y: y)] = 255
-        return
-      }
-      let adjustedDepth = normalize(depth, min: regionRange.lowerBound, max: regionRange.upperBound)
-      let depthPixelValue = UInt8(adjustedDepth * 255)
-      pixelValues[arrayIndex(for: pixelSize.width, x: x, y: y)] = depthPixelValue
+//      let adjustedDepth = normalize(depth, min: regionRange.lowerBound, max: regionRange.upperBound)
+//      let depthPixelValue = UInt8(adjustedDepth * 255)
+      pixelValues[arrayIndex(for: pixelSize.width, x: x, y: y)] = 255
     }
 
     CVPixelBufferUnlockBaseAddress(depthBuffer, .readOnly)
 
-    if let image = createImage(
-      pixelValues: pixelValues,
-      imageSize: pixelSize,
-      colorSpace: colorSpace,
-      bitmapInfo: bitmapInfo
-    ) {
-      applyFilters(image: image)
+    if
+      let depthImage = createCIImage(
+        pixelValues: pixelValues,
+        imageSize: pixelSize,
+        colorSpace: colorSpace,
+        bitmapInfo: bitmapInfo
+      ),
+      let foregroundImage = createCIImage(with: videoSampleBuffer) {
+      let maskScaleFactor = Float(foregroundImage.extent.width) / Float(pixelSize.width)
+      let maskImage = createMask(depthImage: depthImage, scale: maskScaleFactor)
+      let backgroundImage = CIImage(color: CIColor(red: 1, green: 0, blue: 0))
+        .cropped(to: foregroundImage.extent)
+      applyMask(foreground: foregroundImage, background: backgroundImage, mask: maskImage)
     }
   }
 
-  func applyFilters(image: CGImage) {
-    let ciImage = CIImage(cgImage: image)
+  func createMask(depthImage: CIImage, scale: Float) -> CIImage {
     let blurRadius = 2
-    let flipTransform = CGAffineTransform(scaleX: -1, y: 1)
-    let ciImageWithContrast = ciImage
+    return depthImage
       .clampedToExtent()
       .applyingFilter("CIGaussianBlur", parameters: ["inputRadius": blurRadius])
-      .cropped(to: ciImage.extent)
+      .cropped(to: depthImage.extent)
+      .applyingFilter("CILanczosScaleTransform", parameters: [
+        "inputScale": scale
+//        "inputAspectRatio": 1.0
+      ])
+  }
+
+  func applyMask(foreground foregroundImage: CIImage, background backgroundImage: CIImage, mask maskImage: CIImage) {
+    let flipTransform = CGAffineTransform(scaleX: -1, y: 1)
+    let parameters = ["inputMaskImage": maskImage, "inputBackgroundImage": backgroundImage]
+    let maskedImage = foregroundImage
+      .applyingFilter("CIBlendWithMask", parameters: parameters)
       .applyingFilter("CIAffineTransform", parameters: ["inputTransform": flipTransform])
-    
-    guard let cgImage = context.createCGImage(ciImageWithContrast, from: ciImageWithContrast.extent) else {
+
+    guard let cgImage = context.createCGImage(maskedImage, from: maskedImage.extent) else {
       return
     }
+
     DispatchQueue.main.async {
       self.effectLayer.contents = cgImage
     }
@@ -165,29 +160,4 @@ fileprivate func loop(size: Size<Int>, _ callback: (Int, Int) -> Void) {
       callback(x, y)
     }
   }
-}
-
-// MARK: - math functions
-
-internal func normalize<T: FloatingPoint>(_ x: T, min: T, max: T) -> T {
-  return (x - min) / (max - min)
-}
-
-internal func clamp<T: FloatingPoint>(_ x: T, min xMin: T, max xMax: T) -> T {
-  if x.isNaN {
-    return xMin
-  }
-  return max(min(x, xMax), xMin)
-}
-
-internal func clamp<T: SignedInteger>(_ x: T, min xMin: T, max xMax: T) -> T {
-  return max(min(x, xMax), xMin)
-}
-
-internal func symmetricDerivative(_ x: Int, _ h: Int, _ f: (Int) -> Float32) -> Float32 {
-  return (f(x + h) - f(x - h)) / 2 * Float32(h)
-}
-
-internal func symmetricSecondDerivative(_ x: Int, _ h: Int, _ f: (Int) -> Float32) -> Float32 {
-  return (f(x + h) - 2 * f(x) + f(x - h)) / Float32(h * h)
 }

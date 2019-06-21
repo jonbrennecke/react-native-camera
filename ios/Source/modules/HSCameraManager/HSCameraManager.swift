@@ -10,9 +10,9 @@ class HSCameraManager: NSObject {
   private let videoOutput = AVCaptureVideoDataOutput()
   private let videoFileOutput = AVCaptureMovieFileOutput()
   private let depthOutput = AVCaptureDepthDataOutput()
-  
+
   private lazy var outputSynchronizer = AVCaptureDataOutputSynchronizer(dataOutputs: [depthOutput, videoOutput])
-  
+
   private var videoCaptureDevice: AVCaptureDevice?
   private var videoCaptureDeviceInput: AVCaptureDeviceInput?
   private var audioCaptureDevice: AVCaptureDevice?
@@ -135,8 +135,8 @@ class HSCameraManager: NSObject {
 
     outputSynchronizer.setDelegate(self, queue: sessionQueue)
 
-//    TODO adding this breaks the depth output synchronizer
-// setup videoFileOutput
+//    TODO: adding this breaks the depth output synchronizer
+    // setup videoFileOutput
 //    if captureSession.canAddOutput(videoFileOutput) {
 //      captureSession.addOutput(videoFileOutput)
 //    } else {
@@ -249,7 +249,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
     else {
       return
     }
-    
+
     // Check if data was dropped for any reason
     if depthData.depthDataWasDropped || videoData.sampleBufferWasDropped {
       return
