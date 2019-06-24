@@ -9,7 +9,6 @@ class HSEffectManager: NSObject {
     let layer = CALayer()
     layer.contentsGravity = .resizeAspectFill
     layer.isGeometryFlipped = false
-    layer.opacity = 0.9
     return layer
   }()
 
@@ -57,25 +56,51 @@ class HSEffectManager: NSObject {
 
     let regionDepth = depthAtRegionOfInterest()
     let regionRange = regionDepth - 0.15 ... regionDepth + 0.15
+    
+    let depthAtIndex = { (x: Int, y: Int) -> Float32 in
+      let pixelBufferIndex = arrayIndex(for: pixelBufferBytesPerRow, x: x, y: y)
+      return pixelBufferPtr[pixelBufferIndex]
+    }
+    
+    let setPixel = { (x: Int, y: Int, value: UInt8) -> Void in
+      pixelValues[arrayIndex(for: pixelSize.width, x: x, y: y)] = value
+    }
 
     loop(size: pixelSize) { x, y in
-      let pixelBufferIndex = arrayIndex(for: pixelBufferBytesPerRow, x: x, y: y)
-      let depthValue = pixelBufferPtr[pixelBufferIndex]
+      let depthValue = depthAtIndex(x, y)
       if depthValue.isNaN {
-        pixelValues[arrayIndex(for: pixelSize.width, x: x, y: y)] = 0
+        // handle unknown values; this is due to the distance between the infrared sensor and receiver
+        for i in stride(from: x, to: x - 25, by: -1) {
+          let depthValue = depthAtIndex(i, y)
+          if depthValue.isNaN {
+            continue;
+          }
+          let depth = normalize(depthValue, min: minDepth, max: maxDepth)
+          if depth < regionRange.lowerBound {
+            setPixel(x, y, 0)
+            return
+          }
+          let adjustedDepth = normalize(depth, min: regionRange.lowerBound, max: regionRange.upperBound)
+          let depthPixelValue = UInt8(adjustedDepth * 255)
+          setPixel(x, y, depthPixelValue)
+          return
+        }
+        
+        setPixel(x, y, 0)
         return
       }
       let depth = normalize(depthValue, min: minDepth, max: maxDepth)
       if depth < regionRange.lowerBound {
-        pixelValues[arrayIndex(for: pixelSize.width, x: x, y: y)] = 0 // background
-        return
-      } else if depth > regionRange.upperBound {
-        pixelValues[arrayIndex(for: pixelSize.width, x: x, y: y)] = 255 // foreground
+        setPixel(x, y, 0)
         return
       }
-//      let adjustedDepth = normalize(depth, min: regionRange.lowerBound, max: regionRange.upperBound)
-//      let depthPixelValue = UInt8(adjustedDepth * 255)
-      pixelValues[arrayIndex(for: pixelSize.width, x: x, y: y)] = 255
+      if depth > regionRange.upperBound {
+        setPixel(x, y, 255)
+        return
+      }
+      let adjustedDepth = normalize(depth, min: regionRange.lowerBound, max: regionRange.upperBound)
+      let depthPixelValue = UInt8(adjustedDepth * 255)
+      setPixel(x, y, depthPixelValue)
     }
 
     CVPixelBufferUnlockBaseAddress(depthBuffer, .readOnly)
@@ -97,25 +122,23 @@ class HSEffectManager: NSObject {
   }
 
   func createMask(depthImage: CIImage, scale: Float) -> CIImage {
-    let blurRadius = 2
+    let blurRadius = 3
     return depthImage
       .clampedToExtent()
+      .applyingFilter("CINoiseReduction", parameters: ["inputNoiseLevel": 1, "inputSharpness": 0.4])
       .applyingFilter("CIGaussianBlur", parameters: ["inputRadius": blurRadius])
       .cropped(to: depthImage.extent)
-      .applyingFilter("CILanczosScaleTransform", parameters: [
-        "inputScale": scale
-//        "inputAspectRatio": 1.0
-      ])
+      .applyingFilter("CILanczosScaleTransform", parameters: ["inputScale": scale])
   }
 
   func applyMask(foreground foregroundImage: CIImage, background backgroundImage: CIImage, mask maskImage: CIImage) {
     let flipTransform = CGAffineTransform(scaleX: -1, y: 1)
-    let parameters = ["inputMaskImage": maskImage, "inputBackgroundImage": backgroundImage]
-    let maskedImage = foregroundImage
-      .applyingFilter("CIBlendWithMask", parameters: parameters)
+//    let parameters = ["inputMaskImage": maskImage, "inputBackgroundImage": backgroundImage]
+    let displayImage = maskImage
+//      .applyingFilter("CIBlendWithMask", parameters: parameters)
       .applyingFilter("CIAffineTransform", parameters: ["inputTransform": flipTransform])
 
-    guard let cgImage = context.createCGImage(maskedImage, from: maskedImage.extent) else {
+    guard let cgImage = context.createCGImage(displayImage, from: displayImage.extent) else {
       return
     }
 

@@ -58,7 +58,7 @@
 		FC845E6A22B9B30000522016 /* HSCameraManagerDepthDataDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSCameraManagerDepthDataDelegate.swift; sourceTree = "<group>"; };
 		FC845E7922BABE1200522016 /* Size.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Size.swift; sourceTree = "<group>"; };
 		FC845E7B22BC1BFE00522016 /* imageUtils.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = imageUtils.swift; sourceTree = "<group>"; tabWidth = 2; };
-		FC845E7D22BC843100522016 /* mathUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mathUtils.swift; sourceTree = "<group>"; };
+		FC845E7D22BC843100522016 /* mathUtils.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = mathUtils.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FCFC983A22AC7CD20089D452 /* HSReactNativeCamera-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HSReactNativeCamera-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
