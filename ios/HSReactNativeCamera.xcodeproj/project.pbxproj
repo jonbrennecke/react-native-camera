@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FC00944122CABD5A009DC2CE /* modelUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC00944022CABD5A009DC2CE /* modelUtils.swift */; };
+		FC00944E22CAC82F009DC2CE /* SegmentationModel.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = FC00944D22CAC82F009DC2CE /* SegmentationModel.mlmodel */; };
 		FC7B9EAB22B97DB40012D8D6 /* HSCameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7B9EAA22B97DB40012D8D6 /* HSCameraManager.swift */; };
 		FC7B9EAD22B97EB90012D8D6 /* HSCameraManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7B9EAC22B97EB90012D8D6 /* HSCameraManagerDelegate.swift */; };
 		FC7B9EAF22B97EED0012D8D6 /* HSCameraSetupResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7B9EAE22B97EED0012D8D6 /* HSCameraSetupResult.swift */; };
@@ -25,6 +27,16 @@
 		FC845E7E22BC843100522016 /* mathUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E7D22BC843100522016 /* mathUtils.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		FC71B6CA22CAB23A003EA230 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FC71B6C622CAB23A003EA230 /* HSCameraUtils.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FC71B66422CAAFCF003EA230;
+			remoteInfo = HSCameraUtils;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		58B511D91A9E6C8500147676 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -39,6 +51,9 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libHSReactNativeCamera.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libHSReactNativeCamera.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		FC00944022CABD5A009DC2CE /* modelUtils.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = modelUtils.swift; sourceTree = "<group>"; tabWidth = 2; };
+		FC00944D22CAC82F009DC2CE /* SegmentationModel.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = SegmentationModel.mlmodel; sourceTree = "<group>"; };
+		FC71B6C622CAB23A003EA230 /* HSCameraUtils.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HSCameraUtils.xcodeproj; path = "../../../../backflip-camera-utils/HSCameraUtils.xcodeproj"; sourceTree = "<group>"; };
 		FC7B9EAA22B97DB40012D8D6 /* HSCameraManager.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSCameraManager.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC7B9EAC22B97EB90012D8D6 /* HSCameraManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSCameraManagerDelegate.swift; sourceTree = "<group>"; };
 		FC7B9EAE22B97EED0012D8D6 /* HSCameraSetupResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSCameraSetupResult.swift; sourceTree = "<group>"; };
@@ -50,7 +65,7 @@
 		FC845E1D22B992B200522016 /* HSCameraManagerBridgeModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HSCameraManagerBridgeModule.m; sourceTree = "<group>"; };
 		FC845E1F22B992BB00522016 /* HSCameraManagerBridgeModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSCameraManagerBridgeModule.h; sourceTree = "<group>"; };
 		FC845E5E22B9ABF600522016 /* HSEffectManager.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSEffectManager.swift; sourceTree = "<group>"; tabWidth = 2; };
-		FC845E6122B9AEED00522016 /* HSEffectManagerBridgeModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HSEffectManagerBridgeModule.m; sourceTree = "<group>"; };
+		FC845E6122B9AEED00522016 /* HSEffectManagerBridgeModule.m */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.c.objc; path = HSEffectManagerBridgeModule.m; sourceTree = "<group>"; tabWidth = 2; };
 		FC845E6322B9AEF500522016 /* HSEffectManagerBridgeModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSEffectManagerBridgeModule.h; sourceTree = "<group>"; };
 		FC845E6422B9B0B700522016 /* HSCameraEffectView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSCameraEffectView.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC845E6722B9B1BC00522016 /* HSCameraEffectViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HSCameraEffectViewManager.m; sourceTree = "<group>"; };
@@ -87,7 +102,32 @@
 				FCFC983A22AC7CD20089D452 /* HSReactNativeCamera-Bridging-Header.h */,
 				FCDAC44F22AE01A6004A36E7 /* Source */,
 				134814211AA4EA7D00B7C361 /* Products */,
+				FC71B6C522CAB236003EA230 /* Libraries */,
 			);
+			sourceTree = "<group>";
+		};
+		FC00944422CABF2A009DC2CE /* models */ = {
+			isa = PBXGroup;
+			children = (
+				FC00944D22CAC82F009DC2CE /* SegmentationModel.mlmodel */,
+			);
+			path = models;
+			sourceTree = "<group>";
+		};
+		FC71B6C522CAB236003EA230 /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				FC71B6C622CAB23A003EA230 /* HSCameraUtils.xcodeproj */,
+			);
+			path = Libraries;
+			sourceTree = "<group>";
+		};
+		FC71B6C722CAB23A003EA230 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FC71B6CB22CAB23A003EA230 /* HSCameraUtils.framework */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		FC73F2F522B02C20009B6D9F /* views */ = {
@@ -159,6 +199,7 @@
 				FC845E7922BABE1200522016 /* Size.swift */,
 				FC845E7B22BC1BFE00522016 /* imageUtils.swift */,
 				FC845E7D22BC843100522016 /* mathUtils.swift */,
+				FC00944022CABD5A009DC2CE /* modelUtils.swift */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -166,6 +207,7 @@
 		FCDAC44F22AE01A6004A36E7 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				FC00944422CABF2A009DC2CE /* models */,
 				FC73F2F622B02D56009B6D9F /* modules */,
 				FC73F2F522B02C20009B6D9F /* views */,
 				FCA0A4C122ACC92700A93C32 /* utils */,
@@ -200,7 +242,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0830;
-				ORGANIZATIONNAME = Facebook;
+				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					58B511DA1A9E6C8500147676 = {
 						CreatedOnToolsVersion = 6.1.1;
@@ -219,12 +261,28 @@
 			mainGroup = 58B511D21A9E6C8500147676;
 			productRefGroup = 58B511D21A9E6C8500147676;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = FC71B6C722CAB23A003EA230 /* Products */;
+					ProjectRef = FC71B6C622CAB23A003EA230 /* HSCameraUtils.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				58B511DA1A9E6C8500147676 /* HSReactNativeCamera */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		FC71B6CB22CAB23A003EA230 /* HSCameraUtils.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = HSCameraUtils.framework;
+			remoteRef = FC71B6CA22CAB23A003EA230 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXSourcesBuildPhase section */
 		58B511D71A9E6C8500147676 /* Sources */ = {
@@ -234,6 +292,8 @@
 				FC845E6222B9AEED00522016 /* HSEffectManagerBridgeModule.m in Sources */,
 				FC845E6B22B9B30000522016 /* HSCameraManagerDepthDataDelegate.swift in Sources */,
 				FC845E6822B9B1BC00522016 /* HSCameraEffectViewManager.m in Sources */,
+				FC00944122CABD5A009DC2CE /* modelUtils.swift in Sources */,
+				FC00944E22CAC82F009DC2CE /* SegmentationModel.mlmodel in Sources */,
 				FC845E7C22BC1BFE00522016 /* imageUtils.swift in Sources */,
 				FC7B9EAD22B97EB90012D8D6 /* HSCameraManagerDelegate.swift in Sources */,
 				FC845E7E22BC843100522016 /* mathUtils.swift in Sources */,

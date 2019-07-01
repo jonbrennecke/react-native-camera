@@ -28,8 +28,12 @@ RCT_EXPORT_METHOD(start:(RCTResponseSenderBlock)callback) {
 
 - (void)cameraManagerDidOutputDepthData:(AVDepthData *)depthData
                               videoData:(CMSampleBufferRef)videoData {
-  [HSEffectManager.sharedInstance applyEffectWithDepthData:depthData
-                                                 videoData:videoData];
+  NSError *error;
+  [HSEffectManager.sharedInstance applyEffectWithDepthData:depthData videoData:videoData error:&error];
+  if (error) {
+    NSString * description = [NSString stringWithFormat:@"Error: %@", error.localizedDescription];
+    RCTMakeAndLogError(description, nil, nil);
+  }
 }
 
 @end
