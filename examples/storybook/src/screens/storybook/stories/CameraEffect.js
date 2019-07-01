@@ -6,7 +6,8 @@ import { SafeAreaView } from 'react-native';
 import {
   CameraEffect,
   requestCameraPermissions,
-  startCameraPreview
+  startCameraPreview,
+  startCameraEffects
 } from '@jonbrennecke/react-native-camera';
 
 import { StorybookAsyncWrapper } from '../utils';
@@ -20,7 +21,8 @@ const styles = {
 const loadAsync = async () => {
   try {
     await requestCameraPermissions();
-    startCameraPreview({ enableEffects: true });
+    startCameraPreview();
+    await startCameraEffects();
   }
   catch (error) {
     // eslint-disable-next-line no-console

@@ -13,16 +13,14 @@ export const requestCameraPermissions = async (): Promise<boolean> => {
   return CameraManager.requestCameraPermissionsAsync();
 };
 
-export type StartCameraPreviewParams = {
-  enableEffects?: boolean,
+export const startCameraPreview = () => {
+  CameraManager.startCameraPreview();
 };
 
-export const startCameraPreview = ({
-  enableEffects = false,
-}: StartCameraPreviewParams = {}) => {
-  CameraManager.startCameraPreview();
-  if (enableEffects) {
-    EffectManager.startEffects();
+export const startCameraEffects = async () => {
+  const success = await EffectManager.startAsync();
+  if (!success) {
+    throw new Error('Failed to start camera effects');
   }
 };
 
