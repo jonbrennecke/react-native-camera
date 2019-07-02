@@ -24,14 +24,11 @@
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
 		FC664F2B22CADAA000FD8AE7 /* libHSReactNativeCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FC7B9EA922B97A940012D8D6 /* libHSReactNativeCamera.a */; };
-		FC664F4222CADD7600FD8AE7 /* libHSCameraUtils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FC664F4122CADD7600FD8AE7 /* libHSCameraUtils.a */; };
 		FC6B60CF22AF63ED0060F828 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC6B60A022AF63EC0060F828 /* JavaScriptCore.framework */; };
 		FC6EA7D621CEA44D007C3B3E /* PassionOne-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FC6EA7AC21CEA44D007C3B3E /* PassionOne-Regular.ttf */; };
 		FC6EA7D721CEA44D007C3B3E /* PT_Sans-Web-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FC6EA7D421CEA44D007C3B3E /* PT_Sans-Web-Bold.ttf */; };
 		FC6EA7D821CEA44D007C3B3E /* PT_Sans-Web-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FC6EA7D521CEA44D007C3B3E /* PT_Sans-Web-Regular.ttf */; };
-		FC75EB2F22CAE8BA003AB14E /* HSReactNativeCameraShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC75EB2E22CAE8BA003AB14E /* HSReactNativeCameraShared.framework */; };
-		FC75EB3022CAE8BA003AB14E /* HSReactNativeCameraShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FC75EB2E22CAE8BA003AB14E /* HSReactNativeCameraShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		FC75EB5922CAEB58003AB14E /* SegmentationModel.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = FC75EB5822CAEB58003AB14E /* SegmentationModel.mlmodel */; };
+		FCBFAEEE22CBD7A100A0AC11 /* libHSCameraUtils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FC664F4122CADD7600FD8AE7 /* libHSCameraUtils.a */; };
 		FCDAA01C22AC8D8F00A2E246 /* Empty.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCDAA01B22AC8D8F00A2E246 /* Empty.swift */; };
 		FCFE3FA822CAD38F00F38015 /* libHSReactNativeCamera.a in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FC7B9EA922B97A940012D8D6 /* libHSReactNativeCamera.a */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -296,20 +293,6 @@
 			remoteGlobalIDString = ED296FEE214C9CF800B7C4FE;
 			remoteInfo = "jsiexecutor-tvOS";
 		};
-		FC75EB2D22CAE8BA003AB14E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FC7B9EA422B97A940012D8D6 /* HSReactNativeCamera.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = FC75EB1222CAE6EA003AB14E;
-			remoteInfo = HSReactNativeCameraShared;
-		};
-		FC75EB3122CAE8BA003AB14E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FC7B9EA422B97A940012D8D6 /* HSReactNativeCamera.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = FC75EB1122CAE6EA003AB14E;
-			remoteInfo = HSReactNativeCameraShared;
-		};
 		FC7B9EA822B97A940012D8D6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FC7B9EA422B97A940012D8D6 /* HSReactNativeCamera.xcodeproj */;
@@ -333,7 +316,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				FC75EB3022CAE8BA003AB14E /* HSReactNativeCameraShared.framework in Embed Frameworks */,
 				FCFE3FA822CAD38F00F38015 /* libHSReactNativeCamera.a in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -371,16 +353,17 @@
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
 		BD50A92D35494C8A876C6C03 /* libReactNativeNavigation.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libReactNativeNavigation.a; sourceTree = "<group>"; };
 		C58E7DD208D94D92847F0B1B /* libReactNativeConfig-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libReactNativeConfig-tvOS.a"; sourceTree = "<group>"; };
-		FC00941622CAB45D009DC2CE /* HSCameraUtils.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = HSCameraUtils.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC664F4122CADD7600FD8AE7 /* libHSCameraUtils.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libHSCameraUtils.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC6B60A022AF63EC0060F828 /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FC6EA7AC21CEA44D007C3B3E /* PassionOne-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PassionOne-Regular.ttf"; path = "../assets/fonts/PassionOne-Regular.ttf"; sourceTree = "<group>"; };
 		FC6EA7D421CEA44D007C3B3E /* PT_Sans-Web-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PT_Sans-Web-Bold.ttf"; path = "../assets/fonts/PT_Sans-Web-Bold.ttf"; sourceTree = "<group>"; };
 		FC6EA7D521CEA44D007C3B3E /* PT_Sans-Web-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PT_Sans-Web-Regular.ttf"; path = "../assets/fonts/PT_Sans-Web-Regular.ttf"; sourceTree = "<group>"; };
-		FC75EB5822CAEB58003AB14E /* SegmentationModel.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = SegmentationModel.mlmodel; sourceTree = "<group>"; };
 		FC7B9EA422B97A940012D8D6 /* HSReactNativeCamera.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HSReactNativeCamera.xcodeproj; path = ../../../ios/HSReactNativeCamera.xcodeproj; sourceTree = "<group>"; };
+		FCBFAF0622CBDB0200A0AC11 /* PromiseKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PromiseKit.framework; path = "../../../../../../../Library/Developer/Xcode/DerivedData/Storybook-aykofoufjpltyqchwrnbfzpoimmw/Build/Products/Debug-iphoneos/PromiseKit.framework"; sourceTree = "<group>"; };
 		FCDAA01A22AC8D8E00A2E246 /* Storybook-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Storybook-Bridging-Header.h"; sourceTree = "<group>"; };
 		FCDAA01B22AC8D8F00A2E246 /* Empty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Empty.swift; sourceTree = "<group>"; };
+		FCEAB5EE22CB153B00176014 /* libHSCameraUtils.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libHSCameraUtils.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		FCF7C7A322CAF5C200DC2903 /* libHSReactNativeCamera.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHSReactNativeCamera.a; path = "../../../../../../../Library/Developer/Xcode/DerivedData/Storybook-aykofoufjpltyqchwrnbfzpoimmw/Build/Products/Debug-iphoneos/libHSReactNativeCamera.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -388,9 +371,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FC75EB2F22CAE8BA003AB14E /* HSReactNativeCameraShared.framework in Frameworks */,
 				FC6B60CF22AF63ED0060F828 /* JavaScriptCore.framework in Frameworks */,
-				FC664F4222CADD7600FD8AE7 /* libHSCameraUtils.a in Frameworks */,
+				FCBFAEEE22CBD7A100A0AC11 /* libHSCameraUtils.a in Frameworks */,
 				FC664F2B22CADAA000FD8AE7 /* libHSReactNativeCamera.a in Frameworks */,
 				ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */,
 				11D1A2F320CAFA9E000508D9 /* libRCTAnimation.a in Frameworks */,
@@ -532,8 +514,10 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FCBFAF0622CBDB0200A0AC11 /* PromiseKit.framework */,
+				FCEAB5EE22CB153B00176014 /* libHSCameraUtils.a */,
+				FCF7C7A322CAF5C200DC2903 /* libHSReactNativeCamera.a */,
 				FC664F4122CADD7600FD8AE7 /* libHSCameraUtils.a */,
-				FC00941622CAB45D009DC2CE /* HSCameraUtils.framework */,
 				FC6B60A022AF63EC0060F828 /* JavaScriptCore.framework */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
 			);
@@ -590,7 +574,6 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				FC75EB5822CAEB58003AB14E /* SegmentationModel.mlmodel */,
 				13B07FAE1A68108700A75B9A /* Storybook */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* StorybookTests */,
@@ -647,7 +630,6 @@
 			isa = PBXGroup;
 			children = (
 				FC7B9EA922B97A940012D8D6 /* libHSReactNativeCamera.a */,
-				FC75EB2E22CAE8BA003AB14E /* HSReactNativeCameraShared.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -669,7 +651,6 @@
 			);
 			dependencies = (
 				FCFE3FAA22CAD38F00F38015 /* PBXTargetDependency */,
-				FC75EB3222CAE8BA003AB14E /* PBXTargetDependency */,
 			);
 			name = Storybook;
 			productName = "Hello World";
@@ -1024,13 +1005,6 @@
 			remoteRef = FC6B60CD22AF63ED0060F828 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		FC75EB2E22CAE8BA003AB14E /* HSReactNativeCameraShared.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = HSReactNativeCameraShared.framework;
-			remoteRef = FC75EB2D22CAE8BA003AB14E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		FC7B9EA922B97A940012D8D6 /* libHSReactNativeCamera.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1077,7 +1051,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FC75EB5922CAEB58003AB14E /* SegmentationModel.mlmodel in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				FCDAA01C22AC8D8F00A2E246 /* Empty.swift in Sources */,
@@ -1087,11 +1060,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		FC75EB3222CAE8BA003AB14E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = HSReactNativeCameraShared;
-			targetProxy = FC75EB3122CAE8BA003AB14E /* PBXContainerItemProxy */;
-		};
 		FCFE3FAA22CAD38F00F38015 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = HSReactNativeCamera;

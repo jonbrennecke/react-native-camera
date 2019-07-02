@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FC2FB8F022CBCEA5007CE0AF /* HSSegmentationModelLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC2FB8EF22CBCEA5007CE0AF /* HSSegmentationModelLoader.swift */; };
 		FC664EE322CAD98000FD8AE7 /* HSEffectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E5E22B9ABF600522016 /* HSEffectManager.swift */; };
 		FC664EE422CAD98900FD8AE7 /* HSEffectManagerBridgeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = FC845E6122B9AEED00522016 /* HSEffectManagerBridgeModule.m */; };
 		FC664EE522CAD98D00FD8AE7 /* HSCameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7B9EAA22B97DB40012D8D6 /* HSCameraManager.swift */; };
@@ -23,9 +24,10 @@
 		FC664EF122CAD9AA00FD8AE7 /* Size.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E7922BABE1200522016 /* Size.swift */; };
 		FC664EF222CAD9AA00FD8AE7 /* imageUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E7B22BC1BFE00522016 /* imageUtils.swift */; };
 		FC664EF322CAD9AA00FD8AE7 /* mathUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E7D22BC843100522016 /* mathUtils.swift */; };
-		FC664EF422CAD9AA00FD8AE7 /* modelUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC00944022CABD5A009DC2CE /* modelUtils.swift */; };
-		FC75EB1B22CAE711003AB14E /* SegmentationModel.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = FC75EADF22CADE5B003AB14E /* SegmentationModel.mlmodel */; };
-		FC75EB1C22CAE7D2003AB14E /* SegmentationModel.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = FC75EADF22CADE5B003AB14E /* SegmentationModel.mlmodel */; };
+		FCBFAF0822CBE27300A0AC11 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBFAF0722CBE27300A0AC11 /* Result.swift */; };
+		FCBFAF0B22CBE9CB00A0AC11 /* libHSCameraUtils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FC71B6CB22CAB23A003EA230 /* libHSCameraUtils.a */; };
+		FCBFAF0F22CBF07200A0AC11 /* HSSegmentationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBFAF0E22CBF07200A0AC11 /* HSSegmentationModel.swift */; };
+		FCBFAF1122CBF28B00A0AC11 /* HSSegmentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBFAF1022CBF28B00A0AC11 /* HSSegmentation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +37,48 @@
 			proxyType = 2;
 			remoteGlobalIDString = FC71B66422CAAFCF003EA230;
 			remoteInfo = HSCameraUtils;
+		};
+		FCBFAE5522CBCFF900A0AC11 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 63B0AC571D595E1B00FA21D9;
+			remoteInfo = PromiseKit;
+		};
+		FCBFAE5722CBCFF900A0AC11 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 631751A81D59766500A9DDDC;
+			remoteInfo = "PMKA+Tests";
+		};
+		FCBFAE5922CBCFF900A0AC11 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6314113C1D59795700E24B9E;
+			remoteInfo = PMKBridgeTests;
+		};
+		FCBFAE5B22CBCFF900A0AC11 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 630019221D596292003B4E30;
+			remoteInfo = PMKCoreTests;
+		};
+		FCBFAE5D22CBCFF900A0AC11 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 633027EA203CC0060037E136;
+			remoteInfo = PMKDeprecatedTests;
+		};
+		FCBFAE5F22CBCFF900A0AC11 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = C0244E622047A6CB00ACB4AC;
+			remoteInfo = "PMKJSA+Tests";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -51,12 +95,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		FC00944022CABD5A009DC2CE /* modelUtils.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = modelUtils.swift; sourceTree = "<group>"; tabWidth = 2; };
+		FC2FB8EF22CBCEA5007CE0AF /* HSSegmentationModelLoader.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSSegmentationModelLoader.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC664F4022CADCE600FD8AE7 /* libHSReactNativeCamera.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHSReactNativeCamera.a; path = "../../../../../../../Library/Developer/Xcode/DerivedData/Storybook-aykofoufjpltyqchwrnbfzpoimmw/Build/Products/Debug-iphoneos/libHSReactNativeCamera.a"; sourceTree = "<group>"; };
 		FC71B6C622CAB23A003EA230 /* HSCameraUtils.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HSCameraUtils.xcodeproj; path = "../../../../backflip-camera-utils/HSCameraUtils.xcodeproj"; sourceTree = "<group>"; };
-		FC75EADF22CADE5B003AB14E /* SegmentationModel.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = SegmentationModel.mlmodel; sourceTree = "<group>"; };
-		FC75EAE122CADE70003AB14E /* libHSReactNativeCamera.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libHSReactNativeCamera.a; sourceTree = "<group>"; };
-		FC75EB1222CAE6EA003AB14E /* HSReactNativeCameraShared.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = HSReactNativeCameraShared.framework; path = "/Users/jon/Projects/highstreet/@jonbrennecke/react-native-camera/ios/build/Debug-iphoneos/HSReactNativeCameraShared.framework"; sourceTree = "<absolute>"; };
 		FC75EB2B22CAE84A003AB14E /* libHSReactNativeCamera.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libHSReactNativeCamera.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC7B9EAA22B97DB40012D8D6 /* HSCameraManager.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSCameraManager.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC7B9EAC22B97EB90012D8D6 /* HSCameraManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSCameraManagerDelegate.swift; sourceTree = "<group>"; };
@@ -78,6 +119,10 @@
 		FC845E7922BABE1200522016 /* Size.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Size.swift; sourceTree = "<group>"; };
 		FC845E7B22BC1BFE00522016 /* imageUtils.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = imageUtils.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC845E7D22BC843100522016 /* mathUtils.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = mathUtils.swift; sourceTree = "<group>"; tabWidth = 2; };
+		FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = PromiseKit.xcodeproj; path = PromiseKit/PromiseKit.xcodeproj; sourceTree = SOURCE_ROOT; };
+		FCBFAF0722CBE27300A0AC11 /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
+		FCBFAF0E22CBF07200A0AC11 /* HSSegmentationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSSegmentationModel.swift; sourceTree = "<group>"; };
+		FCBFAF1022CBF28B00A0AC11 /* HSSegmentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSSegmentation.swift; sourceTree = "<group>"; };
 		FCFC983A22AC7CD20089D452 /* HSReactNativeCamera-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HSReactNativeCamera-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -86,13 +131,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		FC75EB0F22CAE6EA003AB14E /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
+				FCBFAF0B22CBE9CB00A0AC11 /* libHSCameraUtils.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,24 +142,17 @@
 			isa = PBXGroup;
 			children = (
 				FCFC983A22AC7CD20089D452 /* HSReactNativeCamera-Bridging-Header.h */,
-				FC75EAE122CADE70003AB14E /* libHSReactNativeCamera.a */,
 				FCDAC44F22AE01A6004A36E7 /* Source */,
 				FC71B6C522CAB236003EA230 /* Libraries */,
 				FC75EB2B22CAE84A003AB14E /* libHSReactNativeCamera.a */,
+				FCBFAF0A22CBE9CB00A0AC11 /* Frameworks */,
 			);
-			sourceTree = "<group>";
-		};
-		FC00944422CABF2A009DC2CE /* models */ = {
-			isa = PBXGroup;
-			children = (
-				FC75EADF22CADE5B003AB14E /* SegmentationModel.mlmodel */,
-			);
-			path = models;
 			sourceTree = "<group>";
 		};
 		FC71B6C522CAB236003EA230 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */,
 				FC71B6C622CAB23A003EA230 /* HSCameraUtils.xcodeproj */,
 			);
 			path = Libraries;
@@ -146,6 +178,8 @@
 		FC73F2F622B02D56009B6D9F /* modules */ = {
 			isa = PBXGroup;
 			children = (
+				FCBFAF0E22CBF07200A0AC11 /* HSSegmentationModel.swift */,
+				FCBFAF1222CBF38F00A0AC11 /* HSSegmentation */,
 				FC845E6022B9AC4B00522016 /* HSEffectManager */,
 				FC7B9EB022B97EF40012D8D6 /* HSCameraManager */,
 			);
@@ -203,16 +237,44 @@
 				FC845E7922BABE1200522016 /* Size.swift */,
 				FC845E7B22BC1BFE00522016 /* imageUtils.swift */,
 				FC845E7D22BC843100522016 /* mathUtils.swift */,
-				FC00944022CABD5A009DC2CE /* modelUtils.swift */,
 				FC664F4022CADCE600FD8AE7 /* libHSReactNativeCamera.a */,
+				FCBFAF0722CBE27300A0AC11 /* Result.swift */,
 			);
 			path = utils;
+			sourceTree = "<group>";
+		};
+		FCBFAE4D22CBCFF900A0AC11 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FCBFAE5622CBCFF900A0AC11 /* PromiseKit.framework */,
+				FCBFAE5822CBCFF900A0AC11 /* PMKA+Tests.xctest */,
+				FCBFAE5A22CBCFF900A0AC11 /* PMKBridgeTests.xctest */,
+				FCBFAE5C22CBCFF900A0AC11 /* PMKCoreTests.xctest */,
+				FCBFAE5E22CBCFF900A0AC11 /* PMKDeprecatedTests.xctest */,
+				FCBFAE6022CBCFF900A0AC11 /* PMKJSA+Tests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FCBFAF0A22CBE9CB00A0AC11 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		FCBFAF1222CBF38F00A0AC11 /* HSSegmentation */ = {
+			isa = PBXGroup;
+			children = (
+				FC2FB8EF22CBCEA5007CE0AF /* HSSegmentationModelLoader.swift */,
+				FCBFAF1022CBF28B00A0AC11 /* HSSegmentation.swift */,
+			);
+			path = HSSegmentation;
 			sourceTree = "<group>";
 		};
 		FCDAC44F22AE01A6004A36E7 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				FC00944422CABF2A009DC2CE /* models */,
 				FC73F2F622B02D56009B6D9F /* modules */,
 				FC73F2F522B02C20009B6D9F /* views */,
 				FCA0A4C122ACC92700A93C32 /* utils */,
@@ -221,16 +283,6 @@
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
-
-/* Begin PBXHeadersBuildPhase section */
-		FC75EB0D22CAE6EA003AB14E /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		FC664EDB22CAD96E00FD8AE7 /* HSReactNativeCamera */ = {
@@ -250,24 +302,6 @@
 			productReference = FC75EB2B22CAE84A003AB14E /* libHSReactNativeCamera.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		FC75EB1122CAE6EA003AB14E /* HSReactNativeCameraShared */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = FC75EB1722CAE6EA003AB14E /* Build configuration list for PBXNativeTarget "HSReactNativeCameraShared" */;
-			buildPhases = (
-				FC75EB0D22CAE6EA003AB14E /* Headers */,
-				FC75EB0E22CAE6EA003AB14E /* Sources */,
-				FC75EB0F22CAE6EA003AB14E /* Frameworks */,
-				FC75EB1022CAE6EA003AB14E /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = HSReactNativeCameraShared;
-			productName = HSReactNativeCameraShared;
-			productReference = FC75EB1222CAE6EA003AB14E /* HSReactNativeCameraShared.framework */;
-			productType = "com.apple.product-type.framework";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -279,11 +313,6 @@
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					FC664EDB22CAD96E00FD8AE7 = {
-						CreatedOnToolsVersion = 10.2.1;
-						DevelopmentTeam = 6DUV3UU8M8;
-						ProvisioningStyle = Automatic;
-					};
-					FC75EB1122CAE6EA003AB14E = {
 						CreatedOnToolsVersion = 10.2.1;
 						DevelopmentTeam = 6DUV3UU8M8;
 						ProvisioningStyle = Automatic;
@@ -306,11 +335,14 @@
 					ProductGroup = FC71B6C722CAB23A003EA230 /* Products */;
 					ProjectRef = FC71B6C622CAB23A003EA230 /* HSCameraUtils.xcodeproj */;
 				},
+				{
+					ProductGroup = FCBFAE4D22CBCFF900A0AC11 /* Products */;
+					ProjectRef = FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
 				FC664EDB22CAD96E00FD8AE7 /* HSReactNativeCamera */,
-				FC75EB1122CAE6EA003AB14E /* HSReactNativeCameraShared */,
 			);
 		};
 /* End PBXProject section */
@@ -323,32 +355,65 @@
 			remoteRef = FC71B6CA22CAB23A003EA230 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-/* End PBXReferenceProxy section */
-
-/* Begin PBXResourcesBuildPhase section */
-		FC75EB1022CAE6EA003AB14E /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
+		FCBFAE5622CBCFF900A0AC11 /* PromiseKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = PromiseKit.framework;
+			remoteRef = FCBFAE5522CBCFF900A0AC11 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-/* End PBXResourcesBuildPhase section */
+		FCBFAE5822CBCFF900A0AC11 /* PMKA+Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "PMKA+Tests.xctest";
+			remoteRef = FCBFAE5722CBCFF900A0AC11 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FCBFAE5A22CBCFF900A0AC11 /* PMKBridgeTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = PMKBridgeTests.xctest;
+			remoteRef = FCBFAE5922CBCFF900A0AC11 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FCBFAE5C22CBCFF900A0AC11 /* PMKCoreTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = PMKCoreTests.xctest;
+			remoteRef = FCBFAE5B22CBCFF900A0AC11 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FCBFAE5E22CBCFF900A0AC11 /* PMKDeprecatedTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = PMKDeprecatedTests.xctest;
+			remoteRef = FCBFAE5D22CBCFF900A0AC11 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FCBFAE6022CBCFF900A0AC11 /* PMKJSA+Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "PMKJSA+Tests.xctest";
+			remoteRef = FCBFAE5F22CBCFF900A0AC11 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXSourcesBuildPhase section */
 		FC664ED822CAD96E00FD8AE7 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FCBFAF1122CBF28B00A0AC11 /* HSSegmentation.swift in Sources */,
 				FC664EEF22CAD9AA00FD8AE7 /* permissionsUtils.swift in Sources */,
 				FC664EF322CAD9AA00FD8AE7 /* mathUtils.swift in Sources */,
+				FCBFAF0822CBE27300A0AC11 /* Result.swift in Sources */,
 				FC664EF122CAD9AA00FD8AE7 /* Size.swift in Sources */,
-				FC664EF422CAD9AA00FD8AE7 /* modelUtils.swift in Sources */,
-				FC75EB1C22CAE7D2003AB14E /* SegmentationModel.mlmodel in Sources */,
 				FC664EE722CAD98D00FD8AE7 /* HSCameraManagerDepthDataDelegate.swift in Sources */,
 				FC664EE422CAD98900FD8AE7 /* HSEffectManagerBridgeModule.m in Sources */,
 				FC664EED22CAD9A500FD8AE7 /* HSCameraView.swift in Sources */,
 				FC664EEC22CAD99E00FD8AE7 /* HSCameraEffectViewManager.m in Sources */,
+				FC2FB8F022CBCEA5007CE0AF /* HSSegmentationModelLoader.swift in Sources */,
 				FC664EEB22CAD99E00FD8AE7 /* HSCameraEffectView.swift in Sources */,
 				FC664EEE22CAD9A500FD8AE7 /* HSCameraViewManager.m in Sources */,
 				FC664EE522CAD98D00FD8AE7 /* HSCameraManager.swift in Sources */,
@@ -357,15 +422,8 @@
 				FC664EE322CAD98000FD8AE7 /* HSEffectManager.swift in Sources */,
 				FC664EF022CAD9AA00FD8AE7 /* cameraUtils.swift in Sources */,
 				FC664EE922CAD99000FD8AE7 /* HSCameraManagerBridgeModule.m in Sources */,
+				FCBFAF0F22CBF07200A0AC11 /* HSSegmentationModel.swift in Sources */,
 				FC664EF222CAD9AA00FD8AE7 /* imageUtils.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		FC75EB0E22CAE6EA003AB14E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				FC75EB1B22CAE711003AB14E /* SegmentationModel.mlmodel in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -476,6 +534,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 6DUV3UU8M8;
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/Frameworks/**";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -513,6 +572,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 6DUV3UU8M8;
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/Frameworks/**";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				MTL_FAST_MATH = YES;
@@ -523,95 +583,6 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		FC75EB1822CAE6EA003AB14E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 6DUV3UU8M8;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = HSReactNativeCameraShared/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.jonbrennecke.HSReactNativeCameraShared;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		FC75EB1922CAE6EA003AB14E /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 6DUV3UU8M8;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = HSReactNativeCameraShared/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.jonbrennecke.HSReactNativeCameraShared;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
 		};
@@ -632,15 +603,6 @@
 			buildConfigurations = (
 				FC664EE122CAD96F00FD8AE7 /* Debug */,
 				FC664EE222CAD96F00FD8AE7 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		FC75EB1722CAE6EA003AB14E /* Build configuration list for PBXNativeTarget "HSReactNativeCameraShared" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				FC75EB1822CAE6EA003AB14E /* Debug */,
-				FC75EB1922CAE6EA003AB14E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

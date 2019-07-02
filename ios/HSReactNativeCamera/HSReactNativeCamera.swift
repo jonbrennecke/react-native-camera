@@ -5,6 +5,4 @@
 //  Created by Jonathan Brennecke on 7/1/19.
 //
 
-class HSReactNativeCamera {
-
-}
+class HSReactNativeCamera {}

@@ -1,7 +1,7 @@
 import AVFoundation
 import CoreGraphics
-import UIKit
 import HSCameraUtils
+import UIKit
 
 @available(iOS 11.0, *)
 @objc
@@ -15,24 +15,29 @@ class HSEffectManager: NSObject {
   @objc(sharedInstance)
   public static let shared = HSEffectManager()
   
-  private lazy var model: SegmentationModel = {
-    return SegmentationModel()
-//    SegmentationModel(contentsOf: <#T##URL#>)
-  }()
+  private var segmentation: HSSegmentation?
+
+  @objc
+  public func start() {
+    HSSegmentationModelLoader.loadModel { result in
+      switch result {
+      case let .ok(model):
+        self.segmentation = HSSegmentation(model: model)
+      case .err(_):
+        fatalError("Failed to load model") // FIXME
+      }
+    }
+  }
 
   @objc(applyEffectWithDepthData:videoData:error:)
   public func applyEffect(with depthData: AVDepthData, videoSampleBuffer: CMSampleBuffer) throws {
-    let depthPixelBuffer = HSPixelBuffer<Float32>(depthData: depthData)
-    guard let videoPixelBuffer = HSPixelBuffer<Float32>(sampleBuffer: videoSampleBuffer) else {
-      return
+    if let segmentation = segmentation {
+      let depthPixelBuffer = HSPixelBuffer<Float32>(depthData: depthData)
+      guard let colorPixelBuffer = HSPixelBuffer<Float32>(sampleBuffer: videoSampleBuffer) else {
+        return
+      }
+      try segmentation.runSegmentation(colorBuffer: colorPixelBuffer, depthBuffer: depthPixelBuffer)
     }
-    
-    let input = SegmentationModelInput(
-      color_image_input: videoPixelBuffer.buffer,
-      depth_image_input: depthPixelBuffer.buffer
-    )
-    let output = try model.prediction(input: input)
-    print(output.segmentation_image_output)
   }
 
   func createMask(depthImage: CIImage, scale: Float) -> CIImage {
@@ -47,9 +52,9 @@ class HSEffectManager: NSObject {
 
 //  func applyMask(foreground foregroundImage: CIImage, background backgroundImage: CIImage, mask maskImage: CIImage) {
 //    let flipTransform = CGAffineTransform(scaleX: -1, y: 1)
-////    let parameters = ["inputMaskImage": maskImage, "inputBackgroundImage": backgroundImage]
+  ////    let parameters = ["inputMaskImage": maskImage, "inputBackgroundImage": backgroundImage]
 //    let displayImage = maskImage
-////      .applyingFilter("CIBlendWithMask", parameters: parameters)
+  ////      .applyingFilter("CIBlendWithMask", parameters: parameters)
 //      .applyingFilter("CIAffineTransform", parameters: ["inputTransform": flipTransform])
 //
 //    guard let cgImage = context.createCGImage(displayImage, from: displayImage.extent) else {
