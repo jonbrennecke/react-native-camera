@@ -15,7 +15,10 @@ class HSEffectManager: NSObject {
   @objc(sharedInstance)
   public static let shared = HSEffectManager()
   
-  private let model = SegmentationModel()
+  private lazy var model: SegmentationModel = {
+    return SegmentationModel()
+//    SegmentationModel(contentsOf: <#T##URL#>)
+  }()
 
   @objc(applyEffectWithDepthData:videoData:error:)
   public func applyEffect(with depthData: AVDepthData, videoSampleBuffer: CMSampleBuffer) throws {
