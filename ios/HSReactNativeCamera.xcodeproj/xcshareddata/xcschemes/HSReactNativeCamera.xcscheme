@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "58B511DA1A9E6C8500147676"
+               BlueprintIdentifier = "FC2952D722CAD67F00716A3A"
                BuildableName = "libHSReactNativeCamera.a"
                BlueprintName = "HSReactNativeCamera"
                ReferencedContainer = "container:HSReactNativeCamera.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "58B511DA1A9E6C8500147676"
+            BlueprintIdentifier = "FC2952D722CAD67F00716A3A"
             BuildableName = "libHSReactNativeCamera.a"
             BlueprintName = "HSReactNativeCamera"
             ReferencedContainer = "container:HSReactNativeCamera.xcodeproj">
@@ -63,7 +63,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "58B511DA1A9E6C8500147676"
+            BlueprintIdentifier = "FC2952D722CAD67F00716A3A"
             BuildableName = "libHSReactNativeCamera.a"
             BlueprintName = "HSReactNativeCamera"
             ReferencedContainer = "container:HSReactNativeCamera.xcodeproj">

@@ -7,24 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FC00944122CABD5A009DC2CE /* modelUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC00944022CABD5A009DC2CE /* modelUtils.swift */; };
-		FC00944E22CAC82F009DC2CE /* SegmentationModel.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = FC00944D22CAC82F009DC2CE /* SegmentationModel.mlmodel */; };
-		FC7B9EAB22B97DB40012D8D6 /* HSCameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7B9EAA22B97DB40012D8D6 /* HSCameraManager.swift */; };
-		FC7B9EAD22B97EB90012D8D6 /* HSCameraManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7B9EAC22B97EB90012D8D6 /* HSCameraManagerDelegate.swift */; };
-		FC7B9EAF22B97EED0012D8D6 /* HSCameraSetupResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7B9EAE22B97EED0012D8D6 /* HSCameraSetupResult.swift */; };
-		FC7B9EB222B980F60012D8D6 /* permissionsUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7B9EB122B980F60012D8D6 /* permissionsUtils.swift */; };
-		FC845E1622B98A3D00522016 /* cameraUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E1522B98A3D00522016 /* cameraUtils.swift */; };
-		FC845E1822B98D6300522016 /* HSCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E1722B98D6300522016 /* HSCameraView.swift */; };
-		FC845E1A22B98E5600522016 /* HSCameraViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FC845E1922B98E5600522016 /* HSCameraViewManager.m */; };
-		FC845E1E22B992B200522016 /* HSCameraManagerBridgeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = FC845E1D22B992B200522016 /* HSCameraManagerBridgeModule.m */; };
-		FC845E5F22B9ABF600522016 /* HSEffectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E5E22B9ABF600522016 /* HSEffectManager.swift */; };
-		FC845E6222B9AEED00522016 /* HSEffectManagerBridgeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = FC845E6122B9AEED00522016 /* HSEffectManagerBridgeModule.m */; };
-		FC845E6522B9B0B700522016 /* HSCameraEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E6422B9B0B700522016 /* HSCameraEffectView.swift */; };
-		FC845E6822B9B1BC00522016 /* HSCameraEffectViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FC845E6722B9B1BC00522016 /* HSCameraEffectViewManager.m */; };
-		FC845E6B22B9B30000522016 /* HSCameraManagerDepthDataDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E6A22B9B30000522016 /* HSCameraManagerDepthDataDelegate.swift */; };
-		FC845E7A22BABE1200522016 /* Size.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E7922BABE1200522016 /* Size.swift */; };
-		FC845E7C22BC1BFE00522016 /* imageUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E7B22BC1BFE00522016 /* imageUtils.swift */; };
-		FC845E7E22BC843100522016 /* mathUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E7D22BC843100522016 /* mathUtils.swift */; };
+		FC664EE322CAD98000FD8AE7 /* HSEffectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E5E22B9ABF600522016 /* HSEffectManager.swift */; };
+		FC664EE422CAD98900FD8AE7 /* HSEffectManagerBridgeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = FC845E6122B9AEED00522016 /* HSEffectManagerBridgeModule.m */; };
+		FC664EE522CAD98D00FD8AE7 /* HSCameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7B9EAA22B97DB40012D8D6 /* HSCameraManager.swift */; };
+		FC664EE622CAD98D00FD8AE7 /* HSCameraManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7B9EAC22B97EB90012D8D6 /* HSCameraManagerDelegate.swift */; };
+		FC664EE722CAD98D00FD8AE7 /* HSCameraManagerDepthDataDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E6A22B9B30000522016 /* HSCameraManagerDepthDataDelegate.swift */; };
+		FC664EE822CAD98D00FD8AE7 /* HSCameraSetupResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7B9EAE22B97EED0012D8D6 /* HSCameraSetupResult.swift */; };
+		FC664EE922CAD99000FD8AE7 /* HSCameraManagerBridgeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = FC845E1D22B992B200522016 /* HSCameraManagerBridgeModule.m */; };
+		FC664EEB22CAD99E00FD8AE7 /* HSCameraEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E6422B9B0B700522016 /* HSCameraEffectView.swift */; };
+		FC664EEC22CAD99E00FD8AE7 /* HSCameraEffectViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FC845E6722B9B1BC00522016 /* HSCameraEffectViewManager.m */; };
+		FC664EED22CAD9A500FD8AE7 /* HSCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E1722B98D6300522016 /* HSCameraView.swift */; };
+		FC664EEE22CAD9A500FD8AE7 /* HSCameraViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FC845E1922B98E5600522016 /* HSCameraViewManager.m */; };
+		FC664EEF22CAD9AA00FD8AE7 /* permissionsUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7B9EB122B980F60012D8D6 /* permissionsUtils.swift */; };
+		FC664EF022CAD9AA00FD8AE7 /* cameraUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E1522B98A3D00522016 /* cameraUtils.swift */; };
+		FC664EF122CAD9AA00FD8AE7 /* Size.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E7922BABE1200522016 /* Size.swift */; };
+		FC664EF222CAD9AA00FD8AE7 /* imageUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E7B22BC1BFE00522016 /* imageUtils.swift */; };
+		FC664EF322CAD9AA00FD8AE7 /* mathUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E7D22BC843100522016 /* mathUtils.swift */; };
+		FC664EF422CAD9AA00FD8AE7 /* modelUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC00944022CABD5A009DC2CE /* modelUtils.swift */; };
+		FC75EAE022CADE5B003AB14E /* SegmentationModel.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = FC75EADF22CADE5B003AB14E /* SegmentationModel.mlmodel */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,7 +38,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		58B511D91A9E6C8500147676 /* CopyFiles */ = {
+		FC664EDA22CAD96E00FD8AE7 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "include/$(PRODUCT_NAME)";
@@ -50,10 +50,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		134814201AA4EA6300B7C361 /* libHSReactNativeCamera.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libHSReactNativeCamera.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC00944022CABD5A009DC2CE /* modelUtils.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = modelUtils.swift; sourceTree = "<group>"; tabWidth = 2; };
-		FC00944D22CAC82F009DC2CE /* SegmentationModel.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = SegmentationModel.mlmodel; sourceTree = "<group>"; };
+		FC664EDC22CAD96E00FD8AE7 /* libHSReactNativeCamera.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libHSReactNativeCamera.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		FC664F4022CADCE600FD8AE7 /* libHSReactNativeCamera.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHSReactNativeCamera.a; path = "../../../../../../../Library/Developer/Xcode/DerivedData/Storybook-aykofoufjpltyqchwrnbfzpoimmw/Build/Products/Debug-iphoneos/libHSReactNativeCamera.a"; sourceTree = "<group>"; };
 		FC71B6C622CAB23A003EA230 /* HSCameraUtils.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HSCameraUtils.xcodeproj; path = "../../../../backflip-camera-utils/HSCameraUtils.xcodeproj"; sourceTree = "<group>"; };
+		FC75EADF22CADE5B003AB14E /* SegmentationModel.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = SegmentationModel.mlmodel; sourceTree = "<group>"; };
+		FC75EAE122CADE70003AB14E /* libHSReactNativeCamera.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libHSReactNativeCamera.a; sourceTree = "<group>"; };
 		FC7B9EAA22B97DB40012D8D6 /* HSCameraManager.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSCameraManager.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC7B9EAC22B97EB90012D8D6 /* HSCameraManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSCameraManagerDelegate.swift; sourceTree = "<group>"; };
 		FC7B9EAE22B97EED0012D8D6 /* HSCameraSetupResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSCameraSetupResult.swift; sourceTree = "<group>"; };
@@ -78,7 +80,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		58B511D81A9E6C8500147676 /* Frameworks */ = {
+		FC664ED922CAD96E00FD8AE7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -91,7 +93,6 @@
 		134814211AA4EA7D00B7C361 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				134814201AA4EA6300B7C361 /* libHSReactNativeCamera.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -102,6 +103,8 @@
 				FCFC983A22AC7CD20089D452 /* HSReactNativeCamera-Bridging-Header.h */,
 				FCDAC44F22AE01A6004A36E7 /* Source */,
 				134814211AA4EA7D00B7C361 /* Products */,
+				FC664EDC22CAD96E00FD8AE7 /* libHSReactNativeCamera.a */,
+				FC75EAE122CADE70003AB14E /* libHSReactNativeCamera.a */,
 				FC71B6C522CAB236003EA230 /* Libraries */,
 			);
 			sourceTree = "<group>";
@@ -109,7 +112,7 @@
 		FC00944422CABF2A009DC2CE /* models */ = {
 			isa = PBXGroup;
 			children = (
-				FC00944D22CAC82F009DC2CE /* SegmentationModel.mlmodel */,
+				FC75EADF22CADE5B003AB14E /* SegmentationModel.mlmodel */,
 			);
 			path = models;
 			sourceTree = "<group>";
@@ -125,7 +128,7 @@
 		FC71B6C722CAB23A003EA230 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				FC71B6CB22CAB23A003EA230 /* HSCameraUtils.framework */,
+				FC71B6CB22CAB23A003EA230 /* libHSCameraUtils.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -200,6 +203,7 @@
 				FC845E7B22BC1BFE00522016 /* imageUtils.swift */,
 				FC845E7D22BC843100522016 /* mathUtils.swift */,
 				FC00944022CABD5A009DC2CE /* modelUtils.swift */,
+				FC664F4022CADCE600FD8AE7 /* libHSReactNativeCamera.a */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -218,21 +222,21 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		58B511DA1A9E6C8500147676 /* HSReactNativeCamera */ = {
+		FC664EDB22CAD96E00FD8AE7 /* HSReactNativeCamera */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "HSReactNativeCamera" */;
+			buildConfigurationList = FC664EE022CAD96F00FD8AE7 /* Build configuration list for PBXNativeTarget "HSReactNativeCamera" */;
 			buildPhases = (
-				58B511D71A9E6C8500147676 /* Sources */,
-				58B511D81A9E6C8500147676 /* Frameworks */,
-				58B511D91A9E6C8500147676 /* CopyFiles */,
+				FC664ED822CAD96E00FD8AE7 /* Sources */,
+				FC664ED922CAD96E00FD8AE7 /* Frameworks */,
+				FC664EDA22CAD96E00FD8AE7 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = HSReactNativeCamera;
-			productName = RCTDataManager;
-			productReference = 134814201AA4EA6300B7C361 /* libHSReactNativeCamera.a */;
+			productName = HSReactNativeCamera;
+			productReference = FC664EDC22CAD96E00FD8AE7 /* libHSReactNativeCamera.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -241,12 +245,14 @@
 		58B511D31A9E6C8500147676 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 1020;
 				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
-					58B511DA1A9E6C8500147676 = {
-						CreatedOnToolsVersion = 6.1.1;
-						LastSwiftMigration = 1020;
+					FC664EDB22CAD96E00FD8AE7 = {
+						CreatedOnToolsVersion = 10.2.1;
+						DevelopmentTeam = 6DUV3UU8M8;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -269,44 +275,44 @@
 			);
 			projectRoot = "";
 			targets = (
-				58B511DA1A9E6C8500147676 /* HSReactNativeCamera */,
+				FC664EDB22CAD96E00FD8AE7 /* HSReactNativeCamera */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		FC71B6CB22CAB23A003EA230 /* HSCameraUtils.framework */ = {
+		FC71B6CB22CAB23A003EA230 /* libHSCameraUtils.a */ = {
 			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = HSCameraUtils.framework;
+			fileType = archive.ar;
+			path = libHSCameraUtils.a;
 			remoteRef = FC71B6CA22CAB23A003EA230 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXSourcesBuildPhase section */
-		58B511D71A9E6C8500147676 /* Sources */ = {
+		FC664ED822CAD96E00FD8AE7 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FC845E6222B9AEED00522016 /* HSEffectManagerBridgeModule.m in Sources */,
-				FC845E6B22B9B30000522016 /* HSCameraManagerDepthDataDelegate.swift in Sources */,
-				FC845E6822B9B1BC00522016 /* HSCameraEffectViewManager.m in Sources */,
-				FC00944122CABD5A009DC2CE /* modelUtils.swift in Sources */,
-				FC00944E22CAC82F009DC2CE /* SegmentationModel.mlmodel in Sources */,
-				FC845E7C22BC1BFE00522016 /* imageUtils.swift in Sources */,
-				FC7B9EAD22B97EB90012D8D6 /* HSCameraManagerDelegate.swift in Sources */,
-				FC845E7E22BC843100522016 /* mathUtils.swift in Sources */,
-				FC7B9EAF22B97EED0012D8D6 /* HSCameraSetupResult.swift in Sources */,
-				FC845E1E22B992B200522016 /* HSCameraManagerBridgeModule.m in Sources */,
-				FC845E6522B9B0B700522016 /* HSCameraEffectView.swift in Sources */,
-				FC845E1622B98A3D00522016 /* cameraUtils.swift in Sources */,
-				FC845E7A22BABE1200522016 /* Size.swift in Sources */,
-				FC845E5F22B9ABF600522016 /* HSEffectManager.swift in Sources */,
-				FC845E1A22B98E5600522016 /* HSCameraViewManager.m in Sources */,
-				FC7B9EB222B980F60012D8D6 /* permissionsUtils.swift in Sources */,
-				FC7B9EAB22B97DB40012D8D6 /* HSCameraManager.swift in Sources */,
-				FC845E1822B98D6300522016 /* HSCameraView.swift in Sources */,
+				FC664EEF22CAD9AA00FD8AE7 /* permissionsUtils.swift in Sources */,
+				FC664EF322CAD9AA00FD8AE7 /* mathUtils.swift in Sources */,
+				FC664EF122CAD9AA00FD8AE7 /* Size.swift in Sources */,
+				FC664EF422CAD9AA00FD8AE7 /* modelUtils.swift in Sources */,
+				FC75EAE022CADE5B003AB14E /* SegmentationModel.mlmodel in Sources */,
+				FC664EE722CAD98D00FD8AE7 /* HSCameraManagerDepthDataDelegate.swift in Sources */,
+				FC664EE422CAD98900FD8AE7 /* HSEffectManagerBridgeModule.m in Sources */,
+				FC664EED22CAD9A500FD8AE7 /* HSCameraView.swift in Sources */,
+				FC664EEC22CAD99E00FD8AE7 /* HSCameraEffectViewManager.m in Sources */,
+				FC664EEB22CAD99E00FD8AE7 /* HSCameraEffectView.swift in Sources */,
+				FC664EEE22CAD9A500FD8AE7 /* HSCameraViewManager.m in Sources */,
+				FC664EE522CAD98D00FD8AE7 /* HSCameraManager.swift in Sources */,
+				FC664EE622CAD98D00FD8AE7 /* HSCameraManagerDelegate.swift in Sources */,
+				FC664EE822CAD98D00FD8AE7 /* HSCameraSetupResult.swift in Sources */,
+				FC664EE322CAD98000FD8AE7 /* HSEffectManager.swift in Sources */,
+				FC664EF022CAD9AA00FD8AE7 /* cameraUtils.swift in Sources */,
+				FC664EE922CAD99000FD8AE7 /* HSCameraManagerBridgeModule.m in Sources */,
+				FC664EF222CAD9AA00FD8AE7 /* imageUtils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -396,52 +402,74 @@
 			};
 			name = Release;
 		};
-		58B511F01A9E6C8500147676 /* Debug */ = {
+		FC664EE122CAD96F00FD8AE7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CLANG_ENABLE_MODULES = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SRCROOT)/../../../React/**",
-					"$(SRCROOT)/../../react-native/React/**",
-				);
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)",
-				);
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 6DUV3UU8M8;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = HSReactNativeCamera;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OBJC_BRIDGING_HEADER = "HSReactNativeCamera-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		58B511F11A9E6C8500147676 /* Release */ = {
+		FC664EE222CAD96F00FD8AE7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CLANG_ENABLE_MODULES = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SRCROOT)/../../../React/**",
-					"$(SRCROOT)/../../react-native/React/**",
-				);
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)",
-				);
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 6DUV3UU8M8;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = HSReactNativeCamera;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "HSReactNativeCamera-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -457,11 +485,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "HSReactNativeCamera" */ = {
+		FC664EE022CAD96F00FD8AE7 /* Build configuration list for PBXNativeTarget "HSReactNativeCamera" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				58B511F01A9E6C8500147676 /* Debug */,
-				58B511F11A9E6C8500147676 /* Release */,
+				FC664EE122CAD96F00FD8AE7 /* Debug */,
+				FC664EE222CAD96F00FD8AE7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

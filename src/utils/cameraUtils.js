@@ -2,6 +2,8 @@
 import Bluebird from 'bluebird';
 import { NativeModules } from 'react-native';
 
+console.log(NativeModules);
+
 const {
   HSCameraManager: NativeCameraManager,
   HSEffectManager: NativeEffectManager,
