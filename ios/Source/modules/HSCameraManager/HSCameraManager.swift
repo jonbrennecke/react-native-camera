@@ -108,13 +108,13 @@ class HSCameraManager: NSObject {
       captureSession.sessionPreset = .high
     }
 
-    // setup videoCaptureDevice
+    // Setup videoCaptureDevice
     videoCaptureDevice = captureDevice(withPosition: .front)
     guard let videoCaptureDevice = videoCaptureDevice else {
       return .failure
     }
 
-    // setup videoCaptureDeviceInput
+    // Setup videoCaptureDeviceInput
     videoCaptureDeviceInput = try? AVCaptureDeviceInput(device: videoCaptureDevice)
     guard let videoCaptureDeviceInput = videoCaptureDeviceInput else {
       return .failure
@@ -133,6 +133,17 @@ class HSCameraManager: NSObject {
       return .failure
     }
 
+    // Set depth format of videoCaptureDevice
+    if case .some = try? videoCaptureDevice.lockForConfiguration() {
+      let depthFormats = videoCaptureDevice.activeFormat.supportedDepthDataFormats
+      if let format = depthFormats.first(where: {
+        CMFormatDescriptionGetMediaSubType($0.formatDescription) == kCVPixelFormatType_DepthFloat32
+      }) {
+        videoCaptureDevice.activeDepthDataFormat = format
+      }
+      videoCaptureDevice.unlockForConfiguration()
+    }
+
     outputSynchronizer.setDelegate(self, queue: sessionQueue)
 
 //    TODO: adding this breaks the depth output synchronizer
@@ -148,6 +159,10 @@ class HSCameraManager: NSObject {
 
   private func setupVideoOutput() -> HSCameraSetupResult {
     videoOutput.alwaysDiscardsLateVideoFrames = true
+    videoOutput.videoSettings = [
+      // kCVPixelFormatType_32BGRA is required because of effects
+      kCVPixelBufferPixelFormatTypeKey: kCVPixelFormatType_32BGRA,
+    ] as [String: Any]
     videoOutput.setSampleBufferDelegate(self, queue: sessionQueue)
     if captureSession.canAddOutput(videoOutput) {
       captureSession.addOutput(videoOutput)
@@ -168,7 +183,7 @@ class HSCameraManager: NSObject {
 
   private func setupDepthOutput() -> HSCameraSetupResult {
     depthOutput.alwaysDiscardsLateDepthData = true
-    depthOutput.isFilteringEnabled = false // Don't filter depth data; the built in filter is not very good
+    depthOutput.isFilteringEnabled = false
     depthOutput.setDelegate(self, callbackQueue: sessionQueue)
     if captureSession.canAddOutput(depthOutput) {
       captureSession.addOutput(depthOutput)

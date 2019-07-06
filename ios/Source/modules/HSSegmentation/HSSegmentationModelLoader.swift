@@ -12,11 +12,13 @@ public struct HSSegmentationModelLoader {
 
   // TODO: read from environment variable
   private static let urlProtocol = "http://"
-  private static let address = "192.168.0.139:8000"
+  private static let address = "192.168.254.24"
+//  private static let address = "172.20.10.2"
+  private static let port = "8000"
   private static let modelFileName = "SegmentationModel.mlmodel"
 
   private static let modelURL: URL = {
-    URL(string: "\(urlProtocol)\(address)/\(modelFileName)")!
+    URL(string: "\(urlProtocol)\(address):\(port)/\(modelFileName)")!
   }()
 
   private static let fileManager = FileManager.default
@@ -59,14 +61,14 @@ public struct HSSegmentationModelLoader {
     } catch {
       completionHandler(.err(.failedToCompileModel))
     }
-    
+
     guard let model = try? HSSegmentationModel(contentsOf: compiledModelURL) else {
       completionHandler(.err(.failedToCompileModel))
       return
     }
     completionHandler(.ok(model))
   }
-  
+
   private static func saveModel(at url: URL) -> URL? {
     guard let filesURL = try? fileManager.url(
       for: .applicationSupportDirectory,
@@ -102,7 +104,7 @@ public struct HSSegmentationModelLoader {
         compileModel(at: modelFileURL) { result in
           completionHandler(result)
         }
-      case .err(_):
+      case .err:
         completionHandler(.err(.failedToDownloadModel))
         return
       }
