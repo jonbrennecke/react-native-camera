@@ -10,7 +10,6 @@ class HSEffectManager: NSObject {
     let layer = CALayer()
     layer.contentsGravity = .resizeAspectFill
     layer.backgroundColor = UIColor.red.cgColor
-//    layer.drawsAsynchronously = true
     return layer
   }()
 
@@ -23,14 +22,30 @@ class HSEffectManager: NSObject {
   private var segmentation: HSSegmentation?
   private let context = CIContext()
 
-  private lazy var pool: CVPixelBufferPool! = {
+  private lazy var depthCVPixelBufferPool: CVPixelBufferPool = {
     let poolAttributes = [kCVPixelBufferPoolMinimumBufferCountKey: 1] as CFDictionary
     let bufferAttributes = [
+      kCVPixelBufferCGImageCompatibilityKey: true,
+      kCVPixelBufferCGBitmapContextCompatibilityKey: true,
       kCVPixelBufferPixelFormatTypeKey: kCVPixelFormatType_OneComponent8,
       kCVPixelBufferWidthKey: HSEffectManager.depthImageSize.width,
       kCVPixelBufferHeightKey: HSEffectManager.depthImageSize.height,
     ] as [String: Any] as CFDictionary
-    var pool: CVPixelBufferPool?
+    var pool: CVPixelBufferPool!
+    CVPixelBufferPoolCreate(kCFAllocatorDefault, poolAttributes, bufferAttributes, &pool)
+    return pool
+  }()
+
+  private lazy var colorCVPixelBufferPool: CVPixelBufferPool = {
+    let poolAttributes = [kCVPixelBufferPoolMinimumBufferCountKey: 1] as CFDictionary
+    let bufferAttributes = [
+      kCVPixelBufferCGImageCompatibilityKey: true,
+      kCVPixelBufferCGBitmapContextCompatibilityKey: true,
+      kCVPixelBufferPixelFormatTypeKey: kCVPixelFormatType_32BGRA,
+      kCVPixelBufferWidthKey: HSEffectManager.colorImageSize.width,
+      kCVPixelBufferHeightKey: HSEffectManager.colorImageSize.height,
+    ] as [String: Any] as CFDictionary
+    var pool: CVPixelBufferPool!
     CVPixelBufferPoolCreate(kCFAllocatorDefault, poolAttributes, bufferAttributes, &pool)
     return pool
   }()
@@ -84,24 +99,35 @@ class HSEffectManager: NSObject {
   }
 
   private func preprocess(sampleBuffer: CMSampleBuffer) -> HSPixelBuffer? {
-    return HSPixelBuffer(sampleBuffer: sampleBuffer)
+    guard let buffer = HSPixelBuffer(sampleBuffer: sampleBuffer) else {
+      return nil
+    }
+    return resize(
+      buffer,
+      to: HSEffectManager.colorImageSize,
+      pixelBufferPool: colorCVPixelBufferPool
+    )
   }
 
   private func preprocess(depthData: AVDepthData) -> HSPixelBuffer? {
     let depthData = convertToDepthFloat32(depthData)
     let buffer = HSPixelBuffer(depthData: depthData)
-    guard let resizedBuffer = resize(buffer, to: buffer.size) else {
-      return nil
-    }
-    let iterator: HSPixelBufferIterator<Float32> = resizedBuffer.makeIterator()
+    let iterator: HSPixelBufferIterator<Float32> = buffer.makeIterator()
     let bounds = iterator.bounds()
-    let outputIterator = map(iterator, to: kCVPixelFormatType_OneComponent8) { value -> UInt8 in
+    guard let mappedIterator = map(iterator, to: kCVPixelFormatType_OneComponent8, transform: { value -> UInt8 in
       let normalized = normalize(value, min: bounds.lowerBound, max: bounds.upperBound)
       let scaled = normalized * 255
       let pixel = clamp(scaled, min: 0, max: 255)
       return UInt8(exactly: pixel.rounded()) ?? 0
+    }) else {
+      return nil
     }
-    return outputIterator?.pixelBuffer
+    return resize(
+      mappedIterator.pixelBuffer,
+      to: HSEffectManager.depthImageSize,
+      pixelBufferPool: depthCVPixelBufferPool,
+      isGrayscale: true
+    )
   }
 }
 
