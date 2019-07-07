@@ -1,6 +1,8 @@
 import AVFoundation
 import Photos
 
+fileprivate let DEFAULT_DEPTH_CAPTURE_FRAMES_PER_SECOND = Float64(24)
+
 @available(iOS 11.1, *)
 @objc
 class HSCameraManager: NSObject {
@@ -104,7 +106,7 @@ class HSCameraManager: NSObject {
   }
 
   private func attemptToSetupCameraCaptureSession() -> HSCameraSetupResult {
-    let preset: AVCaptureSession.Preset = .photo
+    let preset: AVCaptureSession.Preset = .hd1920x1080
     if captureSession.canSetSessionPreset(preset) {
       captureSession.sessionPreset = preset
     }
@@ -135,13 +137,28 @@ class HSCameraManager: NSObject {
     }
 
     // Set depth format of videoCaptureDevice
+    // TODO: only required if capturing depth
     if case .some = try? videoCaptureDevice.lockForConfiguration() {
-      let depthFormats = videoCaptureDevice.activeFormat.supportedDepthDataFormats
-      if let format = depthFormats.first(where: {
-        CMFormatDescriptionGetMediaSubType($0.formatDescription) == kCVPixelFormatType_DepthFloat32
-      }) {
-        videoCaptureDevice.activeDepthDataFormat = format
+      let supportedDepthFormats = videoCaptureDevice.activeFormat.supportedDepthDataFormats
+
+      let depthFormats = supportedDepthFormats.filter { format in
+        return CMFormatDescriptionGetMediaSubType(format.formatDescription) == kCVPixelFormatType_DepthFloat32
       }
+
+      let highestResolutionDepthFormat = depthFormats.max { a, b in
+        CMVideoFormatDescriptionGetDimensions(a.formatDescription).width < CMVideoFormatDescriptionGetDimensions(b.formatDescription).width
+      }
+
+      if let format = highestResolutionDepthFormat {
+        videoCaptureDevice.activeDepthDataFormat = format
+        let maxFrameRateRange = format.videoSupportedFrameRateRanges.max { $0.maxFrameRate < $1.maxFrameRate }
+        let depthFrameDuration = CMTimeMake(
+          value: 1,
+          timescale: CMTimeScale(maxFrameRateRange?.maxFrameRate ?? DEFAULT_DEPTH_CAPTURE_FRAMES_PER_SECOND)
+        )
+        videoCaptureDevice.activeDepthDataMinFrameDuration = depthFrameDuration
+      }
+
       videoCaptureDevice.unlockForConfiguration()
     }
 

@@ -30,7 +30,7 @@ class HSEffectManager: NSObject {
 
   private lazy var displayLink: CADisplayLink = {
     let displayLink = CADisplayLink(target: self, selector: #selector(handleDisplayLinkUpdate))
-    displayLink.preferredFramesPerSecond = 30
+    displayLink.preferredFramesPerSecond = 24
     return displayLink
   }()
 
@@ -163,7 +163,8 @@ class HSEffectManager: NSObject {
         let scaled = normalized * 255
         let pixel = clamp(scaled, min: 0, max: 255)
         return UInt8(exactly: pixel.rounded()) ?? 0
-      }) else {
+      }
+    ) else {
       return nil
     }
     return resize(

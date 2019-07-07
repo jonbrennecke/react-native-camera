@@ -44,7 +44,7 @@ public class HSSegmentation {
     guard var destPixelBuffer = createPixelBuffer(with: pixelBufferPool) else {
       return nil
     }
-    
+
     _ = copy(buffer: &destBuffer, to: &destPixelBuffer, bufferInfo: bufferInfo)
 
     // copy vImage_Buffer to CVPixelBuffer
