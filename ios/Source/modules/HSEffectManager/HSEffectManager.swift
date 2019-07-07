@@ -87,14 +87,6 @@ class HSEffectManager: NSObject {
       return
     }
 
-//    let imageBuffer = HSImageBuffer(pixelBuffer: colorBuffer)
-//    let imageBuffer = HSImageBuffer(pixelBuffer: depthBuffer)
-//    if let cgImage = imageBuffer.makeImage() {
-//      DispatchQueue.main.async {
-//        self.effectLayer.contents = cgImage
-//      }
-//    }
-
     do {
       if let pixelBuffer = try segmentation.runSegmentation(
         colorBuffer: colorBuffer,
@@ -104,7 +96,6 @@ class HSEffectManager: NSObject {
         let imageBuffer = HSImageBuffer(pixelBuffer: pixelBuffer)
         if let image = imageBuffer.makeImage() {
           DispatchQueue.main.async {
-            print("set layer contents")
             self.effectLayer.contents = image
           }
         }

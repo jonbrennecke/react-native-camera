@@ -104,8 +104,9 @@ class HSCameraManager: NSObject {
   }
 
   private func attemptToSetupCameraCaptureSession() -> HSCameraSetupResult {
-    if captureSession.canSetSessionPreset(.high) {
-      captureSession.sessionPreset = .high
+    let preset: AVCaptureSession.Preset = .photo
+    if captureSession.canSetSessionPreset(preset) {
+      captureSession.sessionPreset = preset
     }
 
     // Setup videoCaptureDevice
