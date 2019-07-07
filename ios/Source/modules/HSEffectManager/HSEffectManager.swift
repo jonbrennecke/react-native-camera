@@ -50,7 +50,7 @@ class HSEffectManager: NSObject {
     CVPixelBufferPoolCreate(kCFAllocatorDefault, poolAttributes, bufferAttributes, &pool)
     return pool
   }()
-  
+
   private lazy var outputCVPixelBufferPool: CVPixelBufferPool = {
     let poolAttributes = [kCVPixelBufferPoolMinimumBufferCountKey: 1] as CFDictionary
     let bufferAttributes = [
@@ -59,7 +59,7 @@ class HSEffectManager: NSObject {
       kCVPixelBufferPixelFormatTypeKey: kCVPixelFormatType_OneComponent8,
       kCVPixelBufferWidthKey: HSEffectManager.outputImageSize.width,
       kCVPixelBufferHeightKey: HSEffectManager.outputImageSize.height,
-      ] as [String: Any] as CFDictionary
+    ] as [String: Any] as CFDictionary
     var pool: CVPixelBufferPool!
     CVPixelBufferPoolCreate(kCFAllocatorDefault, poolAttributes, bufferAttributes, &pool)
     return pool
@@ -95,25 +95,23 @@ class HSEffectManager: NSObject {
 //      }
 //    }
 
-      do {
-        if let pixelBuffer = try segmentation.runSegmentation(
-          colorBuffer: colorBuffer,
-          depthBuffer: depthBuffer,
-          pixelBufferPool: outputCVPixelBufferPool
-        ) {
-          let imageBuffer = HSImageBuffer(pixelBuffer: pixelBuffer)
-          if let image = imageBuffer.makeImage() {
-            DispatchQueue.main.async {
-              print("set layer contents")
-              self.effectLayer.contents = image
-            }
+    do {
+      if let pixelBuffer = try segmentation.runSegmentation(
+        colorBuffer: colorBuffer,
+        depthBuffer: depthBuffer,
+        pixelBufferPool: outputCVPixelBufferPool
+      ) {
+        let imageBuffer = HSImageBuffer(pixelBuffer: pixelBuffer)
+        if let image = imageBuffer.makeImage() {
+          DispatchQueue.main.async {
+            print("set layer contents")
+            self.effectLayer.contents = image
           }
         }
-
       }
-      catch let error {
-        fatalError(error.localizedDescription)
-      }
+    } catch {
+      fatalError(error.localizedDescription)
+    }
   }
 
   private func preprocess(sampleBuffer: CMSampleBuffer) -> HSPixelBuffer? {
