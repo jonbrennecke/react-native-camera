@@ -1,5 +1,6 @@
 import CoreML
 import HSCameraUtils
+import Accelerate
 
 public class HSSegmentation {
   private let model: HSSegmentationModel
@@ -10,7 +11,8 @@ public class HSSegmentation {
 
   public func runSegmentation(
     colorBuffer: HSPixelBuffer,
-    depthBuffer: HSPixelBuffer
+    depthBuffer: HSPixelBuffer,
+    pixelBufferPool: CVPixelBufferPool
   ) throws -> HSPixelBuffer? {
     let input = HSSegmentationModelInput(
       color_image_input: colorBuffer.buffer,
@@ -18,23 +20,80 @@ public class HSSegmentation {
     )
     let output = try model.prediction(input: input)
 
+    // convert multiarray to CVPixelBuffer
+    
     let multiArray = output.segmentation_image_output
     let height = multiArray.shape[1].intValue
     let width = multiArray.shape[2].intValue
     let size = Size<Int>(width: width, height: height)
 
-    let pixels: [Double] = convert(multiArray: multiArray)
-    var integers = pixels.map { pixel -> UInt8 in
-//      let scaled = (value - min) * 255 / (max - min)
-//      let pixel = clamp(scaled, min: 0, max: 255)
-      return UInt8(exactly: pixel.rounded())!
+    let rawPixels: [Double] = convert(multiArray: multiArray)
+    let bounds = rawPixels.bounds()
+    
+    var pixels = rawPixels.map { pixel -> UInt8 in
+      let normalized = normalize(pixel, min: bounds.lowerBound, max: bounds.upperBound)
+      let scaled = clamp(normalized * 255, min: 0, max: 255)
+      return UInt8(exactly: scaled.rounded()) ?? 0
     }
 
-//    guard let buffer = createBuffer(with: &integers, size: size, bytesPerRow:  bufferInfo: .grayScaleUInt8) else {
-//      return nil
-//    }
-//    return HSPixelBuffer(pixelBuffer: buffer)
-    return nil
+    // create vImage_Buffer with data
+    let bufferInfo = HSBufferInfo(pixelFormatType: kCVPixelFormatType_OneComponent8)
+    let bytesPerPixel = bufferInfo.bytesPerPixel
+    let destHeight = vImagePixelCount(size.height)
+    let destWidth = vImagePixelCount(size.width)
+    let destTotalBytes = size.height * size.width * bytesPerPixel
+    let destBytesPerRow = size.width * bytesPerPixel
+    guard let destData = malloc(destTotalBytes) else {
+      return nil
+    }
+    
+    // TODO: create vImage_Buffer directly with data
+    memcpy(destData, &pixels, destTotalBytes)
+    
+    var destBuffer = vImage_Buffer(
+      data: destData,
+      height: destHeight,
+      width: destWidth,
+      rowBytes: destBytesPerRow
+    )
+    
+    guard let destPixelBuffer = createPixelBuffer(with: pixelBufferPool) else {
+      free(destData)
+      return nil
+    }
+    
+    var cgImageFormat = vImage_CGImageFormat(
+      bitsPerComponent: UInt32(bufferInfo.bitsPerComponent),
+      bitsPerPixel: UInt32(bufferInfo.bitsPerPixel),
+      colorSpace: Unmanaged.passRetained(bufferInfo.colorSpace),
+      bitmapInfo: bufferInfo.bitmapInfo,
+      version: 0,
+      decode: nil,
+      renderingIntent: .defaultIntent
+    )
+    
+    guard let cvImageFormat = vImageCVImageFormat_CreateWithCVPixelBuffer(destPixelBuffer)?.takeRetainedValue() else {
+      free(destData)
+      return nil
+    }
+    vImageCVImageFormat_SetColorSpace(cvImageFormat, bufferInfo.colorSpace)
+    
+    let copyError = vImageBuffer_CopyToCVPixelBuffer(
+      &destBuffer,
+      &cgImageFormat,
+      destPixelBuffer,
+      cvImageFormat,
+      nil,
+      vImage_Flags(kvImageNoFlags)
+    )
+    
+    if copyError != kvImageNoError {
+      free(destData)
+      return nil
+    }
+    free(destData)
+    
+    return HSPixelBuffer(pixelBuffer: destPixelBuffer)
   }
 }
 
@@ -53,8 +112,6 @@ func convert<T: Numeric>(multiArray: MLMultiArray) -> [T] {
   for y in 0 ..< height {
     for x in 0 ..< width {
       let value = ptr[y * heightStride + x * widthStride]
-//      let scaled = (value - min) * T(255) / (max - min)
-//      let pixel = clamp(scaled, min: T(0), max: T(255)).toUInt8
       pixels[y * width + x] = value
     }
   }

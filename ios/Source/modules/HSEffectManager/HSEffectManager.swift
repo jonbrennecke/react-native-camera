@@ -18,6 +18,7 @@ class HSEffectManager: NSObject {
 
   private static let depthImageSize = Size<Int>(width: 1080, height: 1920)
   private static let colorImageSize = Size<Int>(width: 1080, height: 1920)
+  private static let outputImageSize = Size<Int>(width: 1080, height: 1916)
 
   private var segmentation: HSSegmentation?
   private let context = CIContext()
@@ -49,6 +50,20 @@ class HSEffectManager: NSObject {
     CVPixelBufferPoolCreate(kCFAllocatorDefault, poolAttributes, bufferAttributes, &pool)
     return pool
   }()
+  
+  private lazy var outputCVPixelBufferPool: CVPixelBufferPool = {
+    let poolAttributes = [kCVPixelBufferPoolMinimumBufferCountKey: 1] as CFDictionary
+    let bufferAttributes = [
+      kCVPixelBufferCGImageCompatibilityKey: true,
+      kCVPixelBufferCGBitmapContextCompatibilityKey: true,
+      kCVPixelBufferPixelFormatTypeKey: kCVPixelFormatType_OneComponent8,
+      kCVPixelBufferWidthKey: HSEffectManager.outputImageSize.width,
+      kCVPixelBufferHeightKey: HSEffectManager.outputImageSize.height,
+      ] as [String: Any] as CFDictionary
+    var pool: CVPixelBufferPool!
+    CVPixelBufferPoolCreate(kCFAllocatorDefault, poolAttributes, bufferAttributes, &pool)
+    return pool
+  }()
 
   @objc
   public func start() {
@@ -63,39 +78,42 @@ class HSEffectManager: NSObject {
   }
 
   @objc(applyEffectWithDepthData:videoData:error:)
-  public func applyEffect(with depthData: AVDepthData, videoSampleBuffer _: CMSampleBuffer) throws {
+  public func applyEffect(with depthData: AVDepthData, videoSampleBuffer: CMSampleBuffer) throws {
     guard
-//      let segmentation = segmentation,
-//      let colorBuffer = preprocess(sampleBuffer: videoSampleBuffer),
+      let segmentation = segmentation,
+      let colorBuffer = preprocess(sampleBuffer: videoSampleBuffer),
       let depthBuffer = preprocess(depthData: depthData)
     else {
       return
     }
 
 //    let imageBuffer = HSImageBuffer(pixelBuffer: colorBuffer)
+//    let imageBuffer = HSImageBuffer(pixelBuffer: depthBuffer)
+//    if let cgImage = imageBuffer.makeImage() {
+//      DispatchQueue.main.async {
+//        self.effectLayer.contents = cgImage
+//      }
+//    }
 
-    let imageBuffer = HSImageBuffer(pixelBuffer: depthBuffer)
-    if let cgImage = imageBuffer.makeImage() {
-      DispatchQueue.main.async {
-        self.effectLayer.contents = cgImage
+      do {
+        if let pixelBuffer = try segmentation.runSegmentation(
+          colorBuffer: colorBuffer,
+          depthBuffer: depthBuffer,
+          pixelBufferPool: outputCVPixelBufferPool
+        ) {
+          let imageBuffer = HSImageBuffer(pixelBuffer: pixelBuffer)
+          if let image = imageBuffer.makeImage() {
+            DispatchQueue.main.async {
+              print("set layer contents")
+              self.effectLayer.contents = image
+            }
+          }
+        }
+
       }
-    }
-
-//      do {
-//        if let pixelBuffer = try segmentation.runSegmentation(colorBuffer: colorPixelBuffer, depthBuffer: depthPixelBuffer) {
-//          let imageBuffer = HSImageBuffer(pixelBuffer: pixelBuffer)
-//          if let image = imageBuffer.makeImage() {
-//            DispatchQueue.main.async {
-//              print("set layer contents")
-//              self.effectLayer.contents = image
-//            }
-//          }
-//        }
-
-//      }
-//      catch let error {
-//        fatalError(error.localizedDescription)
-//      }
+      catch let error {
+        fatalError(error.localizedDescription)
+      }
   }
 
   private func preprocess(sampleBuffer: CMSampleBuffer) -> HSPixelBuffer? {
