@@ -269,7 +269,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
     if !synchronizedDepthData.depthDataWasDropped {
       delegate.cameraManagerDidOutput(depthData: synchronizedDepthData.depthData)
     }
-    
+
     if !synchronizedVideoData.sampleBufferWasDropped {
       delegate.cameraManagerDidOutput(videoSampleBuffer: synchronizedVideoData.sampleBuffer)
     }

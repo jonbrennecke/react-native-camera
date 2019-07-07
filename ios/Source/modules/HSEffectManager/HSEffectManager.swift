@@ -6,13 +6,12 @@ import UIKit
 @available(iOS 11.0, *)
 @objc
 class HSEffectManager: NSObject {
-  
   @objc(HSEffectManagerResult)
   public enum Result: Int {
     case success
     case failedToLoadModel
   }
-  
+
   internal lazy var effectLayer: CALayer = {
     let layer = CALayer()
     layer.contentsGravity = .resizeAspectFill
@@ -28,7 +27,7 @@ class HSEffectManager: NSObject {
   private static let outputImageSize = Size<Int>(width: 1080, height: 1916)
 
   private var segmentation: HSSegmentation?
-  
+
   private lazy var displayLink: CADisplayLink = {
     let displayLink = CADisplayLink(target: self, selector: #selector(handleDisplayLinkUpdate))
     displayLink.preferredFramesPerSecond = 20
@@ -76,21 +75,21 @@ class HSEffectManager: NSObject {
     CVPixelBufferPoolCreate(kCFAllocatorDefault, poolAttributes, bufferAttributes, &pool)
     return pool
   }()
-  
+
   @objc
   public var depthData: AVDepthData?
-  
+
   @objc
   public var videoSampleBuffer: CMSampleBuffer?
 
   @objc(start:)
   public func start(_ completionHandler: @escaping (HSEffectManager.Result) -> Void) {
-    loadModel { (result) in
+    loadModel { result in
       self.displayLink.add(to: .main, forMode: .common)
       completionHandler(result)
     }
   }
-  
+
   private func loadModel(_ completionHandler: @escaping (HSEffectManager.Result) -> Void) {
     HSSegmentationModelLoader.loadModel { result in
       switch result {
@@ -102,16 +101,15 @@ class HSEffectManager: NSObject {
       }
     }
   }
-  
+
   @objc
-  private func handleDisplayLinkUpdate(_ displayLink: CADisplayLink) {
+  private func handleDisplayLinkUpdate(_: CADisplayLink) {
     guard let depthData = depthData, let videoSampleBuffer = videoSampleBuffer else {
       return
     }
     do {
       try applyEffects(with: depthData, videoSampleBuffer: videoSampleBuffer)
-    }
-    catch let error  {
+    } catch {
       fatalError(error.localizedDescription)
     }
   }

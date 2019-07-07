@@ -16,27 +16,30 @@ RCT_EXPORT_MODULE(HSEffectManager)
   return self;
 }
 
-- (NSString*)stringifyResult:(enum HSEffectManagerResult)result {
+- (NSString *)stringifyResult:(enum HSEffectManagerResult)result {
   switch (result) {
-    case HSEffectManagerResultFailedToLoadModel:
-      return @"Failed to load model";
-    default:
-      return @"Unknown error";
+  case HSEffectManagerResultFailedToLoadModel:
+    return @"Failed to load model";
+  default:
+    return @"Unknown error";
   }
 }
 
 RCT_EXPORT_METHOD(start : (RCTResponseSenderBlock)callback) {
   if (@available(iOS 11.1, *)) {
-    [[HSEffectManager sharedInstance] start:^(enum HSEffectManagerResult result) {
-      if (result != HSEffectManagerResultSuccess) {
-        NSString* underlyingError = [self stringifyResult:result];
-        NSString* errorMessage = [NSString stringWithFormat:@"Failed to start cammera effects; Error = %@", underlyingError];
-        id error = RCTMakeError(errorMessage, nil, nil);
-        callback(@[ error, @(NO) ]);
-      } else {
-        callback(@[ [NSNull null], @(YES) ]);
-      }
-    }];
+    [[HSEffectManager sharedInstance]
+        start:^(enum HSEffectManagerResult result) {
+          if (result != HSEffectManagerResultSuccess) {
+            NSString *underlyingError = [self stringifyResult:result];
+            NSString *errorMessage = [NSString
+                stringWithFormat:@"Failed to start cammera effects; Error = %@",
+                                 underlyingError];
+            id error = RCTMakeError(errorMessage, nil, nil);
+            callback(@[ error, @(NO) ]);
+          } else {
+            callback(@[ [NSNull null], @(YES) ]);
+          }
+        }];
     HSCameraManager.sharedInstance.depthDelegate = self;
     return;
   }
@@ -45,8 +48,9 @@ RCT_EXPORT_METHOD(start : (RCTResponseSenderBlock)callback) {
   callback(@[ error, @(NO) ]);
 }
 
-- (void)cameraManagerDidOutputVideoSampleBuffer:(CMSampleBufferRef)videoSampleBuffer {
-  HSEffectManager.sharedInstance.videoSampleBuffer = videoSampleBuffer;
+- (void)cameraManagerDidOutputVideoSampleBuffer:
+    (CMSampleBufferRef)sampleBuffer {
+  HSEffectManager.sharedInstance.videoSampleBuffer = sampleBuffer;
 }
 
 - (void)cameraManagerDidOutputDepthData:(AVDepthData *)depthData {
