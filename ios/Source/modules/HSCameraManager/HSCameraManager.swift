@@ -260,18 +260,19 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
   func dataOutputSynchronizer(_: AVCaptureDataOutputSynchronizer, didOutput collection: AVCaptureSynchronizedDataCollection) {
     guard
       let delegate = depthDelegate,
-      let depthData = collection.synchronizedData(for: depthOutput) as? AVCaptureSynchronizedDepthData,
-      let videoData = collection.synchronizedData(for: videoOutput) as? AVCaptureSynchronizedSampleBufferData
+      let synchronizedDepthData = collection.synchronizedData(for: depthOutput) as? AVCaptureSynchronizedDepthData,
+      let synchronizedVideoData = collection.synchronizedData(for: videoOutput) as? AVCaptureSynchronizedSampleBufferData
     else {
       return
     }
 
-    // Check if data was dropped for any reason
-    if depthData.depthDataWasDropped || videoData.sampleBufferWasDropped {
-      return
+    if !synchronizedDepthData.depthDataWasDropped {
+      delegate.cameraManagerDidOutput(depthData: synchronizedDepthData.depthData)
     }
-
-    delegate.cameraManagerDidOutput(depthData: depthData.depthData, videoData: videoData.sampleBuffer)
+    
+    if !synchronizedVideoData.sampleBufferWasDropped {
+      delegate.cameraManagerDidOutput(videoSampleBuffer: synchronizedVideoData.sampleBuffer)
+    }
   }
 }
 

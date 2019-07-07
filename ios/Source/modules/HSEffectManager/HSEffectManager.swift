@@ -6,10 +6,17 @@ import UIKit
 @available(iOS 11.0, *)
 @objc
 class HSEffectManager: NSObject {
+  
+  @objc(HSEffectManagerResult)
+  public enum Result: Int {
+    case success
+    case failedToLoadModel
+  }
+  
   internal lazy var effectLayer: CALayer = {
     let layer = CALayer()
     layer.contentsGravity = .resizeAspectFill
-    layer.backgroundColor = UIColor.red.cgColor
+    layer.backgroundColor = UIColor.black.cgColor
     return layer
   }()
 
@@ -21,7 +28,12 @@ class HSEffectManager: NSObject {
   private static let outputImageSize = Size<Int>(width: 1080, height: 1916)
 
   private var segmentation: HSSegmentation?
-  private let context = CIContext()
+  
+  private lazy var displayLink: CADisplayLink = {
+    let displayLink = CADisplayLink(target: self, selector: #selector(handleDisplayLinkUpdate))
+    displayLink.preferredFramesPerSecond = 20
+    return displayLink
+  }()
 
   private lazy var depthCVPixelBufferPool: CVPixelBufferPool = {
     let poolAttributes = [kCVPixelBufferPoolMinimumBufferCountKey: 1] as CFDictionary
@@ -64,21 +76,47 @@ class HSEffectManager: NSObject {
     CVPixelBufferPoolCreate(kCFAllocatorDefault, poolAttributes, bufferAttributes, &pool)
     return pool
   }()
-
+  
   @objc
-  public func start() {
+  public var depthData: AVDepthData?
+  
+  @objc
+  public var videoSampleBuffer: CMSampleBuffer?
+
+  @objc(start:)
+  public func start(_ completionHandler: @escaping (HSEffectManager.Result) -> Void) {
+    loadModel { (result) in
+      self.displayLink.add(to: .main, forMode: .common)
+      completionHandler(result)
+    }
+  }
+  
+  private func loadModel(_ completionHandler: @escaping (HSEffectManager.Result) -> Void) {
     HSSegmentationModelLoader.loadModel { result in
       switch result {
       case let .ok(model):
         self.segmentation = HSSegmentation(model: model)
+        completionHandler(.success)
       case .err:
-        fatalError("Failed to load model") // FIXME: add completionHandler callback
+        completionHandler(.failedToLoadModel)
       }
     }
   }
+  
+  @objc
+  private func handleDisplayLinkUpdate(_ displayLink: CADisplayLink) {
+    guard let depthData = depthData, let videoSampleBuffer = videoSampleBuffer else {
+      return
+    }
+    do {
+      try applyEffects(with: depthData, videoSampleBuffer: videoSampleBuffer)
+    }
+    catch let error  {
+      fatalError(error.localizedDescription)
+    }
+  }
 
-  @objc(applyEffectWithDepthData:videoData:error:)
-  public func applyEffect(with depthData: AVDepthData, videoSampleBuffer: CMSampleBuffer) throws {
+  private func applyEffects(with depthData: AVDepthData, videoSampleBuffer: CMSampleBuffer) throws {
     guard
       let segmentation = segmentation,
       let colorBuffer = preprocess(sampleBuffer: videoSampleBuffer),

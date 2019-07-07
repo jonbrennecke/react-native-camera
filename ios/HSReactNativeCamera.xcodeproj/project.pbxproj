@@ -113,7 +113,7 @@
 		FC845E6422B9B0B700522016 /* HSCameraEffectView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSCameraEffectView.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC845E6722B9B1BC00522016 /* HSCameraEffectViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HSCameraEffectViewManager.m; sourceTree = "<group>"; };
 		FC845E6922B9B1C500522016 /* HSCameraEffectViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSCameraEffectViewManager.h; sourceTree = "<group>"; };
-		FC845E6A22B9B30000522016 /* HSCameraManagerDepthDataDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSCameraManagerDepthDataDelegate.swift; sourceTree = "<group>"; };
+		FC845E6A22B9B30000522016 /* HSCameraManagerDepthDataDelegate.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSCameraManagerDepthDataDelegate.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC845E7D22BC843100522016 /* mathUtils.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = mathUtils.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = PromiseKit.xcodeproj; path = PromiseKit/PromiseKit.xcodeproj; sourceTree = SOURCE_ROOT; };
 		FCBFAF0722CBE27300A0AC11 /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
@@ -262,8 +262,8 @@
 		FCBFAF1222CBF38F00A0AC11 /* HSSegmentation */ = {
 			isa = PBXGroup;
 			children = (
-				FC2FB8EF22CBCEA5007CE0AF /* HSSegmentationModelLoader.swift */,
 				FCBFAF1022CBF28B00A0AC11 /* HSSegmentation.swift */,
+				FC2FB8EF22CBCEA5007CE0AF /* HSSegmentationModelLoader.swift */,
 			);
 			path = HSSegmentation;
 			sourceTree = "<group>";
