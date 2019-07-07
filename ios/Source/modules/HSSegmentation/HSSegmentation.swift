@@ -32,25 +32,17 @@ public class HSSegmentation {
     let bytesPerPixel = bufferInfo.bytesPerPixel
     let destHeight = vImagePixelCount(size.height)
     let destWidth = vImagePixelCount(size.width)
-    let destTotalBytes = size.height * size.width * bytesPerPixel
     let destBytesPerRow = size.width * bytesPerPixel
-    guard let destData = malloc(destTotalBytes) else {
-      return nil
-    }
-
-    // TODO: create vImage_Buffer directly with data
     var pixels = convertMultiArrayToPixels(multiArray)
-    memcpy(destData, &pixels, destTotalBytes)
 
     var destBuffer = vImage_Buffer(
-      data: destData,
+      data: &pixels,
       height: destHeight,
       width: destWidth,
       rowBytes: destBytesPerRow
     )
 
     guard let destPixelBuffer = createPixelBuffer(with: pixelBufferPool) else {
-      free(destData)
       return nil
     }
 
@@ -65,7 +57,6 @@ public class HSSegmentation {
     )
 
     guard let cvImageFormat = vImageCVImageFormat_CreateWithCVPixelBuffer(destPixelBuffer)?.takeRetainedValue() else {
-      free(destData)
       return nil
     }
     vImageCVImageFormat_SetColorSpace(cvImageFormat, bufferInfo.colorSpace)
@@ -80,10 +71,8 @@ public class HSSegmentation {
     )
 
     if copyError != kvImageNoError {
-      free(destData)
       return nil
     }
-    free(destData)
 
     return HSPixelBuffer(pixelBuffer: destPixelBuffer)
   }
