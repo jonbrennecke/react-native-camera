@@ -40,38 +40,41 @@ public class HSSegmentation {
       rowBytes: destBytesPerRow
     )
 
-    // create CVPixelBuffer with vImage_Buffer
-    guard let destPixelBuffer = createPixelBuffer(with: pixelBufferPool) else {
+    // create CVPixelBuffer with pool
+    guard var destPixelBuffer = createPixelBuffer(with: pixelBufferPool) else {
       return nil
     }
+    
+    _ = copy(buffer: &destBuffer, to: &destPixelBuffer, bufferInfo: bufferInfo)
 
-    var cgImageFormat = vImage_CGImageFormat(
-      bitsPerComponent: UInt32(bufferInfo.bitsPerComponent),
-      bitsPerPixel: UInt32(bufferInfo.bitsPerPixel),
-      colorSpace: Unmanaged.passRetained(bufferInfo.colorSpace),
-      bitmapInfo: bufferInfo.bitmapInfo,
-      version: 0,
-      decode: nil,
-      renderingIntent: .defaultIntent
-    )
-
-    guard let cvImageFormat = vImageCVImageFormat_CreateWithCVPixelBuffer(destPixelBuffer)?.takeRetainedValue() else {
-      return nil
-    }
-    vImageCVImageFormat_SetColorSpace(cvImageFormat, bufferInfo.colorSpace)
-
-    let copyError = vImageBuffer_CopyToCVPixelBuffer(
-      &destBuffer,
-      &cgImageFormat,
-      destPixelBuffer,
-      cvImageFormat,
-      nil,
-      vImage_Flags(kvImageNoFlags)
-    )
-
-    if copyError != kvImageNoError {
-      return nil
-    }
+    // copy vImage_Buffer to CVPixelBuffer
+//    var cgImageFormat = vImage_CGImageFormat(
+//      bitsPerComponent: UInt32(bufferInfo.bitsPerComponent),
+//      bitsPerPixel: UInt32(bufferInfo.bitsPerPixel),
+//      colorSpace: Unmanaged.passRetained(bufferInfo.colorSpace),
+//      bitmapInfo: bufferInfo.bitmapInfo,
+//      version: 0,
+//      decode: nil,
+//      renderingIntent: .defaultIntent
+//    )
+//
+//    guard let cvImageFormat = vImageCVImageFormat_CreateWithCVPixelBuffer(destPixelBuffer)?.takeRetainedValue() else {
+//      return nil
+//    }
+//    vImageCVImageFormat_SetColorSpace(cvImageFormat, bufferInfo.colorSpace)
+//
+//    let copyError = vImageBuffer_CopyToCVPixelBuffer(
+//      &destBuffer,
+//      &cgImageFormat,
+//      destPixelBuffer,
+//      cvImageFormat,
+//      nil,
+//      vImage_Flags(kvImageNoFlags)
+//    )
+//
+//    if copyError != kvImageNoError {
+//      return nil
+//    }
 
     return HSPixelBuffer(pixelBuffer: destPixelBuffer)
   }

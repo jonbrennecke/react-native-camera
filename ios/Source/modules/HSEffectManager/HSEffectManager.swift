@@ -30,7 +30,7 @@ class HSEffectManager: NSObject {
 
   private lazy var displayLink: CADisplayLink = {
     let displayLink = CADisplayLink(target: self, selector: #selector(handleDisplayLinkUpdate))
-    displayLink.preferredFramesPerSecond = 20
+    displayLink.preferredFramesPerSecond = 30
     return displayLink
   }()
 
@@ -108,8 +108,10 @@ class HSEffectManager: NSObject {
       return
     }
     do {
+      // TODO: run in background queue
       try applyEffects(with: depthData, videoSampleBuffer: videoSampleBuffer)
     } catch {
+      // TODO: handle error in javascript
       fatalError(error.localizedDescription)
     }
   }
@@ -122,22 +124,17 @@ class HSEffectManager: NSObject {
     else {
       return
     }
-
-    do {
-      if let pixelBuffer = try segmentation.runSegmentation(
-        colorBuffer: colorBuffer,
-        depthBuffer: depthBuffer,
-        pixelBufferPool: outputCVPixelBufferPool
-      ) {
-        let imageBuffer = HSImageBuffer(pixelBuffer: pixelBuffer)
-        if let image = imageBuffer.makeImage() {
-          DispatchQueue.main.async {
-            self.effectLayer.contents = image
-          }
+    if let pixelBuffer = try segmentation.runSegmentation(
+      colorBuffer: colorBuffer,
+      depthBuffer: depthBuffer,
+      pixelBufferPool: outputCVPixelBufferPool
+    ) {
+      let imageBuffer = HSImageBuffer(pixelBuffer: pixelBuffer)
+      if let image = imageBuffer.makeImage() {
+        DispatchQueue.main.async {
+          self.effectLayer.contents = image
         }
       }
-    } catch {
-      fatalError(error.localizedDescription)
     }
   }
 
@@ -157,12 +154,16 @@ class HSEffectManager: NSObject {
     let buffer = HSPixelBuffer(depthData: depthData)
     let iterator: HSPixelBufferIterator<Float32> = buffer.makeIterator()
     let bounds = iterator.bounds()
-    guard let mappedIterator = map(iterator, to: kCVPixelFormatType_OneComponent8, transform: { value -> UInt8 in
-      let normalized = normalize(value, min: bounds.lowerBound, max: bounds.upperBound)
-      let scaled = normalized * 255
-      let pixel = clamp(scaled, min: 0, max: 255)
-      return UInt8(exactly: pixel.rounded()) ?? 0
-    }) else {
+    guard let mappedIterator = map(
+      iterator,
+      pixelFormatType: kCVPixelFormatType_OneComponent8,
+      pixelBufferPool: depthCVPixelBufferPool,
+      transform: { value -> UInt8 in
+        let normalized = normalize(value, min: bounds.lowerBound, max: bounds.upperBound)
+        let scaled = normalized * 255
+        let pixel = clamp(scaled, min: 0, max: 255)
+        return UInt8(exactly: pixel.rounded()) ?? 0
+      }) else {
       return nil
     }
     return resize(
