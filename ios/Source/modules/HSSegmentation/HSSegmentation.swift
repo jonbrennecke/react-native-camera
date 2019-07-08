@@ -55,30 +55,15 @@ fileprivate func convertMultiArrayToPixels(_ multiArray: MLMultiArray) -> [UInt8
   let size = Size<Int>(width: width, height: height)
   let heightStride = multiArray.strides[1].intValue
   let widthStride = multiArray.strides[2].intValue
-
   let ptr = UnsafeMutablePointer<Double>(OpaquePointer(multiArray.dataPointer))
-  let forEachPixel = { (body: (Double, Int, Int) -> Void) in
-    for y in 0 ..< height {
-      for x in 0 ..< width {
-        let value = ptr[y * heightStride + x * widthStride]
-        body(value, x, y)
-      }
-    }
-  }
-
-  let minMax = bounds({ body in
-    forEachPixel { pixel, _, _ in
-      body(pixel)
-    }
-  })
-
   let count = size.width * size.height
   var pixels = [UInt8](repeating: 0, count: count)
-  forEachPixel { pixel, x, y in
-    let normalized = normalize(pixel, min: minMax.lowerBound, max: minMax.upperBound)
-    let scaled = clamp(normalized * 255, min: 0, max: 255)
-    pixels[y * width + x] = UInt8(exactly: scaled.rounded()) ?? 0
+  for y in 0 ..< height {
+    for x in 0 ..< width {
+      let value = ptr[y * heightStride + x * widthStride]
+      let scaled = clamp(value * 255, min: 0, max: 255)
+      pixels[y * width + x] = UInt8(exactly: scaled.rounded()) ?? 0
+    }
   }
-
   return pixels
 }

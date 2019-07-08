@@ -23,6 +23,7 @@
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
+		FC114C0222D3D774008F333B /* SegmentationModel.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = FC114C0122D3D773008F333B /* SegmentationModel.mlmodel */; };
 		FC664F2B22CADAA000FD8AE7 /* libHSReactNativeCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FC7B9EA922B97A940012D8D6 /* libHSReactNativeCamera.a */; };
 		FC6B60CF22AF63ED0060F828 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC6B60A022AF63EC0060F828 /* JavaScriptCore.framework */; };
 		FC6EA7D621CEA44D007C3B3E /* PassionOne-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FC6EA7AC21CEA44D007C3B3E /* PassionOne-Regular.ttf */; };
@@ -353,6 +354,7 @@
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
 		BD50A92D35494C8A876C6C03 /* libReactNativeNavigation.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libReactNativeNavigation.a; sourceTree = "<group>"; };
 		C58E7DD208D94D92847F0B1B /* libReactNativeConfig-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libReactNativeConfig-tvOS.a"; sourceTree = "<group>"; };
+		FC114C0122D3D773008F333B /* SegmentationModel.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = SegmentationModel.mlmodel; sourceTree = "<group>"; };
 		FC664F4122CADD7600FD8AE7 /* libHSCameraUtils.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libHSCameraUtils.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC6B60A022AF63EC0060F828 /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FC6EA7AC21CEA44D007C3B3E /* PassionOne-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PassionOne-Regular.ttf"; path = "../assets/fonts/PassionOne-Regular.ttf"; sourceTree = "<group>"; };
@@ -574,6 +576,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				FC114C0122D3D773008F333B /* SegmentationModel.mlmodel */,
 				13B07FAE1A68108700A75B9A /* Storybook */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* StorybookTests */,
@@ -1051,6 +1054,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC114C0222D3D774008F333B /* SegmentationModel.mlmodel in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				FCDAA01C22AC8D8F00A2E246 /* Empty.swift in Sources */,
