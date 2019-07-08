@@ -107,16 +107,19 @@ class HSEffectManager: NSObject {
     guard let depthData = depthData, let videoSampleBuffer = videoSampleBuffer else {
       return
     }
+    applyEffects(with: depthData, videoSampleBuffer: videoSampleBuffer)
+  }
+
+  private func applyEffects(with depthData: AVDepthData, videoSampleBuffer: CMSampleBuffer) {
     do {
-      // TODO: run in background queue
-      try applyEffects(with: depthData, videoSampleBuffer: videoSampleBuffer)
+      try applyEffectsOrThrow(with: depthData, videoSampleBuffer: videoSampleBuffer)
     } catch {
       // TODO: handle error in javascript
       fatalError(error.localizedDescription)
     }
   }
 
-  private func applyEffects(with depthData: AVDepthData, videoSampleBuffer: CMSampleBuffer) throws {
+  private func applyEffectsOrThrow(with depthData: AVDepthData, videoSampleBuffer: CMSampleBuffer) throws {
     guard
       let segmentation = segmentation,
       let colorBuffer = preprocess(sampleBuffer: videoSampleBuffer),
