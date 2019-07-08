@@ -22,6 +22,7 @@ class HSEffectManager: NSObject {
   @objc(sharedInstance)
   public static let shared = HSEffectManager()
 
+  private static let rawDepthImageSize = Size<Int>(width: 360, height: 640) // TODO: variable depending on device
   private static let depthImageSize = Size<Int>(width: 1080, height: 1920)
   private static let colorImageSize = Size<Int>(width: 1080, height: 1920)
   private static let outputImageSize = Size<Int>(width: 1080, height: 1916)
@@ -32,6 +33,20 @@ class HSEffectManager: NSObject {
     let displayLink = CADisplayLink(target: self, selector: #selector(handleDisplayLinkUpdate))
     displayLink.preferredFramesPerSecond = 24
     return displayLink
+  }()
+  
+  private lazy var rawDepthCVPixelBufferPool: CVPixelBufferPool = {
+    let poolAttributes = [kCVPixelBufferPoolMinimumBufferCountKey: 1] as CFDictionary
+    let bufferAttributes = [
+      kCVPixelBufferCGImageCompatibilityKey: true,
+      kCVPixelBufferCGBitmapContextCompatibilityKey: true,
+      kCVPixelBufferPixelFormatTypeKey: kCVPixelFormatType_OneComponent8,
+      kCVPixelBufferWidthKey: HSEffectManager.rawDepthImageSize.width,
+      kCVPixelBufferHeightKey: HSEffectManager.rawDepthImageSize.height,
+      ] as [String: Any] as CFDictionary
+    var pool: CVPixelBufferPool!
+    CVPixelBufferPoolCreate(kCFAllocatorDefault, poolAttributes, bufferAttributes, &pool)
+    return pool
   }()
 
   private lazy var depthCVPixelBufferPool: CVPixelBufferPool = {
@@ -160,7 +175,7 @@ class HSEffectManager: NSObject {
     guard let mappedIterator = map(
       iterator,
       pixelFormatType: kCVPixelFormatType_OneComponent8,
-      pixelBufferPool: depthCVPixelBufferPool,
+      pixelBufferPool: rawDepthCVPixelBufferPool,
       transform: { value -> UInt8 in
         let normalized = normalize(value, min: bounds.lowerBound, max: bounds.upperBound)
         let scaled = normalized * 255
