@@ -25,7 +25,7 @@
 		FCBFAF0822CBE27300A0AC11 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBFAF0722CBE27300A0AC11 /* Result.swift */; };
 		FCBFAF0B22CBE9CB00A0AC11 /* libHSCameraUtils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FC71B6CB22CAB23A003EA230 /* libHSCameraUtils.a */; };
 		FCBFAF0F22CBF07200A0AC11 /* HSSegmentationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBFAF0E22CBF07200A0AC11 /* HSSegmentationModel.swift */; };
-		FCBFAF1122CBF28B00A0AC11 /* HSSegmentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBFAF1022CBF28B00A0AC11 /* HSSegmentation.swift */; };
+		FCBFAF1122CBF28B00A0AC11 /* createSegmentationMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBFAF1022CBF28B00A0AC11 /* createSegmentationMask.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -117,8 +117,8 @@
 		FC845E7D22BC843100522016 /* mathUtils.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = mathUtils.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = PromiseKit.xcodeproj; path = PromiseKit/PromiseKit.xcodeproj; sourceTree = SOURCE_ROOT; };
 		FCBFAF0722CBE27300A0AC11 /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
-		FCBFAF0E22CBF07200A0AC11 /* HSSegmentationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSSegmentationModel.swift; sourceTree = "<group>"; };
-		FCBFAF1022CBF28B00A0AC11 /* HSSegmentation.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSSegmentation.swift; sourceTree = "<group>"; tabWidth = 2; };
+		FCBFAF0E22CBF07200A0AC11 /* HSSegmentationModel.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSSegmentationModel.swift; sourceTree = "<group>"; tabWidth = 2; };
+		FCBFAF1022CBF28B00A0AC11 /* createSegmentationMask.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = createSegmentationMask.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FCDEEBEB22CC534C00B09AF2 /* libHSReactNativeCamera.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHSReactNativeCamera.a; path = "../../../../../Library/Developer/Xcode/DerivedData/Storybook-aykofoufjpltyqchwrnbfzpoimmw/Build/Products/Debug-iphoneos/libHSReactNativeCamera.a"; sourceTree = "<group>"; };
 		FCFC983A22AC7CD20089D452 /* HSReactNativeCamera-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HSReactNativeCamera-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -176,7 +176,6 @@
 		FC73F2F622B02D56009B6D9F /* modules */ = {
 			isa = PBXGroup;
 			children = (
-				FCBFAF0E22CBF07200A0AC11 /* HSSegmentationModel.swift */,
 				FCBFAF1222CBF38F00A0AC11 /* HSSegmentation */,
 				FC845E6022B9AC4B00522016 /* HSEffectManager */,
 				FC7B9EB022B97EF40012D8D6 /* HSCameraManager */,
@@ -262,7 +261,8 @@
 		FCBFAF1222CBF38F00A0AC11 /* HSSegmentation */ = {
 			isa = PBXGroup;
 			children = (
-				FCBFAF1022CBF28B00A0AC11 /* HSSegmentation.swift */,
+				FCBFAF0E22CBF07200A0AC11 /* HSSegmentationModel.swift */,
+				FCBFAF1022CBF28B00A0AC11 /* createSegmentationMask.swift */,
 				FC2FB8EF22CBCEA5007CE0AF /* HSSegmentationModelLoader.swift */,
 			);
 			path = HSSegmentation;
@@ -400,7 +400,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FCBFAF1122CBF28B00A0AC11 /* HSSegmentation.swift in Sources */,
+				FCBFAF1122CBF28B00A0AC11 /* createSegmentationMask.swift in Sources */,
 				FC664EEF22CAD9AA00FD8AE7 /* permissionsUtils.swift in Sources */,
 				FC664EF322CAD9AA00FD8AE7 /* mathUtils.swift in Sources */,
 				FCBFAF0822CBE27300A0AC11 /* Result.swift in Sources */,

@@ -138,11 +138,12 @@ class HSCameraManager: NSObject {
 
     // Set depth format of videoCaptureDevice
     // TODO: only required if capturing depth
+    let selectedDepthFormat = kCVPixelFormatType_DisparityFloat32
     if case .some = try? videoCaptureDevice.lockForConfiguration() {
       let supportedDepthFormats = videoCaptureDevice.activeFormat.supportedDepthDataFormats
 
       let depthFormats = supportedDepthFormats.filter { format in
-        return CMFormatDescriptionGetMediaSubType(format.formatDescription) == kCVPixelFormatType_DepthFloat32
+        return CMFormatDescriptionGetMediaSubType(format.formatDescription) == selectedDepthFormat
       }
 
       let highestResolutionDepthFormat = depthFormats.max { a, b in
@@ -201,7 +202,7 @@ class HSCameraManager: NSObject {
 
   private func setupDepthOutput() -> HSCameraSetupResult {
     depthOutput.alwaysDiscardsLateDepthData = true
-    depthOutput.isFilteringEnabled = false
+    depthOutput.isFilteringEnabled = true
     depthOutput.setDelegate(self, callbackQueue: sessionQueue)
     if captureSession.canAddOutput(depthOutput) {
       captureSession.addOutput(depthOutput)

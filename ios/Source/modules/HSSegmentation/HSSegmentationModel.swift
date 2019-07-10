@@ -1,4 +1,5 @@
 import CoreML
+import HSCameraUtils
 
 /// Model Prediction Input Type
 @available(macOS 10.13, iOS 11.0, tvOS 11.0, watchOS 4.0, *)
@@ -58,78 +59,72 @@ class HSSegmentationModelOutput: MLFeatureProvider {
   }
 }
 
-/// Class for model loading and prediction
 @available(macOS 10.13, iOS 11.0, tvOS 11.0, watchOS 4.0, *)
-class HSSegmentationModel {
-  var model: MLModel
+internal class HSSegmentationModel {
+  private var model: MLModel
 
-  /**
-   Construct a model with explicit path to mlmodelc file
-   - parameters:
-   - url: the file url of the model
-   - throws: an NSError object that describes the problem
-   */
+  public enum InputKey: String {
+    case cameraImage = "color_image_input"
+    case depthImage = "depth_image_input"
+    
+    public var stringValue: String {
+      return self.rawValue
+    }
+  }
+  
+  public enum OutputKey: String {
+    case segmentationImage = "segmentation_image_output"
+    
+    public var stringValue: String {
+      return self.rawValue
+    }
+  }
+
   init(contentsOf url: URL) throws {
     model = try MLModel(contentsOf: url)
   }
 
-  /**
-   Construct a model with explicit path to mlmodelc file and configuration
-   - parameters:
-   - url: the file url of the model
-   - configuration: the desired model configuration
-   - throws: an NSError object that describes the problem
-   */
   @available(macOS 10.14, iOS 12.0, tvOS 12.0, watchOS 5.0, *)
   init(contentsOf url: URL, configuration: MLModelConfiguration) throws {
     model = try MLModel(contentsOf: url, configuration: configuration)
   }
 
-  /**
-   Make a prediction using the structured interface
-   - parameters:
-   - input: the input to the prediction as SegmentationModelInput
-   - throws: an NSError object that describes the problem
-   - returns: the result of the prediction as SegmentationModelOutput
-   */
+  internal func sizeOf(input: InputKey) -> Size<Int>? {
+    guard
+      let featureDescription = model.modelDescription.inputDescriptionsByName[input.stringValue],
+      let constraint = featureDescription.imageConstraint
+    else {
+      return nil
+    }
+    return Size(width: constraint.pixelsWide, height: constraint.pixelsHigh)
+  }
+  
+  internal func sizeOf(output: OutputKey) -> Size<Int>? {
+    guard
+      let featureDescription = model.modelDescription.outputDescriptionsByName[output.stringValue],
+      let constraint = featureDescription.multiArrayConstraint
+      else {
+        return nil
+    }
+    let height = constraint.shape[1].intValue
+    let width = constraint.shape[2].intValue
+    return Size(width: width, height: height)
+  }
+
   func prediction(input: HSSegmentationModelInput) throws -> HSSegmentationModelOutput {
     return try prediction(input: input, options: MLPredictionOptions())
   }
 
-  /**
-   Make a prediction using the structured interface
-   - parameters:
-   - input: the input to the prediction as SegmentationModelInput
-   - options: prediction options
-   - throws: an NSError object that describes the problem
-   - returns: the result of the prediction as SegmentationModelOutput
-   */
   func prediction(input: HSSegmentationModelInput, options: MLPredictionOptions) throws -> HSSegmentationModelOutput {
     let outFeatures = try model.prediction(from: input, options: options)
     return HSSegmentationModelOutput(features: outFeatures)
   }
 
-  /**
-   Make a prediction using the convenience interface
-   - parameters:
-   - color_image_input as color (kCVPixelFormatType_32BGRA) image buffer, 1080 pixels wide by 1920 pixels high
-   - depth_image_input as grayscale (kCVPixelFormatType_OneComponent8) image buffer, 1080 pixels wide by 1920 pixels high
-   - throws: an NSError object that describes the problem
-   - returns: the result of the prediction as SegmentationModelOutput
-   */
   func prediction(color_image_input: CVPixelBuffer, depth_image_input: CVPixelBuffer) throws -> HSSegmentationModelOutput {
     let input_ = HSSegmentationModelInput(color_image_input: color_image_input, depth_image_input: depth_image_input)
     return try prediction(input: input_)
   }
 
-  /**
-   Make a batch prediction using the structured interface
-   - parameters:
-   - inputs: the inputs to the prediction as [SegmentationModelInput]
-   - options: prediction options
-   - throws: an NSError object that describes the problem
-   - returns: the result of the prediction as [SegmentationModelOutput]
-   */
   @available(macOS 10.14, iOS 12.0, tvOS 12.0, watchOS 5.0, *)
   func predictions(inputs: [HSSegmentationModelInput], options: MLPredictionOptions = MLPredictionOptions()) throws -> [HSSegmentationModelOutput] {
     let batchIn = MLArrayBatchProvider(array: inputs)
