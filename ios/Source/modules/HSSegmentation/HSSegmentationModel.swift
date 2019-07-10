@@ -66,17 +66,17 @@ internal class HSSegmentationModel {
   public enum InputKey: String {
     case cameraImage = "color_image_input"
     case depthImage = "depth_image_input"
-    
+
     public var stringValue: String {
-      return self.rawValue
+      return rawValue
     }
   }
-  
+
   public enum OutputKey: String {
     case segmentationImage = "segmentation_image_output"
-    
+
     public var stringValue: String {
-      return self.rawValue
+      return rawValue
     }
   }
 
@@ -98,13 +98,13 @@ internal class HSSegmentationModel {
     }
     return Size(width: constraint.pixelsWide, height: constraint.pixelsHigh)
   }
-  
+
   internal func sizeOf(output: OutputKey) -> Size<Int>? {
     guard
       let featureDescription = model.modelDescription.outputDescriptionsByName[output.stringValue],
       let constraint = featureDescription.multiArrayConstraint
-      else {
-        return nil
+    else {
+      return nil
     }
     let height = constraint.shape[1].intValue
     let width = constraint.shape[2].intValue

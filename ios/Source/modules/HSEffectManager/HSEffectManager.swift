@@ -25,12 +25,11 @@ class HSEffectManager: NSObject {
   // TODO: raw input sizes depend on device's camera resolution which may vary
   private static let rawCameraImageSize = Size<Int>(width: 1080, height: 1920)
   private static let rawDepthImageSize = Size<Int>(width: 360, height: 640)
-  
-//  private static let depthImageSize = Size<Int>(width: 256, height: 448)
-//  private static let cameraImageSize = Size<Int>(width: 256, height: 448)
-//  private static let outputImageSize = Size<Int>(width: 256, height: 448)
 
   private var model: HSSegmentationModel?
+  private var modelDepthInputPixelBufferPool: CVPixelBufferPool?
+  private var modelCameraInputPixelBufferPool: CVPixelBufferPool?
+  private var modelOutputPixelBufferPool: CVPixelBufferPool?
 
   private lazy var displayLink: CADisplayLink = {
     let displayLink = CADisplayLink(target: self, selector: #selector(handleDisplayLinkUpdate))
@@ -66,6 +65,12 @@ class HSEffectManager: NSObject {
     return pool
   }()
 
+  @objc
+  public var depthData: AVDepthData?
+
+  @objc
+  public var videoSampleBuffer: CMSampleBuffer?
+
   private func createCVPixelBufferPool(size: Size<Int>, pixelFormatType: OSType) -> CVPixelBufferPool? {
     let poolAttributes = [kCVPixelBufferPoolMinimumBufferCountKey: 1] as CFDictionary
     let bufferAttributes = [
@@ -82,12 +87,6 @@ class HSEffectManager: NSObject {
     }
     return pool
   }
-
-  @objc
-  public var depthData: AVDepthData?
-
-  @objc
-  public var videoSampleBuffer: CMSampleBuffer?
 
   @objc(start:)
   public func start(_ completionHandler: @escaping (HSEffectManager.Result) -> Void) {
@@ -109,13 +108,9 @@ class HSEffectManager: NSObject {
     }
   }
 
-  private var modelDepthInputPixelBufferPool: CVPixelBufferPool?
-  private var modelCameraInputPixelBufferPool: CVPixelBufferPool?
-  private var modelOutputPixelBufferPool: CVPixelBufferPool?
-
   private func configureModelSettings(with model: HSSegmentationModel) {
     self.model = model
-    
+
     // configure depth image input size
     guard let depthInputSize = model.sizeOf(input: .depthImage) else {
       fatalError("Could not determine the size of depth input for the CoreML model.")
@@ -131,7 +126,7 @@ class HSEffectManager: NSObject {
     modelCameraInputPixelBufferPool = createCVPixelBufferPool(
       size: cameraInputSize, pixelFormatType: kCVPixelFormatType_OneComponent8
     )
-    
+
     // configure output size
     guard let outputSize = model.sizeOf(output: .segmentationImage) else {
       fatalError("Could not determine the output size for the CoreML model.")
@@ -214,13 +209,13 @@ class HSEffectManager: NSObject {
     let buffer = HSPixelBuffer(depthData: depthData)
     let iterator: HSPixelBufferIterator<Float32> = buffer.makeIterator()
     let bounds = iterator.bounds()
+    let isDisparity = depthData.depthDataType == kCVPixelFormatType_DisparityFloat32
+      || depthData.depthDataType == kCVPixelFormatType_DisparityFloat16
     guard let mappedIterator = map(
       iterator,
       pixelFormatType: kCVPixelFormatType_OneComponent8,
       pixelBufferPool: rawDepthCVPixelBufferPool,
       transform: { value -> UInt8 in
-        let isDisparity = depthData.depthDataType == kCVPixelFormatType_DisparityFloat32
-          || depthData.depthDataType == kCVPixelFormatType_DisparityFloat16
         let depth = isDisparity ? 1 / value : value
         let normalized = normalize(depth, min: bounds.lowerBound, max: bounds.upperBound)
         let scaled = normalized * 255
