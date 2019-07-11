@@ -173,14 +173,14 @@ class HSEffectManager: NSObject {
         DispatchQueue.main.async {
           let cameraCIImage = CIImage(cgImage: cameraCGImage)
           let maskCIImage = CIImage(cgImage: maskCGImage)
-//          let composedImage = cameraCIImage
-//            .applyingFilter("CIBlendWithMask", parameters: [
-//              "inputMaskImage": maskCIImage,
-//              "inputBackgroundImage": backgroundCIImage,
-//            ])
-//          let composedCGImage = self.context.createCGImage(composedImage, from: composedImage.extent)
-//          self.effectLayer.contents = composedCGImage
-          self.effectLayer.contents = maskCGImage
+          let composedImage = cameraCIImage
+            .applyingFilter("CIBlendWithMask", parameters: [
+              "inputMaskImage": maskCIImage,
+              "inputBackgroundImage": backgroundCIImage,
+            ])
+          let composedCGImage = self.context.createCGImage(composedImage, from: composedImage.extent)
+          self.effectLayer.contents = composedCGImage
+//          self.effectLayer.contents = maskCGImage
         }
       }
     }
