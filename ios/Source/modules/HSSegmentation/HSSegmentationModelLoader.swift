@@ -12,8 +12,8 @@ public struct HSSegmentationModelLoader {
 
   // TODO: read from environment variable
   private static let urlProtocol = "http://"
-//  private static let address = "192.168.254.24"
-  private static let address = "172.20.10.2"
+  private static let address = "192.168.254.24"
+//  private static let address = "172.20.10.2"
   private static let port = "8000"
   private static let modelFileName = "SegmentationModel.mlmodel"
 

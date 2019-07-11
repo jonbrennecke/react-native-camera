@@ -191,12 +191,11 @@ class HSEffectManager: NSObject {
       return nil
     }
     let imageBuffer = HSImageBuffer(pixelBuffer: grayscalePixelBuffer)
-    let x = imageBuffer.resize(
+    return imageBuffer.resize(
       to: modelCameraInputSize,
       pixelBufferPool: modelCameraInputPixelBufferPool,
       isGrayscale: true
     )?.pixelBuffer
-    return x
   }
 
   private func preprocess(depthData: AVDepthData) -> HSPixelBuffer? {
@@ -207,25 +206,14 @@ class HSEffectManager: NSObject {
       return nil
     }
     let buffer = HSPixelBuffer(depthData: depthData)
-    let iterator: HSPixelBufferIterator<Float32> = buffer.makeIterator()
+    let iterator: HSPixelBufferIterator<Float> = buffer.makeIterator()
     let bounds = iterator.bounds()
-    let isDisparity = depthData.depthDataType == kCVPixelFormatType_DisparityFloat32
-      || depthData.depthDataType == kCVPixelFormatType_DisparityFloat16
-    guard let mappedIterator = map(
-      iterator,
-      pixelFormatType: kCVPixelFormatType_OneComponent8,
-      pixelBufferPool: rawDepthCVPixelBufferPool,
-      transform: { value -> UInt8 in
-        let depth = isDisparity ? 1 / value : value
-        let normalized = normalize(depth, min: bounds.lowerBound, max: bounds.upperBound)
-        let scaled = normalized * 255
-        let pixel = clamp(scaled, min: 0, max: 255)
-        return UInt8(exactly: pixel.rounded()) ?? 0
-      }
+    guard let depthPixelBuffer = convertDisparityFloat32PixelBufferToUInt8(
+      pixelBuffer: buffer, pixelBufferPool: rawDepthCVPixelBufferPool, bounds: bounds
     ) else {
-      return nil
+        return nil
     }
-    let imageBuffer = HSImageBuffer(pixelBuffer: mappedIterator.pixelBuffer)
+    let imageBuffer = HSImageBuffer(pixelBuffer: depthPixelBuffer)
     return imageBuffer.resize(
       to: modelDepthInputSize,
       pixelBufferPool: modelDepthInputPixelBufferPool,

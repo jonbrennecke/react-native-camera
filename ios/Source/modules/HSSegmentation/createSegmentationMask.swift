@@ -12,7 +12,10 @@ internal func createSegmentationMask(
     color_image_input: colorBuffer.buffer,
     depth_image_input: depthBuffer.buffer
   )
+  let startTime = CFAbsoluteTimeGetCurrent()
   let output = try model.prediction(input: input)
+  let endTime = CFAbsoluteTimeGetCurrent()
+  print("predict: execution time: \(endTime - startTime)")
 
   // convert multiarray to pixel data
   let multiArray = output.segmentation_image_output
