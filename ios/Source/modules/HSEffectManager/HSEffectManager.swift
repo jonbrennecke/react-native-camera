@@ -19,6 +19,8 @@ class HSEffectManager: NSObject {
     return layer
   }()
 
+  internal lazy var context = CIContext()
+
   @objc(sharedInstance)
   public static let shared = HSEffectManager()
 
@@ -30,6 +32,15 @@ class HSEffectManager: NSObject {
   private var modelDepthInputPixelBufferPool: CVPixelBufferPool?
   private var modelCameraInputPixelBufferPool: CVPixelBufferPool?
   private var modelOutputPixelBufferPool: CVPixelBufferPool?
+
+  private lazy var backgroundImagePixelBufferPool: CVPixelBufferPool? = {
+    guard let size = model?.sizeOf(output: .segmentationImage) else {
+      return nil
+    }
+    return createCVPixelBufferPool(
+      size: size, pixelFormatType: kCVPixelFormatType_32BGRA
+    )
+  }()
 
   private lazy var displayLink: CADisplayLink = {
     let displayLink = CADisplayLink(target: self, selector: #selector(handleDisplayLinkUpdate))
@@ -65,28 +76,33 @@ class HSEffectManager: NSObject {
     return pool
   }()
 
+  private lazy var backgroundBuffer: HSPixelBuffer? = {
+    guard
+      let size = model?.sizeOf(output: .segmentationImage),
+      let pool = backgroundImagePixelBufferPool
+    else {
+      return nil
+    }
+    let bufferInfo = HSBufferInfo(pixelFormatType: kCVPixelFormatType_32BGRA)
+    var pixels = [HS32BGRAPixelValue](repeating: .red, count: size.width * size.height)
+    return createPixelBuffer(data: &pixels, size: size, pool: pool, bufferInfo: bufferInfo)
+  }()
+
+  private lazy var backgroundImage: CIImage? = {
+    guard
+      let backgroundBuffer = backgroundBuffer,
+      let backgroundCGImage = HSImageBuffer(pixelBuffer: backgroundBuffer).makeImage()
+    else {
+      return nil
+    }
+    return CIImage(cgImage: backgroundCGImage)
+  }()
+
   @objc
   public var depthData: AVDepthData?
 
   @objc
   public var videoSampleBuffer: CMSampleBuffer?
-
-  private func createCVPixelBufferPool(size: Size<Int>, pixelFormatType: OSType) -> CVPixelBufferPool? {
-    let poolAttributes = [kCVPixelBufferPoolMinimumBufferCountKey: 1] as CFDictionary
-    let bufferAttributes = [
-      kCVPixelBufferCGImageCompatibilityKey: true,
-      kCVPixelBufferCGBitmapContextCompatibilityKey: true,
-      kCVPixelBufferPixelFormatTypeKey: pixelFormatType,
-      kCVPixelBufferWidthKey: size.width,
-      kCVPixelBufferHeightKey: size.height,
-    ] as [String: Any] as CFDictionary
-    var pool: CVPixelBufferPool!
-    let status = CVPixelBufferPoolCreate(kCFAllocatorDefault, poolAttributes, bufferAttributes, &pool)
-    if status != kCVReturnSuccess {
-      return nil
-    }
-    return pool
-  }
 
   @objc(start:)
   public func start(_ completionHandler: @escaping (HSEffectManager.Result) -> Void) {
@@ -168,10 +184,22 @@ class HSEffectManager: NSObject {
       depthBuffer: depthBuffer,
       pixelBufferPool: modelOutputPixelBufferPool
     ) {
-      let imageBuffer = HSImageBuffer(pixelBuffer: maskPixelBuffer)
-      if let image = imageBuffer.makeImage() {
+      let maskImageBuffer = HSImageBuffer(pixelBuffer: maskPixelBuffer)
+      let cameraImageBuffer = HSImageBuffer(pixelBuffer: cameraBuffer)
+      if
+        let maskCGImage = maskImageBuffer.makeImage(),
+        let cameraCGImage = cameraImageBuffer.makeImage(),
+        let backgroundCIImage = backgroundImage {
         DispatchQueue.main.async {
-          self.effectLayer.contents = image
+          let cameraCIImage = CIImage(cgImage: cameraCGImage)
+          let maskCIImage = CIImage(cgImage: maskCGImage)
+          let composedImage = cameraCIImage
+            .applyingFilter("CIBlendWithMask", parameters: [
+              "inputMaskImage": maskCIImage,
+              "inputBackgroundImage": backgroundCIImage,
+            ])
+          let composedCGImage = self.context.createCGImage(composedImage, from: composedImage.extent)
+          self.effectLayer.contents = composedCGImage
         }
       }
     }
@@ -211,7 +239,7 @@ class HSEffectManager: NSObject {
     guard let depthPixelBuffer = convertDisparityFloat32PixelBufferToUInt8(
       pixelBuffer: buffer, pixelBufferPool: rawDepthCVPixelBufferPool, bounds: bounds
     ) else {
-        return nil
+      return nil
     }
     let imageBuffer = HSImageBuffer(pixelBuffer: depthPixelBuffer)
     return imageBuffer.resize(

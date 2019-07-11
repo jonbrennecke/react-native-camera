@@ -1,15 +1,10 @@
 import CoreML
 import HSCameraUtils
 
-/// Model Prediction Input Type
 @available(macOS 10.13, iOS 11.0, tvOS 11.0, watchOS 4.0, *)
 class HSSegmentationModelInput: MLFeatureProvider {
-  /// color_image_input as color (kCVPixelFormatType_32BGRA) image buffer, 1080 pixels wide by 1920 pixels high
   var color_image_input: CVPixelBuffer
-
-  /// depth_image_input as grayscale (kCVPixelFormatType_OneComponent8) image buffer, 1080 pixels wide by 1920 pixels high
   var depth_image_input: CVPixelBuffer
-
   var featureNames: Set<String> {
     return ["color_image_input", "depth_image_input"]
   }
@@ -30,14 +25,10 @@ class HSSegmentationModelInput: MLFeatureProvider {
   }
 }
 
-/// Model Prediction Output Type
 @available(macOS 10.13, iOS 11.0, tvOS 11.0, watchOS 4.0, *)
 class HSSegmentationModelOutput: MLFeatureProvider {
-  /// Source provided by CoreML
-
   private let provider: MLFeatureProvider
 
-  /// segmentation_image_output as 1 x 1914 x 1080 3-dimensional array of doubles
   lazy var segmentation_image_output: MLMultiArray = {
     [unowned self] in self.provider.featureValue(for: "segmentation_image_output")!.multiArrayValue
   }()!
