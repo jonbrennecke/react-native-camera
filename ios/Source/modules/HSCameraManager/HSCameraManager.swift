@@ -1,5 +1,6 @@
 import AVFoundation
 import Photos
+import HSCameraUtils
 
 fileprivate let DEFAULT_DEPTH_CAPTURE_FRAMES_PER_SECOND = Float64(24)
 
@@ -28,6 +29,32 @@ class HSCameraManager: NSObject {
 
   @objc
   public var depthDelegate: HSCameraManagerDepthDataDelegate?
+  
+  public var videoResolution: Size<Int>? {
+    guard let format = videoCaptureDevice?.activeFormat else {
+      return nil
+    }
+    let dimensions = CMVideoFormatDescriptionGetDimensions(format.formatDescription)
+    let width = Int(dimensions.width)
+    let height = Int(dimensions.height)
+    if let connection = videoOutput.connection(with: .video), connection.videoOrientation == .portrait {
+      return Size(width: height, height: width)
+    }
+    return Size(width: width, height: height)
+  }
+  
+  public var depthResolution: Size<Int>? {
+    guard let format = videoCaptureDevice?.activeDepthDataFormat else {
+      return nil
+    }
+    let dimensions = CMVideoFormatDescriptionGetDimensions(format.formatDescription)
+    let width = Int(dimensions.width)
+    let height = Int(dimensions.height)
+    if let connection = depthOutput.connection(with: .depthData), connection.videoOrientation == .portrait {
+      return Size(width: height, height: width)
+    }
+    return Size(width: width, height: height)
+  }
 
   @objc
   public static func requestCameraPermissions(_ callback: @escaping (Bool) -> Void) {
@@ -106,7 +133,7 @@ class HSCameraManager: NSObject {
   }
 
   private func attemptToSetupCameraCaptureSession() -> HSCameraSetupResult {
-    let preset: AVCaptureSession.Preset = .hd1920x1080
+    let preset: AVCaptureSession.Preset = .vga640x480
     if captureSession.canSetSessionPreset(preset) {
       captureSession.sessionPreset = preset
     }
@@ -202,7 +229,7 @@ class HSCameraManager: NSObject {
 
   private func setupDepthOutput() -> HSCameraSetupResult {
     depthOutput.alwaysDiscardsLateDepthData = true
-    depthOutput.isFilteringEnabled = true
+    depthOutput.isFilteringEnabled = false
     depthOutput.setDelegate(self, callbackQueue: sessionQueue)
     if captureSession.canAddOutput(depthOutput) {
       captureSession.addOutput(depthOutput)

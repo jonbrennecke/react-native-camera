@@ -14,7 +14,7 @@ class HSEffectManager: NSObject {
 
   internal lazy var effectLayer: CALayer = {
     let layer = CALayer()
-    layer.contentsGravity = .resizeAspectFill
+    layer.contentsGravity = .resizeAspect
     layer.backgroundColor = UIColor.black.cgColor
     return layer
   }()
@@ -23,10 +23,6 @@ class HSEffectManager: NSObject {
 
   @objc(sharedInstance)
   public static let shared = HSEffectManager()
-
-  // TODO: raw input sizes depend on device's camera resolution which may vary
-  private static let rawCameraImageSize = Size<Int>(width: 1080, height: 1920)
-  private static let rawDepthImageSize = Size<Int>(width: 360, height: 640)
 
   private var model: HSSegmentationModel?
   
@@ -66,15 +62,21 @@ class HSEffectManager: NSObject {
     )
   }()
 
-  private lazy var rawCameraCVPixelBufferPool: CVPixelBufferPool? = {
-    createCVPixelBufferPool(
-      size: HSEffectManager.rawCameraImageSize, pixelFormatType: kCVPixelFormatType_OneComponent8
+  private lazy var cameraCVPixelBufferPool: CVPixelBufferPool? = {
+    guard let resolution = HSCameraManager.shared.videoResolution else {
+      return nil
+    }
+    return createCVPixelBufferPool(
+      size: resolution, pixelFormatType: kCVPixelFormatType_OneComponent8
     )
   }()
 
   private lazy var rawDepthCVPixelBufferPool: CVPixelBufferPool? = {
-    createCVPixelBufferPool(
-      size: HSEffectManager.rawDepthImageSize, pixelFormatType: kCVPixelFormatType_OneComponent8
+    guard let resolution = HSCameraManager.shared.depthResolution else {
+      return nil
+    }
+    return createCVPixelBufferPool(
+      size: resolution, pixelFormatType: kCVPixelFormatType_OneComponent8
     )
   }()
   
@@ -173,14 +175,21 @@ class HSEffectManager: NSObject {
         DispatchQueue.main.async {
           let cameraCIImage = CIImage(cgImage: cameraCGImage)
           let maskCIImage = CIImage(cgImage: maskCGImage)
+//          let maskCIImage = CIImage(cgImage: maskCGImage)
+//            .applyingFilter("CIEdgePreserveUpsampleFilter", parameters: [
+//              "inputSmallImage": CIImage(cgImage: maskCGImage)
+//            ])
+//            .applyingFilter("CIColorControls", parameters: [
+//              "inputContrast": 2
+//            ])
           let composedImage = cameraCIImage
             .applyingFilter("CIBlendWithMask", parameters: [
               "inputMaskImage": maskCIImage,
               "inputBackgroundImage": backgroundCIImage,
             ])
+
           let composedCGImage = self.context.createCGImage(composedImage, from: composedImage.extent)
           self.effectLayer.contents = composedCGImage
-//          self.effectLayer.contents = maskCGImage
         }
       }
     }
@@ -190,13 +199,13 @@ class HSEffectManager: NSObject {
     guard
       let modelCameraInputSize = model?.sizeOf(input: .cameraImage),
       let modelCameraInputPixelBufferPool = modelCameraInputPixelBufferPool,
-      let rawCameraCVPixelBufferPool = rawCameraCVPixelBufferPool,
+      let cameraCVPixelBufferPool = cameraCVPixelBufferPool,
       let colorPixelBuffer = HSPixelBuffer(sampleBuffer: sampleBuffer)
     else {
       return nil
     }
     guard let grayscalePixelBuffer = convertBGRAPixelBufferToGrayscale(
-      pixelBuffer: colorPixelBuffer, pixelBufferPool: rawCameraCVPixelBufferPool
+      pixelBuffer: colorPixelBuffer, pixelBufferPool: cameraCVPixelBufferPool
     ) else {
       return nil
     }
