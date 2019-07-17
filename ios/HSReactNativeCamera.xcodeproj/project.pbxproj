@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FC03B62D22DFD6C700E283B3 /* HSPortraitMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC03B62C22DFD6C700E283B3 /* HSPortraitMask.swift */; };
+		FC03B63022DFDB0700E283B3 /* HSPortraitMaskFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC03B62F22DFDB0700E283B3 /* HSPortraitMaskFactory.swift */; };
 		FC2FB8F022CBCEA5007CE0AF /* HSSegmentationModelLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC2FB8EF22CBCEA5007CE0AF /* HSSegmentationModelLoader.swift */; };
 		FC664EE322CAD98000FD8AE7 /* HSEffectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E5E22B9ABF600522016 /* HSEffectManager.swift */; };
 		FC664EE422CAD98900FD8AE7 /* HSEffectManagerBridgeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = FC845E6122B9AEED00522016 /* HSEffectManagerBridgeModule.m */; };
@@ -93,6 +95,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		FC03B62C22DFD6C700E283B3 /* HSPortraitMask.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSPortraitMask.swift; sourceTree = "<group>"; tabWidth = 2; };
+		FC03B62F22DFDB0700E283B3 /* HSPortraitMaskFactory.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSPortraitMaskFactory.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC2FB8EF22CBCEA5007CE0AF /* HSSegmentationModelLoader.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSSegmentationModelLoader.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC664F4022CADCE600FD8AE7 /* libHSReactNativeCamera.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHSReactNativeCamera.a; path = "../../../../../../../Library/Developer/Xcode/DerivedData/Storybook-aykofoufjpltyqchwrnbfzpoimmw/Build/Products/Debug-iphoneos/libHSReactNativeCamera.a"; sourceTree = "<group>"; };
 		FC71B6C622CAB23A003EA230 /* HSCameraUtils.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HSCameraUtils.xcodeproj; path = "../../../../backflip-camera-utils/HSCameraUtils.xcodeproj"; sourceTree = "<group>"; };
@@ -264,6 +268,8 @@
 				FCBFAF0E22CBF07200A0AC11 /* HSSegmentationModel.swift */,
 				FCBFAF1022CBF28B00A0AC11 /* createSegmentationMask.swift */,
 				FC2FB8EF22CBCEA5007CE0AF /* HSSegmentationModelLoader.swift */,
+				FC03B62C22DFD6C700E283B3 /* HSPortraitMask.swift */,
+				FC03B62F22DFDB0700E283B3 /* HSPortraitMaskFactory.swift */,
 			);
 			path = HSSegmentation;
 			sourceTree = "<group>";
@@ -409,6 +415,7 @@
 				FC664EED22CAD9A500FD8AE7 /* HSCameraView.swift in Sources */,
 				FC664EEC22CAD99E00FD8AE7 /* HSCameraEffectViewManager.m in Sources */,
 				FC2FB8F022CBCEA5007CE0AF /* HSSegmentationModelLoader.swift in Sources */,
+				FC03B62D22DFD6C700E283B3 /* HSPortraitMask.swift in Sources */,
 				FC664EEB22CAD99E00FD8AE7 /* HSCameraEffectView.swift in Sources */,
 				FC664EEE22CAD9A500FD8AE7 /* HSCameraViewManager.m in Sources */,
 				FC664EE522CAD98D00FD8AE7 /* HSCameraManager.swift in Sources */,
@@ -417,6 +424,7 @@
 				FC664EE322CAD98000FD8AE7 /* HSEffectManager.swift in Sources */,
 				FC664EF022CAD9AA00FD8AE7 /* cameraUtils.swift in Sources */,
 				FC664EE922CAD99000FD8AE7 /* HSCameraManagerBridgeModule.m in Sources */,
+				FC03B63022DFDB0700E283B3 /* HSPortraitMaskFactory.swift in Sources */,
 				FCBFAF0F22CBF07200A0AC11 /* HSSegmentationModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

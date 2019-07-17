@@ -1,6 +1,6 @@
 import AVFoundation
-import Photos
 import HSCameraUtils
+import Photos
 
 fileprivate let DEFAULT_DEPTH_CAPTURE_FRAMES_PER_SECOND = Float64(24)
 
@@ -29,7 +29,7 @@ class HSCameraManager: NSObject {
 
   @objc
   public var depthDelegate: HSCameraManagerDepthDataDelegate?
-  
+
   public var videoResolution: Size<Int>? {
     guard let format = videoCaptureDevice?.activeFormat else {
       return nil
@@ -42,7 +42,7 @@ class HSCameraManager: NSObject {
     }
     return Size(width: width, height: height)
   }
-  
+
   public var depthResolution: Size<Int>? {
     guard let format = videoCaptureDevice?.activeDepthDataFormat else {
       return nil
