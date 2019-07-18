@@ -8,17 +8,19 @@
 RCT_EXPORT_MODULE(HSEffectCompositor)
 
 + (BOOL)requiresMainQueueSetup {
-    return NO;
+  return NO;
 }
 
 - (instancetype)init {
-    self = [super init];
-    return self;
+  self = [super init];
+  return self;
 }
 
-RCT_EXPORT_METHOD(createComposition:(NSString*)assetID  callback:(RCTResponseSenderBlock)callback) {
-    [HSEffectComposition compositionWithAssetID:assetID];
-    callback(@[ [NSNull null], @(YES) ]);
+RCT_EXPORT_METHOD(createComposition
+                  : (NSString *)assetID callback
+                  : (RCTResponseSenderBlock)callback) {
+  [HSEffectComposition compositionWithAssetID:assetID];
+  callback(@[ [NSNull null], @(YES) ]);
 }
 
 @end

@@ -8,10 +8,15 @@ const root = path.resolve(__dirname, '..');
 
 const rules = [
   {
-      test: /\.jsx?$/,
-      exclude: /node_modules/,
-      use: 'babel-loader'
-  }
+    test: /\.jsx?$/,
+    exclude: /node_modules\/(?!(@react-native-community\/blur)\/).*/,
+    use: {
+      loader: 'babel-loader',
+      options: {
+        presets: ["module:metro-react-native-babel-preset"]
+      }
+    }
+  },
 ];
 
 const outputPath = path.resolve(root, 'build');
@@ -42,7 +47,7 @@ const resolve = {
     'node_modules',
     path.resolve(root, './node_modules')
   ],
-  extensions: ['.js', '.jsx'],
+  extensions: ['.js', '.jsx', '.android.js', '.ios.js'],
   alias: aliases
 }
 

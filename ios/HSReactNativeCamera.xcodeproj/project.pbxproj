@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		799D0FD2DC19472AA95ED5C4 /* libRNBlur.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E324372C3A6249038A329A4A /* libRNBlur.a */; };
 		FC03B62D22DFD6C700E283B3 /* HSPortraitMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC03B62C22DFD6C700E283B3 /* HSPortraitMask.swift */; };
 		FC03B63022DFDB0700E283B3 /* HSPortraitMaskFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC03B62F22DFDB0700E283B3 /* HSPortraitMaskFactory.swift */; };
 		FC03B63222DFEA0000E283B3 /* HSEffectComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC03B63122DFEA0000E283B3 /* HSEffectComposition.swift */; };
@@ -33,54 +34,26 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		FC0E6E3A22E03BC800B0C1C7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FC0E6E3522E03BC700B0C1C7 /* RNBlur.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A68BD7BC1BC31318005F02DF;
+			remoteInfo = RNBlur;
+		};
+		FC0E6E3C22E03BC800B0C1C7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FC0E6E3522E03BC700B0C1C7 /* RNBlur.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 64D1BD361EEFE88700F3F219;
+			remoteInfo = "RNBlur-tvOS";
+		};
 		FC71B6CA22CAB23A003EA230 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FC71B6C622CAB23A003EA230 /* HSCameraUtils.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = FC71B66422CAAFCF003EA230;
 			remoteInfo = HSCameraUtils;
-		};
-		FCBFAE5522CBCFF900A0AC11 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 63B0AC571D595E1B00FA21D9;
-			remoteInfo = PromiseKit;
-		};
-		FCBFAE5722CBCFF900A0AC11 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 631751A81D59766500A9DDDC;
-			remoteInfo = "PMKA+Tests";
-		};
-		FCBFAE5922CBCFF900A0AC11 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 6314113C1D59795700E24B9E;
-			remoteInfo = PMKBridgeTests;
-		};
-		FCBFAE5B22CBCFF900A0AC11 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 630019221D596292003B4E30;
-			remoteInfo = PMKCoreTests;
-		};
-		FCBFAE5D22CBCFF900A0AC11 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 633027EA203CC0060037E136;
-			remoteInfo = PMKDeprecatedTests;
-		};
-		FCBFAE5F22CBCFF900A0AC11 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = C0244E622047A6CB00ACB4AC;
-			remoteInfo = "PMKJSA+Tests";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -97,11 +70,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E324372C3A6249038A329A4A /* libRNBlur.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNBlur.a; sourceTree = "<group>"; };
 		FC03B62C22DFD6C700E283B3 /* HSPortraitMask.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSPortraitMask.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC03B62F22DFDB0700E283B3 /* HSPortraitMaskFactory.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSPortraitMaskFactory.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC03B63122DFEA0000E283B3 /* HSEffectComposition.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSEffectComposition.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC03B64B22DFF1F000E283B3 /* HSEffectCompositorBridgeModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HSEffectCompositorBridgeModule.m; sourceTree = "<group>"; };
 		FC03B64E22DFF25500E283B3 /* HSEffectCompositorBridgeModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSEffectCompositorBridgeModule.h; sourceTree = "<group>"; };
+		FC0E6E3522E03BC700B0C1C7 /* RNBlur.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNBlur.xcodeproj; path = "../../node_modules/@react-native-community/blur/ios/RNBlur.xcodeproj"; sourceTree = "<group>"; };
 		FC2FB8EF22CBCEA5007CE0AF /* HSSegmentationModelLoader.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSSegmentationModelLoader.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC664F4022CADCE600FD8AE7 /* libHSReactNativeCamera.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHSReactNativeCamera.a; path = "../../../../../../../Library/Developer/Xcode/DerivedData/Storybook-aykofoufjpltyqchwrnbfzpoimmw/Build/Products/Debug-iphoneos/libHSReactNativeCamera.a"; sourceTree = "<group>"; };
 		FC71B6C622CAB23A003EA230 /* HSCameraUtils.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HSCameraUtils.xcodeproj; path = "../../../../backflip-camera-utils/HSCameraUtils.xcodeproj"; sourceTree = "<group>"; };
@@ -124,7 +99,6 @@
 		FC845E6922B9B1C500522016 /* HSCameraEffectViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSCameraEffectViewManager.h; sourceTree = "<group>"; };
 		FC845E6A22B9B30000522016 /* HSCameraManagerDepthDataDelegate.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSCameraManagerDepthDataDelegate.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC845E7D22BC843100522016 /* mathUtils.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = mathUtils.swift; sourceTree = "<group>"; tabWidth = 2; };
-		FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = PromiseKit.xcodeproj; path = PromiseKit/PromiseKit.xcodeproj; sourceTree = SOURCE_ROOT; };
 		FCBFAF0722CBE27300A0AC11 /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		FCBFAF0E22CBF07200A0AC11 /* HSSegmentationModel.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSSegmentationModel.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FCBFAF1022CBF28B00A0AC11 /* createSegmentationMask.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = createSegmentationMask.swift; sourceTree = "<group>"; tabWidth = 2; };
@@ -138,6 +112,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FCBFAF0B22CBE9CB00A0AC11 /* libHSCameraUtils.a in Frameworks */,
+				799D0FD2DC19472AA95ED5C4 /* libRNBlur.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -153,6 +128,7 @@
 				FC75EB2B22CAE84A003AB14E /* libHSReactNativeCamera.a */,
 				FCDEEBEB22CC534C00B09AF2 /* libHSReactNativeCamera.a */,
 				FCBFAF0A22CBE9CB00A0AC11 /* Frameworks */,
+				FC0E6E3322E03AEF00B0C1C7 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -166,10 +142,27 @@
 			path = HSEffectCompositor;
 			sourceTree = "<group>";
 		};
+		FC0E6E3322E03AEF00B0C1C7 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				E324372C3A6249038A329A4A /* libRNBlur.a */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		FC0E6E3622E03BC700B0C1C7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FC0E6E3B22E03BC800B0C1C7 /* libRNBlur.a */,
+				FC0E6E3D22E03BC800B0C1C7 /* libRNBlur.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		FC71B6C522CAB236003EA230 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */,
+				FC0E6E3522E03BC700B0C1C7 /* RNBlur.xcodeproj */,
 				FC71B6C622CAB23A003EA230 /* HSCameraUtils.xcodeproj */,
 			);
 			path = Libraries;
@@ -258,19 +251,6 @@
 			path = utils;
 			sourceTree = "<group>";
 		};
-		FCBFAE4D22CBCFF900A0AC11 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				FCBFAE5622CBCFF900A0AC11 /* PromiseKit.framework */,
-				FCBFAE5822CBCFF900A0AC11 /* PMKA+Tests.xctest */,
-				FCBFAE5A22CBCFF900A0AC11 /* PMKBridgeTests.xctest */,
-				FCBFAE5C22CBCFF900A0AC11 /* PMKCoreTests.xctest */,
-				FCBFAE5E22CBCFF900A0AC11 /* PMKDeprecatedTests.xctest */,
-				FCBFAE6022CBCFF900A0AC11 /* PMKJSA+Tests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		FCBFAF0A22CBE9CB00A0AC11 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -327,7 +307,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1020;
-				LastUpgradeCheck = 0830;
+				LastUpgradeCheck = 830;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					FC664EDB22CAD96E00FD8AE7 = {
@@ -354,8 +334,8 @@
 					ProjectRef = FC71B6C622CAB23A003EA230 /* HSCameraUtils.xcodeproj */;
 				},
 				{
-					ProductGroup = FCBFAE4D22CBCFF900A0AC11 /* Products */;
-					ProjectRef = FCBFAE4C22CBCFF900A0AC11 /* PromiseKit.xcodeproj */;
+					ProductGroup = FC0E6E3622E03BC700B0C1C7 /* Products */;
+					ProjectRef = FC0E6E3522E03BC700B0C1C7 /* RNBlur.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -366,53 +346,25 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		FC0E6E3B22E03BC800B0C1C7 /* libRNBlur.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNBlur.a;
+			remoteRef = FC0E6E3A22E03BC800B0C1C7 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FC0E6E3D22E03BC800B0C1C7 /* libRNBlur.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNBlur.a;
+			remoteRef = FC0E6E3C22E03BC800B0C1C7 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		FC71B6CB22CAB23A003EA230 /* libHSCameraUtils.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libHSCameraUtils.a;
 			remoteRef = FC71B6CA22CAB23A003EA230 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FCBFAE5622CBCFF900A0AC11 /* PromiseKit.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = PromiseKit.framework;
-			remoteRef = FCBFAE5522CBCFF900A0AC11 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FCBFAE5822CBCFF900A0AC11 /* PMKA+Tests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = "PMKA+Tests.xctest";
-			remoteRef = FCBFAE5722CBCFF900A0AC11 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FCBFAE5A22CBCFF900A0AC11 /* PMKBridgeTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = PMKBridgeTests.xctest;
-			remoteRef = FCBFAE5922CBCFF900A0AC11 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FCBFAE5C22CBCFF900A0AC11 /* PMKCoreTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = PMKCoreTests.xctest;
-			remoteRef = FCBFAE5B22CBCFF900A0AC11 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FCBFAE5E22CBCFF900A0AC11 /* PMKDeprecatedTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = PMKDeprecatedTests.xctest;
-			remoteRef = FCBFAE5D22CBCFF900A0AC11 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FCBFAE6022CBCFF900A0AC11 /* PMKJSA+Tests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = "PMKJSA+Tests.xctest";
-			remoteRef = FCBFAE5F22CBCFF900A0AC11 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -557,6 +509,10 @@
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/Frameworks/**";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+				);
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "-ObjC";
@@ -595,6 +551,10 @@
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/Frameworks/**";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+				);
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
