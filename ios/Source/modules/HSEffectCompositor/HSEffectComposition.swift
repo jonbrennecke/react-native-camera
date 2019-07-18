@@ -14,22 +14,10 @@ class HSEffectComposition: NSObject {
       guard let asset = asset else {
         return
       }
-//      asset.loadValuesAsynchronously(forKeys: ["tracks"], completionHandler: <#T##(() -> Void)?##(() -> Void)?##() -> Void#>)
-      let playerItem = AVPlayerItem(asset: asset)
-      playerItem.addObserver(self, forKeyPath: #keyPath(AVPlayerItem.tracks), options: [.old, .new], context: nil)
-      self.player = AVPlayer(playerItem: playerItem)
-    }
-  }
-
-  override func observeValue(
-    forKeyPath keyPath: String?, of _: Any?, change: [NSKeyValueChangeKey: Any]?, context _: UnsafeMutableRawPointer?
-  ) {
-    if keyPath == #keyPath(AVPlayerItem.tracks) {
-      guard let tracks = change?[.newKey] as? [AVPlayerItemTrack] else {
-        return
-      }
-      let mediaTypes = tracks.map { $0.assetTrack?.mediaType }
-      print(mediaTypes)
+      asset.loadValuesAsynchronously(forKeys: ["tracks"], completionHandler: {
+        let mediaTypes = asset.tracks.map { $0.mediaType }
+        print(mediaTypes)
+      })
     }
   }
 }
