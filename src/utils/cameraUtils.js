@@ -29,3 +29,4 @@ export const startCameraEffects = async () => {
 // startCameraCapture
 // stopCameraCapture
 // switchToOppositeCamera
+

@@ -22,6 +22,7 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
+		8B92FE923CC847E19726BA49 /* libHSReactNativeMedia.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 73B85EEA31E74B2EAED371F6 /* libHSReactNativeMedia.a */; };
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
 		FC114C0222D3D774008F333B /* SegmentationModel.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = FC114C0122D3D773008F333B /* SegmentationModel.mlmodel */; };
 		FC664F2B22CADAA000FD8AE7 /* libHSReactNativeCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FC7B9EA922B97A940012D8D6 /* libHSReactNativeCamera.a */; };
@@ -266,6 +267,13 @@
 			remoteGlobalIDString = 358F4ED71D1E81A9004DF814;
 			remoteInfo = RCTBlob;
 		};
+		FC03B68622DFF62500E283B3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B4959B8090384D419DA15F5A /* HSReactNativeMedia.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = HSReactNativeMedia;
+		};
 		FC6B60C722AF63ED0060F828 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 146833FF1AC3E56700842450 /* React.xcodeproj */;
@@ -347,11 +355,13 @@
 		2D16E6891FA4F8E400B85C8A /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		5AC3AC84D4E24EDA91E08877 /* ReactNativeNavigationTests.xctest */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ReactNativeNavigationTests.xctest; sourceTree = "<group>"; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
+		73B85EEA31E74B2EAED371F6 /* libHSReactNativeMedia.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libHSReactNativeMedia.a; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		95176006F66B4664A9CEA9B3 /* libRNJonbrenneckeFarrago.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNJonbrenneckeFarrago.a; sourceTree = "<group>"; };
 		A22375545D454A2599361EEB /* libReactNativeConfig.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libReactNativeConfig.a; sourceTree = "<group>"; };
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
+		B4959B8090384D419DA15F5A /* HSReactNativeMedia.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = HSReactNativeMedia.xcodeproj; path = "../node_modules/@jonbrennecke/react-native-media/ios/HSReactNativeMedia.xcodeproj"; sourceTree = "<group>"; };
 		BD50A92D35494C8A876C6C03 /* libReactNativeNavigation.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libReactNativeNavigation.a; sourceTree = "<group>"; };
 		C58E7DD208D94D92847F0B1B /* libReactNativeConfig-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libReactNativeConfig-tvOS.a"; sourceTree = "<group>"; };
 		FC114C0122D3D773008F333B /* SegmentationModel.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = SegmentationModel.mlmodel; sourceTree = "<group>"; };
@@ -388,6 +398,7 @@
 				832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */,
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
+				8B92FE923CC847E19726BA49 /* libHSReactNativeMedia.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -560,6 +571,7 @@
 				832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */,
 				00C302DF1ABCB9EE00DB3ED1 /* RCTVibration.xcodeproj */,
 				139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */,
+				B4959B8090384D419DA15F5A /* HSReactNativeMedia.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -606,6 +618,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		FC03B68322DFF62400E283B3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FC03B68722DFF62500E283B3 /* libHSReactNativeMedia.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		FC54605921CDAB6600A46BB1 /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -615,6 +635,7 @@
 				C58E7DD208D94D92847F0B1B /* libReactNativeConfig-tvOS.a */,
 				95176006F66B4664A9CEA9B3 /* libRNJonbrenneckeFarrago.a */,
 				218AB209E88A4F139B253AD5 /* libFRGOFarrago.a */,
+				73B85EEA31E74B2EAED371F6 /* libHSReactNativeMedia.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -691,6 +712,10 @@
 				{
 					ProductGroup = FC7B9EA522B97A940012D8D6 /* Products */;
 					ProjectRef = FC7B9EA422B97A940012D8D6 /* HSReactNativeCamera.xcodeproj */;
+				},
+				{
+					ProductGroup = FC03B68322DFF62400E283B3 /* Products */;
+					ProjectRef = B4959B8090384D419DA15F5A /* HSReactNativeMedia.xcodeproj */;
 				},
 				{
 					ProductGroup = 00C302A81ABCB8CE00DB3ED1 /* Products */;
@@ -980,6 +1005,13 @@
 			remoteRef = ADBDB9261DFEBF0700ED6528 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		FC03B68722DFF62500E283B3 /* libHSReactNativeMedia.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libHSReactNativeMedia.a;
+			remoteRef = FC03B68622DFF62500E283B3 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		FC6B60C822AF63ED0060F828 /* libjsi.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1100,10 +1132,15 @@
 					"$(SRCROOT)/../node_modules/@jonbrennecke/farrago/ios",
 					"$(SRCROOT)/../node_modules/@jonbrennecke/farrago/ios",
 					"$(SRCROOT)/../node_modules/@jonbrennecke/farrago/ios",
+					"$(SRCROOT)/../node_modules/@jonbrennecke/react-native-media/ios/**",
 				);
 				INFOPLIST_FILE = Storybook/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/Storybook\"",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1133,10 +1170,15 @@
 					"$(SRCROOT)/../node_modules/@jonbrennecke/farrago/ios",
 					"$(SRCROOT)/../node_modules/@jonbrennecke/farrago/ios",
 					"$(SRCROOT)/../node_modules/@jonbrennecke/farrago/ios",
+					"$(SRCROOT)/../node_modules/@jonbrennecke/react-native-media/ios/**",
 				);
 				INFOPLIST_FILE = Storybook/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/Storybook\"",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

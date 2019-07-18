@@ -84,14 +84,6 @@ class HSEffectManager: NSObject {
     }
   }
 
-  @objc(start:)
-  public func start(_ completionHandler: @escaping (HSEffectManager.Result) -> Void) {
-    loadModel { result in
-      self.displayLink.add(to: .main, forMode: .default)
-      completionHandler(result)
-    }
-  }
-
   @objc
   private func handleDisplayLinkUpdate(_: CADisplayLink) {
     guard let depthData = depthData, let videoSampleBuffer = videoSampleBuffer else {
@@ -101,15 +93,6 @@ class HSEffectManager: NSObject {
   }
 
   private func applyEffects(with depthData: AVDepthData, videoSampleBuffer: CMSampleBuffer) {
-    do {
-      try applyEffectsOrThrow(with: depthData, videoSampleBuffer: videoSampleBuffer)
-    } catch {
-      // TODO: handle error in javascript by dispatching event
-      fatalError(error.localizedDescription)
-    }
-  }
-
-  private func applyEffectsOrThrow(with depthData: AVDepthData, videoSampleBuffer: CMSampleBuffer) throws {
     guard
       let portraitMask = portraitMaskFactory?.makePortraitMask(depthData: depthData, videoSampleBuffer: videoSampleBuffer),
       let backgroundImage = backgroundImage,
@@ -120,6 +103,14 @@ class HSEffectManager: NSObject {
     let composedCGImage = context.createCGImage(composedImage, from: composedImage.extent)
     DispatchQueue.main.async {
       self.effectLayer.contents = composedCGImage
+    }
+  }
+
+  @objc(start:)
+  public func start(_ completionHandler: @escaping (HSEffectManager.Result) -> Void) {
+    loadModel { result in
+      self.displayLink.add(to: .main, forMode: .default)
+      completionHandler(result)
     }
   }
 }
