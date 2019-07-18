@@ -3,12 +3,11 @@ import Photos
 
 @objc
 class HSEffectComposition: NSObject {
-  
   private var player: AVPlayer?
-  
+
   @objc(sharedInstance)
   public static let shared = HSEffectComposition()
-  
+
   @objc
   public func compose(assetID: String) {
     loadVideoAsset(assetID: assetID) { asset in
@@ -21,7 +20,7 @@ class HSEffectComposition: NSObject {
       self.player = AVPlayer(playerItem: playerItem)
     }
   }
-  
+
   override func observeValue(
     forKeyPath keyPath: String?, of _: Any?, change: [NSKeyValueChangeKey: Any]?, context _: UnsafeMutableRawPointer?
   ) {

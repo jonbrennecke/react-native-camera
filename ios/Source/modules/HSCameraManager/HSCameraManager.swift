@@ -9,7 +9,7 @@ fileprivate let DEFAULT_DEPTH_CAPTURE_FRAMES_PER_SECOND = Float64(24)
 class HSCameraManager: NSObject {
   private enum State {
     case stopped
-    case recording(toURL: URL)
+    case recording(toURL: URL, startTime: CMTime)
     case waitingForFileOutputToFinish(toURL: URL)
   }
 
@@ -23,6 +23,25 @@ class HSCameraManager: NSObject {
   private var videoCaptureDeviceInput: AVCaptureDeviceInput?
   private var audioCaptureDevice: AVCaptureDevice?
   private var audioCaptureDeviceInput: AVCaptureDeviceInput?
+  private var assetWriter = HSVideoWriter()
+
+  private lazy var depthDataConverter: HSAVDepthDataToPixelBufferConverter? = {
+    guard let size = depthResolution else {
+      return nil
+    }
+    return HSAVDepthDataToPixelBufferConverter(size: size, pixelFormatType: kCVPixelFormatType_OneComponent8)
+  }()
+
+  private lazy var assetWriterDepthInput: HSVideoWriterInput? = {
+    guard let size = depthResolution else {
+      return nil
+    }
+    return HSVideoWriterInput(
+      videoSize: size,
+      pixelFormatType: kCVPixelFormatType_OneComponent8,
+      isRealTime: true
+    )
+  }()
 
   internal var captureSession = AVCaptureSession()
 
@@ -61,7 +80,7 @@ class HSCameraManager: NSObject {
   @objc
   public var depthDelegate: HSCameraManagerDepthDataDelegate?
 
-  private func saveVideoFileOutput() throws -> URL {
+  private func makeEmptyVideoOutputFile() throws -> URL {
     let outputTemporaryDirectoryURL = try FileManager.default
       .url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: FileManager.default.temporaryDirectory, create: true)
     let outputURL = outputTemporaryDirectoryURL
@@ -120,11 +139,19 @@ class HSCameraManager: NSObject {
   }
 
   private func setupFileOutput() -> HSCameraSetupResult {
-    if captureSession.canAddOutput(videoFileOutput) {
-      captureSession.addOutput(videoFileOutput)
-    } else {
-      return .failure
-    }
+//    if captureSession.canAddOutput(videoFileOutput) {
+//      captureSession.addOutput(videoFileOutput)
+//    } else {
+//      return .failure
+//    }
+//    return .success
+
+//    guard
+//      let depthInput = assetWriterDepthInput,
+//      case .success = assetWriter.add(input: depthInput)
+//    else {
+//      return .failure
+//    }
     return .success
   }
 
@@ -155,7 +182,7 @@ class HSCameraManager: NSObject {
 
   private func setupDepthOutput() -> HSCameraSetupResult {
     depthOutput.alwaysDiscardsLateDepthData = true
-    depthOutput.isFilteringEnabled = false
+    depthOutput.isFilteringEnabled = true
     depthOutput.setDelegate(self, callbackQueue: sessionQueue)
     if captureSession.canAddOutput(depthOutput) {
       captureSession.addOutput(depthOutput)
@@ -271,10 +298,24 @@ class HSCameraManager: NSObject {
         return
       }
       do {
-        let outputURL = try self.saveVideoFileOutput()
-        self.videoFileOutput.stopRecording()
-        self.videoFileOutput.startRecording(to: outputURL, recordingDelegate: self)
-        self.state = .recording(toURL: outputURL)
+        let outputURL = try self.makeEmptyVideoOutputFile()
+        guard
+          case .success = self.assetWriter.prepareToRecord(to: outputURL),
+          let depthInput = self.assetWriterDepthInput,
+          case .success = self.assetWriter.add(input: depthInput)
+        else {
+          completionHandler(nil, false)
+          return
+        }
+
+        guard case .success = self.assetWriter.startRecording() else {
+          completionHandler(nil, false)
+          return
+        }
+        
+        let clock = CMClockGetHostTimeClock()
+        let startTime = CMClockGetTime(clock)
+        self.state = .recording(toURL: outputURL, startTime: startTime)
         completionHandler(nil, true)
       } catch {
         completionHandler(error, false)
@@ -283,15 +324,21 @@ class HSCameraManager: NSObject {
   }
 
   @objc(stopCaptureAndSaveToCameraRoll:completionHandler:)
-  public func stopCapture(andSaveToCameraRoll saveToCameraRoll: Bool, _ completionHandler: (Bool) -> Void) {
-    if videoFileOutput.isRecording {
-      videoFileOutput.stopRecording()
+  public func stopCapture(andSaveToCameraRoll _: Bool, _ completionHandler: (Bool) -> Void) {
+//    if videoFileOutput.isRecording {
+//      videoFileOutput.stopRecording()
+//    }
+    assetWriterDepthInput?.markFinished()
+    assetWriter.stopRecording { url in
+      PHPhotoLibrary.shared().performChanges({
+        PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
+      })
     }
-    if saveToCameraRoll, let url = videoFileOutput.outputFileURL {
-      state = .waitingForFileOutputToFinish(toURL: url)
-      completionHandler(true)
-      return
-    }
+//    if saveToCameraRoll, let url = videoFileOutput.outputFileURL {
+//      state = .waitingForFileOutputToFinish(toURL: url)
+//      completionHandler(true)
+//      return
+//    }
     state = .stopped
     completionHandler(true)
   }
@@ -331,21 +378,35 @@ class HSCameraManager: NSObject {
 
 @available(iOS 11.1, *)
 extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
-  func dataOutputSynchronizer(_: AVCaptureDataOutputSynchronizer, didOutput collection: AVCaptureSynchronizedDataCollection) {
+  func dataOutputSynchronizer(
+    _: AVCaptureDataOutputSynchronizer, didOutput collection: AVCaptureSynchronizedDataCollection
+  ) {
     guard
-      let delegate = depthDelegate,
       let synchronizedDepthData = collection.synchronizedData(for: depthOutput) as? AVCaptureSynchronizedDepthData,
       let synchronizedVideoData = collection.synchronizedData(for: videoOutput) as? AVCaptureSynchronizedSampleBufferData
     else {
       return
     }
 
-    if !synchronizedDepthData.depthDataWasDropped {
-      delegate.cameraManagerDidOutput(depthData: synchronizedDepthData.depthData)
+    if case .recording(_, let startTime) = state {
+      guard let depthBuffer = depthDataConverter?.convert(depthData: synchronizedDepthData.depthData) else {
+        return
+      }
+      let presentationTime = synchronizedDepthData.timestamp - startTime
+      let frameBuffer = HSVideoFrameBuffer(
+        pixelBuffer: depthBuffer, presentationTime: presentationTime
+      )
+      assetWriterDepthInput?.add(videoFrameBuffer: frameBuffer)
     }
 
-    if !synchronizedVideoData.sampleBufferWasDropped {
-      delegate.cameraManagerDidOutput(videoSampleBuffer: synchronizedVideoData.sampleBuffer)
+    if let delegate = depthDelegate {
+      if !synchronizedDepthData.depthDataWasDropped {
+        delegate.cameraManagerDidOutput(depthData: synchronizedDepthData.depthData)
+      }
+
+      if !synchronizedVideoData.sampleBufferWasDropped {
+        delegate.cameraManagerDidOutput(videoSampleBuffer: synchronizedVideoData.sampleBuffer)
+      }
     }
   }
 }
