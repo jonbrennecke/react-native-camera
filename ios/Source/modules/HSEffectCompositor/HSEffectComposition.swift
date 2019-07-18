@@ -3,14 +3,34 @@ import Photos
 
 @objc
 class HSEffectComposition: NSObject {
-  @objc(compositionWithAssetID:)
-  public static func composition(with assetID: String) {
+  
+  private var player: AVPlayer?
+  
+  @objc(sharedInstance)
+  public static let shared = HSEffectComposition()
+  
+  @objc
+  public func compose(assetID: String) {
     loadVideoAsset(assetID: assetID) { asset in
       guard let asset = asset else {
         return
       }
+//      asset.loadValuesAsynchronously(forKeys: ["tracks"], completionHandler: <#T##(() -> Void)?##(() -> Void)?##() -> Void#>)
       let playerItem = AVPlayerItem(asset: asset)
-      print(playerItem.tracks)
+      playerItem.addObserver(self, forKeyPath: #keyPath(AVPlayerItem.tracks), options: [.old, .new], context: nil)
+      self.player = AVPlayer(playerItem: playerItem)
+    }
+  }
+  
+  override func observeValue(
+    forKeyPath keyPath: String?, of _: Any?, change: [NSKeyValueChangeKey: Any]?, context _: UnsafeMutableRawPointer?
+  ) {
+    if keyPath == #keyPath(AVPlayerItem.tracks) {
+      guard let tracks = change?[.newKey] as? [AVPlayerItemTrack] else {
+        return
+      }
+      let mediaTypes = tracks.map { $0.assetTrack?.mediaType }
+      print(mediaTypes)
     }
   }
 }

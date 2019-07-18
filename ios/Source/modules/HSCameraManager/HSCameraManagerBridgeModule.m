@@ -110,6 +110,7 @@ RCT_EXPORT_METHOD(switchToOppositeCamera) {
   }
   AVURLAsset *avasset = [[AVURLAsset alloc] initWithURL:fileURL options:nil];
   CMTime duration = avasset.duration;
+  // TODO: this should be an HSMediaAsset
   NSDictionary *body = @{
     @"id" : asset.localIdentifier,
     @"duration" : @(CMTimeGetSeconds(duration))

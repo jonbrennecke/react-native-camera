@@ -19,7 +19,7 @@ RCT_EXPORT_MODULE(HSEffectCompositor)
 RCT_EXPORT_METHOD(createComposition
                   : (NSString *)assetID callback
                   : (RCTResponseSenderBlock)callback) {
-  [HSEffectComposition compositionWithAssetID:assetID];
+  [[HSEffectComposition sharedInstance] composeWithAssetID:assetID];
   callback(@[ [NSNull null], @(YES) ]);
 }
 

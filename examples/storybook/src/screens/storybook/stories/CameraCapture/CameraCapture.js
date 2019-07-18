@@ -2,7 +2,6 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react-native';
 import { SafeAreaView } from 'react-native';
-import noop from 'lodash/noop';
 import { Provider } from 'react-redux';
 
 import {
