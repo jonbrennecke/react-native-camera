@@ -38,12 +38,37 @@ class HSCameraManager: NSObject {
     }
     return HSVideoWriterInput(
       videoSize: size,
-      pixelFormatType: kCVPixelFormatType_OneComponent8,
+      pixelFormatType: depthPixelFormat,
+      isRealTime: true
+    )
+  }()
+  
+  private lazy var assetWriterVideoInput: HSVideoWriterInput? = {
+    guard let size = videoResolution else {
+      return nil
+    }
+    return HSVideoWriterInput(
+      videoSize: size,
+      pixelFormatType: videoPixelFormat,
       isRealTime: true
     )
   }()
 
   internal var captureSession = AVCaptureSession()
+  
+  // kCVPixelFormatType_32BGRA is required because of compatability with depth effects, but
+  // if depth is disabled, this should be left as the default YpCbCr
+  public var videoPixelFormat: OSType = kCVPixelFormatType_32BGRA {
+    didSet {
+      // TODO: update video output configuration
+    }
+  }
+  
+  public var depthPixelFormat: OSType = kCVPixelFormatType_DisparityFloat32 {
+    didSet {
+      // TODO: update depth output configuration
+    }
+  }
 
   public var videoResolution: Size<Int>? {
     guard let format = videoCaptureDevice?.activeFormat else {
@@ -113,10 +138,6 @@ class HSCameraManager: NSObject {
       return .failure
     }
 
-    if case .failure = setupFileOutput() {
-      return .failure
-    }
-
     configureActiveFormat()
     outputSynchronizer.setDelegate(self, queue: sessionQueue)
     return .success
@@ -138,29 +159,10 @@ class HSCameraManager: NSObject {
     return .success
   }
 
-  private func setupFileOutput() -> HSCameraSetupResult {
-//    if captureSession.canAddOutput(videoFileOutput) {
-//      captureSession.addOutput(videoFileOutput)
-//    } else {
-//      return .failure
-//    }
-//    return .success
-
-//    guard
-//      let depthInput = assetWriterDepthInput,
-//      case .success = assetWriter.add(input: depthInput)
-//    else {
-//      return .failure
-//    }
-    return .success
-  }
-
   private func setupVideoOutput() -> HSCameraSetupResult {
     videoOutput.alwaysDiscardsLateVideoFrames = true
     videoOutput.videoSettings = [
-      // kCVPixelFormatType_32BGRA is required because of depth effects, but
-      // if depth is disabled, this should be left as the default YpCBCr
-      kCVPixelBufferPixelFormatTypeKey: kCVPixelFormatType_32BGRA,
+kCVPixelBufferPixelFormatTypeKey: videoPixelFormat,
     ] as [String: Any]
     videoOutput.setSampleBufferDelegate(self, queue: sessionQueue)
     if captureSession.canAddOutput(videoOutput) {
@@ -222,12 +224,11 @@ class HSCameraManager: NSObject {
     guard let videoCaptureDevice = videoCaptureDevice else {
       return
     }
-    let selectedDepthFormat = kCVPixelFormatType_DisparityFloat32
     if case .some = try? videoCaptureDevice.lockForConfiguration() {
       let supportedDepthFormats = videoCaptureDevice.activeFormat.supportedDepthDataFormats
 
       let depthFormats = supportedDepthFormats.filter { format in
-        return CMFormatDescriptionGetMediaSubType(format.formatDescription) == selectedDepthFormat
+        return CMFormatDescriptionGetMediaSubType(format.formatDescription) == depthPixelFormat
       }
 
       let highestResolutionDepthFormat = depthFormats.max { a, b in
@@ -302,7 +303,9 @@ class HSCameraManager: NSObject {
         guard
           case .success = self.assetWriter.prepareToRecord(to: outputURL),
           let depthInput = self.assetWriterDepthInput,
-          case .success = self.assetWriter.add(input: depthInput)
+          case .success = self.assetWriter.add(input: depthInput),
+          let videoInput = self.assetWriterVideoInput,
+          case .success = self.assetWriter.add(input: videoInput)
         else {
           completionHandler(nil, false)
           return
@@ -325,9 +328,7 @@ class HSCameraManager: NSObject {
 
   @objc(stopCaptureAndSaveToCameraRoll:completionHandler:)
   public func stopCapture(andSaveToCameraRoll _: Bool, _ completionHandler: (Bool) -> Void) {
-//    if videoFileOutput.isRecording {
-//      videoFileOutput.stopRecording()
-//    }
+    assetWriterVideoInput?.markFinished()
     assetWriterDepthInput?.markFinished()
     assetWriter.stopRecording { url in
       PHPhotoLibrary.shared().performChanges({
@@ -388,15 +389,26 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
       return
     }
 
+    // frames may be late, check when recording ended
     if case .recording(_, let startTime) = state {
-      guard let depthBuffer = depthDataConverter?.convert(depthData: synchronizedDepthData.depthData) else {
-        return
+      
+      // add depth frame
+      if let depthBuffer = depthDataConverter?.convert(depthData: synchronizedDepthData.depthData) {
+        let presentationTime = synchronizedDepthData.timestamp - startTime
+        let frameBuffer = HSVideoFrameBuffer(
+          pixelBuffer: depthBuffer, presentationTime: presentationTime
+        )
+        assetWriterDepthInput?.add(videoFrameBuffer: frameBuffer)
       }
-      let presentationTime = synchronizedDepthData.timestamp - startTime
-      let frameBuffer = HSVideoFrameBuffer(
-        pixelBuffer: depthBuffer, presentationTime: presentationTime
-      )
-      assetWriterDepthInput?.add(videoFrameBuffer: frameBuffer)
+      
+      // add video frame
+      if let videoBuffer = HSPixelBuffer(sampleBuffer: synchronizedVideoData.sampleBuffer) {
+        let presentationTime = synchronizedVideoData.timestamp - startTime
+        let frameBuffer = HSVideoFrameBuffer(
+          pixelBuffer: videoBuffer, presentationTime: presentationTime
+        )
+        assetWriterVideoInput?.add(videoFrameBuffer: frameBuffer)
+      }
     }
 
     if let delegate = depthDelegate {
