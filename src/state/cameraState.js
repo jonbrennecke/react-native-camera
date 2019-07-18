@@ -6,7 +6,7 @@ import type { RecordOf, RecordInstance } from 'immutable';
 export type CameraCaptureStatus = 'started' | 'stopped';
 
 export type CameraStateObject = {
-  captureStatus: CameraCaptureStatus
+  captureStatus: CameraCaptureStatus,
 };
 
 export type CameraStateRecord = RecordOf<CameraStateObject>;

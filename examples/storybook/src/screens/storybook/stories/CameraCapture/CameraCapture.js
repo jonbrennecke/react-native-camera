@@ -40,7 +40,9 @@ const Component = CameraStateContainer(
           <CameraCapture
             style={styles.camera}
             onRequestBeginCapture={startCapture}
-            onRequestEndCapture={stopCapture}
+            onRequestEndCapture={() => stopCapture({
+              saveToCameraRoll: true
+            })}
           />
         )}
       />

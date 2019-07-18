@@ -3,10 +3,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import identity from 'lodash/identity';
 
-import {
-  actionCreators,
-  selectCaptureStatus
-} from './';
+import { actionCreators, selectCaptureStatus } from './';
 
 import type { ComponentType } from 'react';
 
@@ -16,26 +13,27 @@ import type { ICameraState, CameraCaptureStatus } from './';
 type OwnProps = {};
 
 type StateProps = {
-  captureStatus: CameraCaptureStatus
+  captureStatus: CameraCaptureStatus,
 };
 
 type DispatchProps = {
   startCapture: () => any,
-  stopCapture: () => any
+  stopCapture: ({ saveToCameraRoll: boolean }) => any,
 };
 
 export type CameraStateHOCProps = OwnProps & StateProps & DispatchProps;
 
 function mapCameraStateToProps(state: ICameraState): StateProps {
   return {
-    captureStatus: selectCaptureStatus(state)
+    captureStatus: selectCaptureStatus(state),
   };
 }
 
 function mapCameraDispatchToProps(dispatch: Dispatch<*>): DispatchProps {
   return {
     startCapture: () => dispatch(actionCreators.startCapture()),
-    stopCapture: () => dispatch(actionCreators.stopCapture())
+    stopCapture: (args: { saveToCameraRoll: boolean }) =>
+      dispatch(actionCreators.stopCapture(args)),
   };
 }
 

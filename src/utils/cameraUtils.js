@@ -17,6 +17,10 @@ export const startCameraPreview = () => {
   CameraManager.startCameraPreview();
 };
 
+export const stopCameraPreview = () => {
+  CameraManager.stopCameraPreview();
+};
+
 export const startCameraEffects = async () => {
   const success = await EffectManager.startAsync();
   if (!success) {
@@ -24,8 +28,18 @@ export const startCameraEffects = async () => {
   }
 };
 
-// TODO:
-// stopCameraPreview
-// startCameraCapture
-// stopCameraCapture
-// switchToOppositeCamera
+export const startCameraCapture = async () => {
+  return await CameraManager.startCameraCaptureAsync();
+};
+
+export const stopCameraCapture = async ({
+  saveToCameraRoll,
+}: {
+  saveToCameraRoll: boolean,
+}): Promise<void> => {
+  return await CameraManager.stopCameraCaptureAsync(saveToCameraRoll);
+};
+
+export const switchToOppositeCamera = () => {
+  CameraManager.switchToOppositeCamera();
+};

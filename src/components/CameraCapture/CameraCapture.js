@@ -19,7 +19,7 @@ const styles = {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-  }
+  },
 };
 
 export type CameraCaptureProps = {
@@ -31,7 +31,7 @@ export type CameraCaptureProps = {
 export const CameraCapture: SFC<CameraCaptureProps> = ({
   style,
   onRequestBeginCapture,
-  onRequestEndCapture
+  onRequestEndCapture,
 }: CameraCaptureProps) => (
   <View style={style}>
     <Camera style={styles.flex} />

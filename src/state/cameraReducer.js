@@ -1,15 +1,13 @@
 // @flow
 import { createReducer } from './createReducer';
 import { createCameraState } from './cameraState';
+import { startCameraCapture, stopCameraCapture } from '../utils';
 
 import type { Action, Dispatch } from '../types';
-import type {
-  ICameraState,
-  CameraCaptureStatus,
-} from './cameraState';
+import type { ICameraState, CameraCaptureStatus } from './cameraState';
 
 const CameraState = createCameraState({
-  captureStatus: 'stopped'
+  captureStatus: 'stopped',
 });
 
 export const initialState = new CameraState();
@@ -23,7 +21,7 @@ const reducers = {
       return state;
     }
     return state.setCaptureStatus(payload.captureStatus);
-  }
+  },
 };
 
 export const {
@@ -34,11 +32,17 @@ export const {
 export const actionCreators = {
   ...identityActionCreators,
 
-  startCapture: () => (dispatch: Dispatch<*>) => {
+  startCapture: () => async (dispatch: Dispatch<*>) => {
+    await startCameraCapture();
     dispatch(actionCreators.setCaptureStatus({ captureStatus: 'started' }));
   },
 
-  stopCapture: () => (dispatch: Dispatch<*>) => {
+  stopCapture: ({
+    saveToCameraRoll = false,
+  }: {
+    saveToCameraRoll: boolean,
+  }) => async (dispatch: Dispatch<*>) => {
+    await stopCameraCapture({ saveToCameraRoll });
     dispatch(actionCreators.setCaptureStatus({ captureStatus: 'stopped' }));
   },
 };

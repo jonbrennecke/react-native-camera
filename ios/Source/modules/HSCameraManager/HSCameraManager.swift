@@ -7,28 +7,24 @@ fileprivate let DEFAULT_DEPTH_CAPTURE_FRAMES_PER_SECOND = Float64(24)
 @available(iOS 11.1, *)
 @objc
 class HSCameraManager: NSObject {
-  internal var captureSession = AVCaptureSession()
+  private enum State {
+    case stopped
+    case recording(toURL: URL)
+    case waitingForFileOutputToFinish(toURL: URL)
+  }
 
-  private let sessionQueue = DispatchQueue(label: "session queue")
+  private var state: State = .stopped
+  private let sessionQueue = DispatchQueue(label: "camera session queue")
   private let videoOutput = AVCaptureVideoDataOutput()
   private let videoFileOutput = AVCaptureMovieFileOutput()
   private let depthOutput = AVCaptureDepthDataOutput()
-
   private lazy var outputSynchronizer = AVCaptureDataOutputSynchronizer(dataOutputs: [depthOutput, videoOutput])
-
   private var videoCaptureDevice: AVCaptureDevice?
   private var videoCaptureDeviceInput: AVCaptureDeviceInput?
   private var audioCaptureDevice: AVCaptureDevice?
   private var audioCaptureDeviceInput: AVCaptureDeviceInput?
 
-  @objc(sharedInstance)
-  public static let shared = HSCameraManager()
-
-  @objc
-  public var delegate: HSCameraManagerDelegate?
-
-  @objc
-  public var depthDelegate: HSCameraManagerDepthDataDelegate?
+  internal var captureSession = AVCaptureSession()
 
   public var videoResolution: Size<Int>? {
     guard let format = videoCaptureDevice?.activeFormat else {
@@ -56,80 +52,23 @@ class HSCameraManager: NSObject {
     return Size(width: width, height: height)
   }
 
-  @objc
-  public static func requestCameraPermissions(_ callback: @escaping (Bool) -> Void) {
-    requestPermissions(for: [
-      .captureDevice(mediaType: .video),
-      .microphone,
-      .mediaLibrary,
-    ]) { success in
-      callback(success)
-    }
-  }
+  @objc(sharedInstance)
+  public static let shared = HSCameraManager()
 
   @objc
-  public func startPreview() {
-    if case .authorized = AVCaptureDevice.authorizationStatus(for: .video) {
-      guard captureSession.isRunning else {
-        captureSession.startRunning()
-        return
-      }
-      return
-    }
-  }
+  public var delegate: HSCameraManagerDelegate?
 
   @objc
-  public func stopPreview() {
-    guard captureSession.isRunning else {
-      return
-    }
-    captureSession.stopRunning()
-  }
+  public var depthDelegate: HSCameraManagerDepthDataDelegate?
 
-  @objc
-  public func startCapture(completionHandler: @escaping (Error?, Bool) -> Void) {
-    sessionQueue.async {
-      guard self.videoCaptureDevice != nil else {
-        completionHandler(nil, false)
-        return
-      }
-      do {
-        let outputURL = try self.saveVideoFileOutputOrThrow()
-        self.videoFileOutput.stopRecording()
-        self.videoFileOutput.startRecording(to: outputURL, recordingDelegate: self)
-        completionHandler(nil, true)
-      } catch {
-        completionHandler(error, false)
-      }
-    }
-  }
-
-  @objc
-  public func stopCapture() {
-    if videoFileOutput.isRecording {
-      videoFileOutput.stopRecording()
-    }
-  }
-
-  private func saveVideoFileOutputOrThrow() throws -> URL {
-    let outputURL = try FileManager.default
-      .url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-      .appendingPathComponent("output")
+  private func saveVideoFileOutput() throws -> URL {
+    let outputTemporaryDirectoryURL = try FileManager.default
+      .url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: FileManager.default.temporaryDirectory, create: true)
+    let outputURL = outputTemporaryDirectoryURL
+      .appendingPathComponent(makeRandomFileName())
       .appendingPathExtension("mov")
     try? FileManager.default.removeItem(at: outputURL)
     return outputURL
-  }
-
-  @objc
-  public func setupCameraCaptureSession() {
-    if captureSession.isRunning {
-      return
-    }
-    captureSession.beginConfiguration()
-    if case .failure = attemptToSetupCameraCaptureSession() {
-      // TODO:
-    }
-    captureSession.commitConfiguration()
   }
 
   private func attemptToSetupCameraCaptureSession() -> HSCameraSetupResult {
@@ -138,20 +77,12 @@ class HSCameraManager: NSObject {
       captureSession.sessionPreset = preset
     }
 
-    // Setup videoCaptureDevice
     videoCaptureDevice = captureDevice(withPosition: .front)
-    guard let videoCaptureDevice = videoCaptureDevice else {
+    guard case .some = videoCaptureDevice else {
       return .failure
     }
 
-    // Setup videoCaptureDeviceInput
-    videoCaptureDeviceInput = try? AVCaptureDeviceInput(device: videoCaptureDevice)
-    guard let videoCaptureDeviceInput = videoCaptureDeviceInput else {
-      return .failure
-    }
-    if captureSession.canAddInput(videoCaptureDeviceInput) {
-      captureSession.addInput(videoCaptureDeviceInput)
-    } else {
+    if case .failure = setupVideoInput() {
       return .failure
     }
 
@@ -163,50 +94,45 @@ class HSCameraManager: NSObject {
       return .failure
     }
 
-    // Set depth format of videoCaptureDevice
-    // TODO: only required if capturing depth
-    let selectedDepthFormat = kCVPixelFormatType_DisparityFloat32
-    if case .some = try? videoCaptureDevice.lockForConfiguration() {
-      let supportedDepthFormats = videoCaptureDevice.activeFormat.supportedDepthDataFormats
-
-      let depthFormats = supportedDepthFormats.filter { format in
-        return CMFormatDescriptionGetMediaSubType(format.formatDescription) == selectedDepthFormat
-      }
-
-      let highestResolutionDepthFormat = depthFormats.max { a, b in
-        CMVideoFormatDescriptionGetDimensions(a.formatDescription).width < CMVideoFormatDescriptionGetDimensions(b.formatDescription).width
-      }
-
-      if let format = highestResolutionDepthFormat {
-        videoCaptureDevice.activeDepthDataFormat = format
-        let maxFrameRateRange = format.videoSupportedFrameRateRanges.max { $0.maxFrameRate < $1.maxFrameRate }
-        let depthFrameDuration = CMTimeMake(
-          value: 1,
-          timescale: CMTimeScale(maxFrameRateRange?.maxFrameRate ?? DEFAULT_DEPTH_CAPTURE_FRAMES_PER_SECOND)
-        )
-        videoCaptureDevice.activeDepthDataMinFrameDuration = depthFrameDuration
-      }
-
-      videoCaptureDevice.unlockForConfiguration()
+    if case .failure = setupFileOutput() {
+      return .failure
     }
 
+    configureActiveFormat()
     outputSynchronizer.setDelegate(self, queue: sessionQueue)
+    return .success
+  }
 
-//    TODO: adding this breaks the depth output synchronizer
-    // setup videoFileOutput
-//    if captureSession.canAddOutput(videoFileOutput) {
-//      captureSession.addOutput(videoFileOutput)
-//    } else {
-//      return .failure
-//    }
+  private func setupVideoInput() -> HSCameraSetupResult {
+    guard let videoCaptureDevice = videoCaptureDevice else {
+      return .failure
+    }
+    videoCaptureDeviceInput = try? AVCaptureDeviceInput(device: videoCaptureDevice)
+    guard let videoCaptureDeviceInput = videoCaptureDeviceInput else {
+      return .failure
+    }
+    if captureSession.canAddInput(videoCaptureDeviceInput) {
+      captureSession.addInput(videoCaptureDeviceInput)
+    } else {
+      return .failure
+    }
+    return .success
+  }
 
+  private func setupFileOutput() -> HSCameraSetupResult {
+    if captureSession.canAddOutput(videoFileOutput) {
+      captureSession.addOutput(videoFileOutput)
+    } else {
+      return .failure
+    }
     return .success
   }
 
   private func setupVideoOutput() -> HSCameraSetupResult {
     videoOutput.alwaysDiscardsLateVideoFrames = true
     videoOutput.videoSettings = [
-      // kCVPixelFormatType_32BGRA is required because of effects
+      // kCVPixelFormatType_32BGRA is required because of depth effects, but
+      // if depth is disabled, this should be left as the default YpCBCr
       kCVPixelBufferPixelFormatTypeKey: kCVPixelFormatType_32BGRA,
     ] as [String: Any]
     videoOutput.setSampleBufferDelegate(self, queue: sessionQueue)
@@ -253,8 +179,6 @@ class HSCameraManager: NSObject {
     guard let audioCaptureDevice = audioCaptureDevice else {
       return .failure
     }
-
-    // setup audioCaptureDeviceInput
     audioCaptureDeviceInput = try? AVCaptureDeviceInput(device: audioCaptureDevice)
     guard let audioCaptureDeviceInput = audioCaptureDeviceInput else {
       return .failure
@@ -265,6 +189,111 @@ class HSCameraManager: NSObject {
       return .failure
     }
     return .success
+  }
+
+  private func configureActiveFormat() {
+    guard let videoCaptureDevice = videoCaptureDevice else {
+      return
+    }
+    let selectedDepthFormat = kCVPixelFormatType_DisparityFloat32
+    if case .some = try? videoCaptureDevice.lockForConfiguration() {
+      let supportedDepthFormats = videoCaptureDevice.activeFormat.supportedDepthDataFormats
+
+      let depthFormats = supportedDepthFormats.filter { format in
+        return CMFormatDescriptionGetMediaSubType(format.formatDescription) == selectedDepthFormat
+      }
+
+      let highestResolutionDepthFormat = depthFormats.max { a, b in
+        CMVideoFormatDescriptionGetDimensions(a.formatDescription).width < CMVideoFormatDescriptionGetDimensions(b.formatDescription).width
+      }
+
+      if let format = highestResolutionDepthFormat {
+        videoCaptureDevice.activeDepthDataFormat = format
+        let maxFrameRateRange = format.videoSupportedFrameRateRanges.max { $0.maxFrameRate < $1.maxFrameRate }
+        let depthFrameDuration = CMTimeMake(
+          value: 1,
+          timescale: CMTimeScale(maxFrameRateRange?.maxFrameRate ?? DEFAULT_DEPTH_CAPTURE_FRAMES_PER_SECOND)
+        )
+        videoCaptureDevice.activeDepthDataMinFrameDuration = depthFrameDuration
+      }
+
+      videoCaptureDevice.unlockForConfiguration()
+    }
+  }
+
+  @objc
+  public static func requestCameraPermissions(_ callback: @escaping (Bool) -> Void) {
+    requestPermissions(for: [
+      .captureDevice(mediaType: .video),
+      .microphone,
+      .mediaLibrary,
+    ]) { success in
+      callback(success)
+    }
+  }
+
+  @objc
+  public func setupCameraCaptureSession() {
+    if captureSession.isRunning {
+      return
+    }
+    captureSession.beginConfiguration()
+    if case .failure = attemptToSetupCameraCaptureSession() {
+      // TODO:
+    }
+    captureSession.commitConfiguration()
+  }
+
+  @objc
+  public func startPreview() {
+    if case .authorized = AVCaptureDevice.authorizationStatus(for: .video) {
+      guard captureSession.isRunning else {
+        captureSession.startRunning()
+        return
+      }
+      return
+    }
+  }
+
+  @objc
+  public func stopPreview() {
+    guard captureSession.isRunning else {
+      return
+    }
+    captureSession.stopRunning()
+  }
+
+  @objc
+  public func startCapture(completionHandler: @escaping (Error?, Bool) -> Void) {
+    sessionQueue.async {
+      guard self.videoCaptureDevice != nil else {
+        completionHandler(nil, false)
+        return
+      }
+      do {
+        let outputURL = try self.saveVideoFileOutput()
+        self.videoFileOutput.stopRecording()
+        self.videoFileOutput.startRecording(to: outputURL, recordingDelegate: self)
+        self.state = .recording(toURL: outputURL)
+        completionHandler(nil, true)
+      } catch {
+        completionHandler(error, false)
+      }
+    }
+  }
+
+  @objc(stopCaptureAndSaveToCameraRoll:completionHandler:)
+  public func stopCapture(andSaveToCameraRoll saveToCameraRoll: Bool, _ completionHandler: (Bool) -> Void) {
+    if videoFileOutput.isRecording {
+      videoFileOutput.stopRecording()
+    }
+    if saveToCameraRoll, let url = videoFileOutput.outputFileURL {
+      state = .waitingForFileOutputToFinish(toURL: url)
+      completionHandler(true)
+      return
+    }
+    state = .stopped
+    completionHandler(true)
   }
 
   @objc
@@ -343,12 +372,25 @@ extension HSCameraManager: AVCaptureFileOutputRecordingDelegate {
 
   func fileOutput(_: AVCaptureFileOutput, didFinishRecordingTo fileURL: URL, from _: [AVCaptureConnection], error: Error?) {
     if error != nil {
-      // TODO: handle error
+      delegate?.cameraManagerDidFinishFileOutput(toFileURL: fileURL, asset: nil, error: error)
       return
     }
-//    TODO: file output
-//    createVideoAsset(forURL: fileURL) { error, _, assetPlaceholder in
-//      self.delegate?.cameraManagerDidFinishFileOutput(toFileURL: fileURL, asset: assetPlaceholder, error: error)
-//    }
+    guard case let .waitingForFileOutputToFinish(toURL: url) = state else {
+      delegate?.cameraManagerDidFinishFileOutput(toFileURL: fileURL, asset: nil, error: error)
+      return
+    }
+    PHPhotoLibrary.shared().performChanges({ [weak self] in
+      let request = PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
+      guard let assetPlaceholder = request?.placeholderForCreatedAsset else {
+        self?.delegate?.cameraManagerDidFinishFileOutput(toFileURL: url, asset: nil, error: error)
+        return
+      }
+      self?.delegate?.cameraManagerDidFinishFileOutput(toFileURL: url, asset: assetPlaceholder, error: error)
+    })
   }
+}
+
+fileprivate func makeRandomFileName() -> String {
+  let random_int = arc4random_uniform(.max)
+  return NSString(format: "%x", random_int) as String
 }

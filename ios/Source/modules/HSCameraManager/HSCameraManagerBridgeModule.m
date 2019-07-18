@@ -46,8 +46,21 @@ RCT_EXPORT_METHOD(startCameraCapture : (RCTResponseSenderBlock)callback) {
       }];
 }
 
-RCT_EXPORT_METHOD(stopCameraCapture) {
-  [HSCameraManager.sharedInstance stopCapture];
+RCT_EXPORT_METHOD(stopCameraCapture
+                  : (BOOL)saveToCameraRoll callback
+                  : (RCTResponseSenderBlock)callback) {
+  [HSCameraManager.sharedInstance
+      stopCaptureAndSaveToCameraRoll:saveToCameraRoll
+                   completionHandler:^(BOOL success) {
+                     if (!success) {
+                       NSString *description = @"Failed to stop camera capture";
+                       NSDictionary<NSString *, id> *error =
+                           RCTMakeError(description, @{}, nil);
+                       callback(@[ error ]);
+                       return;
+                     }
+                     callback(@[ [NSNull null] ]);
+                   }];
 }
 
 RCT_EXPORT_METHOD(switchToOppositeCamera) {
