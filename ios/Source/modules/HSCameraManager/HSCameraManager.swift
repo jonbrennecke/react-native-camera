@@ -328,13 +328,18 @@ class HSCameraManager: NSObject {
 
   @objc(stopCaptureAndSaveToCameraRoll:completionHandler:)
   public func stopCapture(andSaveToCameraRoll _: Bool, _ completionHandler: (Bool) -> Void) {
-    assetWriterVideoInput?.markFinished()
-    assetWriterDepthInput?.markFinished()
-    assetWriter.stopRecording { url in
-      PHPhotoLibrary.shared().performChanges({
-        PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
-      })
+    if case let .recording(_, startTime) = state {
+      assetWriterVideoInput?.markFinished()
+      assetWriterDepthInput?.markFinished()
+      let clock = CMClockGetHostTimeClock()
+      let endTime = CMClockGetTime(clock) - startTime
+      assetWriter.stopRecording(at: endTime) { url in
+        PHPhotoLibrary.shared().performChanges({
+          PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
+        })
+      }
     }
+
 //    if saveToCameraRoll, let url = videoFileOutput.outputFileURL {
 //      state = .waitingForFileOutputToFinish(toURL: url)
 //      completionHandler(true)
