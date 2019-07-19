@@ -94,7 +94,9 @@ class HSEffectManager: NSObject {
 
   private func applyEffects(with depthData: AVDepthData, videoSampleBuffer: CMSampleBuffer) {
     guard
-      let portraitMask = portraitMaskFactory?.makePortraitMask(depthData: depthData, videoSampleBuffer: videoSampleBuffer),
+      let portraitMask = portraitMaskFactory?.makePortraitMask(
+        depthData: depthData, videoSampleBuffer: videoSampleBuffer
+      ),
       let backgroundImage = backgroundImage,
       let composedImage = portraitMask.imageByApplyingMask(toBackground: backgroundImage)
     else {

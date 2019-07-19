@@ -42,7 +42,7 @@ class HSCameraManager: NSObject {
       isRealTime: true
     )
   }()
-  
+
   private lazy var assetWriterVideoInput: HSVideoWriterInput? = {
     guard let size = videoResolution else {
       return nil
@@ -55,7 +55,7 @@ class HSCameraManager: NSObject {
   }()
 
   internal var captureSession = AVCaptureSession()
-  
+
   // kCVPixelFormatType_32BGRA is required because of compatability with depth effects, but
   // if depth is disabled, this should be left as the default YpCbCr
   public var videoPixelFormat: OSType = kCVPixelFormatType_32BGRA {
@@ -63,7 +63,7 @@ class HSCameraManager: NSObject {
       // TODO: update video output configuration
     }
   }
-  
+
   public var depthPixelFormat: OSType = kCVPixelFormatType_DisparityFloat32 {
     didSet {
       // TODO: update depth output configuration
@@ -162,7 +162,7 @@ class HSCameraManager: NSObject {
   private func setupVideoOutput() -> HSCameraSetupResult {
     videoOutput.alwaysDiscardsLateVideoFrames = true
     videoOutput.videoSettings = [
-kCVPixelBufferPixelFormatTypeKey: videoPixelFormat,
+      kCVPixelBufferPixelFormatTypeKey: videoPixelFormat,
     ] as [String: Any]
     videoOutput.setSampleBufferDelegate(self, queue: sessionQueue)
     if captureSession.canAddOutput(videoOutput) {
@@ -315,7 +315,7 @@ kCVPixelBufferPixelFormatTypeKey: videoPixelFormat,
           completionHandler(nil, false)
           return
         }
-        
+
         let clock = CMClockGetHostTimeClock()
         let startTime = CMClockGetTime(clock)
         self.state = .recording(toURL: outputURL, startTime: startTime)
@@ -390,8 +390,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
     }
 
     // frames may be late, check when recording ended
-    if case .recording(_, let startTime) = state {
-      
+    if case let .recording(_, startTime) = state {
       // add depth frame
       if let depthBuffer = depthDataConverter?.convert(depthData: synchronizedDepthData.depthData) {
         let presentationTime = synchronizedDepthData.timestamp - startTime
@@ -400,7 +399,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
         )
         assetWriterDepthInput?.add(videoFrameBuffer: frameBuffer)
       }
-      
+
       // add video frame
       if let videoBuffer = HSPixelBuffer(sampleBuffer: synchronizedVideoData.sampleBuffer) {
         let presentationTime = synchronizedVideoData.timestamp - startTime

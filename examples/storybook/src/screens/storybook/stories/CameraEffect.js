@@ -7,7 +7,7 @@ import {
   CameraEffect,
   requestCameraPermissions,
   startCameraPreview,
-  startCameraEffects
+  startCameraEffects,
 } from '@jonbrennecke/react-native-camera';
 
 import { StorybookAsyncWrapper } from '../utils';
@@ -23,8 +23,7 @@ const loadAsync = async () => {
     await requestCameraPermissions();
     startCameraPreview();
     await startCameraEffects();
-  }
-  catch (error) {
+  } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
   }
@@ -34,9 +33,7 @@ storiesOf('Camera', module).add('Camera Effect', () => (
   <SafeAreaView style={styles.flex}>
     <StorybookAsyncWrapper
       loadAsync={loadAsync}
-      render={() => (
-        <CameraEffect style={styles.flex} />
-      )}
+      render={() => <CameraEffect style={styles.flex} />}
     />
   </SafeAreaView>
 ));

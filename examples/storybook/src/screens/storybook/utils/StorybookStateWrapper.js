@@ -5,7 +5,10 @@ import type { Element } from 'react';
 
 export type StorybookStateWrapperProps<S: Object> = {
   initialState: S,
-  onMount?: (data: S, setState: (S) => void) => void,
+  // eslint-disable-next-line flowtype/space-after-type-colon
+  onMount?:
+    | ((getState: () => S, setState: (S) => void) => void)
+    | ((getState: () => S, setState: (S) => void) => Promise<void>),
   render: (getState: () => S, setState: (S) => void) => ?Element<*>,
 };
 
@@ -20,9 +23,9 @@ export class StorybookStateWrapper<S: Object> extends PureComponent<
     this.state = props.initialState;
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     if (this.props.onMount) {
-      this.props.onMount(this.state, state => this.setState(state));
+      await this.props.onMount(this.state, state => this.setState(state));
     }
   }
 

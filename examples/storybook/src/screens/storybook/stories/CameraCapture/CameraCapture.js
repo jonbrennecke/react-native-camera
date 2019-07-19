@@ -8,7 +8,7 @@ import {
   createCameraStateHOC,
   CameraCapture,
   requestCameraPermissions,
-  startCameraPreview
+  startCameraPreview,
 } from '@jonbrennecke/react-native-camera';
 
 import { createReduxStore } from './cameraStore';
@@ -21,40 +21,36 @@ const styles = {
     flex: 1,
   },
   camera: {
-    flex: 1
-  }
+    flex: 1,
+  },
 };
 
 const CameraStateContainer = createCameraStateHOC();
 
-const Component = CameraStateContainer(
-  ({
-    startCapture,
-    stopCapture
-  }) => {
-    return (
-      <StorybookAsyncWrapper
-        loadAsync={loadAsync}
-        render={() => (
-          <CameraCapture
-            style={styles.camera}
-            onRequestBeginCapture={startCapture}
-            onRequestEndCapture={() => stopCapture({
-              saveToCameraRoll: true
-            })}
-          />
-        )}
-      />
-    );
-  }
-);
+const Component = CameraStateContainer(({ startCapture, stopCapture }) => {
+  return (
+    <StorybookAsyncWrapper
+      loadAsync={loadAsync}
+      render={() => (
+        <CameraCapture
+          style={styles.camera}
+          onRequestBeginCapture={startCapture}
+          onRequestEndCapture={() =>
+            stopCapture({
+              saveToCameraRoll: true,
+            })
+          }
+        />
+      )}
+    />
+  );
+});
 
 const loadAsync = async () => {
   try {
     await requestCameraPermissions();
     startCameraPreview();
-  }
-  catch (error) {
+  } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
   }
