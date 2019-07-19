@@ -39,6 +39,11 @@ class HSVideoCompositionView: UIView {
     })
 
     let playerItem = AVPlayerItem(asset: asset)
+    playerItem.videoComposition = AVVideoComposition(asset: asset) { request in
+      let blurred = request.sourceImage.clampedToExtent().applyingGaussianBlur(sigma: 10)
+      let output = blurred.clamped(to: request.sourceImage.extent)
+      request.finish(with: output, context: nil)
+    }
     player = AVPlayer(playerItem: playerItem)
     DispatchQueue.main.async {
       self.playerLayer.player = self.player
