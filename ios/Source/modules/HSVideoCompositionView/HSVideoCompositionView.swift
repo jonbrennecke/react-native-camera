@@ -1,7 +1,7 @@
 import AVFoundation
+import HSCameraUtils
 import Photos
 import UIKit
-import HSCameraUtils
 
 @objc
 class HSVideoCompositionView: UIView {
@@ -52,6 +52,9 @@ class HSVideoCompositionView: UIView {
     }
   }
   
+  @objc
+  public var isDepthPreviewEnabled: Bool = false
+
   private func configurePlayer(
     asset: AVAsset,
     videoTrackID: CMPersistentTrackID,
@@ -64,7 +67,7 @@ class HSVideoCompositionView: UIView {
     else {
       return
     }
-    
+
     let videoComposition = AVMutableVideoComposition()
     videoComposition.customVideoCompositorClass = HSVideoCompositor.self
     videoComposition.renderSize = CGSize(width: renderSize.width, height: renderSize.height)
@@ -81,14 +84,19 @@ class HSVideoCompositionView: UIView {
     let instruction = AVMutableVideoCompositionInstruction()
     instruction.layerInstructions = [
       videoLayerInstruction,
-      depthLayerInstruction
+      depthLayerInstruction,
     ]
     instruction.backgroundColor = UIColor.red.cgColor
     instruction.timeRange = CMTimeRangeMake(start: CMTime.zero, duration: composition.duration)
     videoComposition.instructions = [instruction]
-    
+
     playerItem = AVPlayerItem(asset: asset)
     playerItem?.videoComposition = videoComposition
+    if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
+      compositor.depthTrackID = depthTrackID
+      compositor.videoTrackID = videoTrackID
+      compositor.isDepthPreviewEnabled = false
+    }
     player = AVQueuePlayer(playerItem: playerItem)
     playerLooper = AVPlayerLooper(player: player!, templateItem: playerItem!)
     DispatchQueue.main.async {

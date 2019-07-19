@@ -12,7 +12,7 @@
 		FC03B63022DFDB0700E283B3 /* HSPortraitMaskFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC03B62F22DFDB0700E283B3 /* HSPortraitMaskFactory.swift */; };
 		FC03B63222DFEA0000E283B3 /* HSVideoCompositionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC03B63122DFEA0000E283B3 /* HSVideoCompositionView.swift */; };
 		FC03B64C22DFF1F000E283B3 /* HSVideoCompositionViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FC03B64B22DFF1F000E283B3 /* HSVideoCompositionViewManager.m */; };
-		FC0511F322E178C300DA531E /* HSCompositionInstruction.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0511F222E178C300DA531E /* HSCompositionInstruction.swift */; };
+		FC0511F322E178C300DA531E /* HSVideoCompositionInstruction.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0511F222E178C300DA531E /* HSVideoCompositionInstruction.swift */; };
 		FC2FB8F022CBCEA5007CE0AF /* HSSegmentationModelLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC2FB8EF22CBCEA5007CE0AF /* HSSegmentationModelLoader.swift */; };
 		FC664EE322CAD98000FD8AE7 /* HSEffectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E5E22B9ABF600522016 /* HSEffectManager.swift */; };
 		FC664EE422CAD98900FD8AE7 /* HSEffectManagerBridgeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = FC845E6122B9AEED00522016 /* HSEffectManagerBridgeModule.m */; };
@@ -78,7 +78,7 @@
 		FC03B63122DFEA0000E283B3 /* HSVideoCompositionView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSVideoCompositionView.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC03B64B22DFF1F000E283B3 /* HSVideoCompositionViewManager.m */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.c.objc; path = HSVideoCompositionViewManager.m; sourceTree = "<group>"; tabWidth = 2; };
 		FC03B64E22DFF25500E283B3 /* HSVideoCompositionViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSVideoCompositionViewManager.h; sourceTree = "<group>"; };
-		FC0511F222E178C300DA531E /* HSCompositionInstruction.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSCompositionInstruction.swift; sourceTree = "<group>"; tabWidth = 2; };
+		FC0511F222E178C300DA531E /* HSVideoCompositionInstruction.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSVideoCompositionInstruction.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC0E6E3522E03BC700B0C1C7 /* RNBlur.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNBlur.xcodeproj; path = "../../node_modules/@react-native-community/blur/ios/RNBlur.xcodeproj"; sourceTree = "<group>"; };
 		FC2FB8EF22CBCEA5007CE0AF /* HSSegmentationModelLoader.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSSegmentationModelLoader.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC664F4022CADCE600FD8AE7 /* libHSReactNativeCamera.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHSReactNativeCamera.a; path = "../../../../../../../Library/Developer/Xcode/DerivedData/Storybook-aykofoufjpltyqchwrnbfzpoimmw/Build/Products/Debug-iphoneos/libHSReactNativeCamera.a"; sourceTree = "<group>"; };
@@ -143,7 +143,7 @@
 				FC03B64B22DFF1F000E283B3 /* HSVideoCompositionViewManager.m */,
 				FC03B63122DFEA0000E283B3 /* HSVideoCompositionView.swift */,
 				FCADFE2822E1521B00E3C76A /* HSVideoCompositor.swift */,
-				FC0511F222E178C300DA531E /* HSCompositionInstruction.swift */,
+				FC0511F222E178C300DA531E /* HSVideoCompositionInstruction.swift */,
 			);
 			path = HSVideoCompositionView;
 			sourceTree = "<group>";
@@ -398,7 +398,7 @@
 				FC03B63222DFEA0000E283B3 /* HSVideoCompositionView.swift in Sources */,
 				FC664EE822CAD98D00FD8AE7 /* HSCameraSetupResult.swift in Sources */,
 				FC664EE322CAD98000FD8AE7 /* HSEffectManager.swift in Sources */,
-				FC0511F322E178C300DA531E /* HSCompositionInstruction.swift in Sources */,
+				FC0511F322E178C300DA531E /* HSVideoCompositionInstruction.swift in Sources */,
 				FCADFE2922E1521B00E3C76A /* HSVideoCompositor.swift in Sources */,
 				FC664EF022CAD9AA00FD8AE7 /* cameraUtils.swift in Sources */,
 				FC664EE922CAD99000FD8AE7 /* HSCameraManagerBridgeModule.m in Sources */,

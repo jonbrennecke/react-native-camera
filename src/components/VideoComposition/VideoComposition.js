@@ -11,11 +11,13 @@ const NativeVideoCompositionView = requireNativeComponent(
 export type VideoCompositionProps = {
   style?: ?Style,
   assetID: ?string,
+  enableDepthPreview?: boolean
 };
 
 export const VideoComposition: SFC<VideoCompositionProps> = ({
   style,
   assetID,
+  enableDepthPreview = true
 }: VideoCompositionProps) => (
-  <NativeVideoCompositionView style={style} assetID={assetID} />
+  <NativeVideoCompositionView style={style} assetID={assetID} isDepthPreviewEnabled={enableDepthPreview} />
 );

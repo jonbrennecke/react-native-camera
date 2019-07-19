@@ -17,4 +17,9 @@ RCT_CUSTOM_VIEW_PROPERTY(assetID, NSString, HSVideoCompositionView) {
   view.assetID = assetID;
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(isDepthPreviewEnabled, BOOL, HSVideoCompositionView) {
+  BOOL isDepthPreviewEnabled = [RCTConvert BOOL:json];
+  view.isDepthPreviewEnabled = isDepthPreviewEnabled;
+}
+
 @end
