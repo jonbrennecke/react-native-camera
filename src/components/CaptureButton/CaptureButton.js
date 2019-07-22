@@ -33,13 +33,14 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
   }),
-  center: {
+  centerAnim: (anim: Animated.Value) => ({
+    transform: [{ scale: anim }],
     height: 65,
     width: 65,
     borderRadius: 32.5,
     overflow: 'hidden',
     backgroundColor: '#fff',
-  },
+  }),
   border: {
     height: 75,
     width: 75,
@@ -74,11 +75,18 @@ const styles = {
 @autobind
 export class CaptureButton extends Component<Props> {
   outerViewAnim: Animated.Value = new Animated.Value(1);
+  centerViewAnim: Animated.Value = new Animated.Value(1);
 
   touchableOnPressIn() {
     Animated.spring(this.outerViewAnim, {
-      toValue: 1.35,
-      duration: 350,
+      toValue: 0.95,
+      duration: 250,
+      useNativeDriver: true,
+      easing: Easing.out(Easing.quad),
+    }).start();
+    Animated.spring(this.centerViewAnim, {
+      toValue: 0.65,
+      duration: 250,
       useNativeDriver: true,
       easing: Easing.out(Easing.quad),
     }).start();
@@ -88,7 +96,13 @@ export class CaptureButton extends Component<Props> {
   touchableOnPressOut() {
     Animated.spring(this.outerViewAnim, {
       toValue: 1.0,
-      duration: 350,
+      duration: 250,
+      useNativeDriver: true,
+      easing: Easing.out(Easing.quad),
+    }).start();
+    Animated.spring(this.centerViewAnim, {
+      toValue: 1.0,
+      duration: 250,
       useNativeDriver: true,
       easing: Easing.out(Easing.quad),
     }).start();
@@ -102,8 +116,8 @@ export class CaptureButton extends Component<Props> {
         onPressOut={this.touchableOnPressOut}
       >
         <Animated.View style={styles.outerViewAnim(this.outerViewAnim)}>
-          <View
-            style={[styles.center, this.props.style]}
+          <Animated.View
+            style={[styles.centerAnim(this.centerViewAnim), this.props.style]}
           />
           <MaskedViewIOS
             style={styles.borderMask}
