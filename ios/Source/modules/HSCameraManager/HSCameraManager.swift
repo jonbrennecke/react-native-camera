@@ -433,8 +433,13 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
     else {
       return
     }
+    
+    // send detected faces to delegate method
+    let metadataObjects = synchronizedMetadata.metadataObjects
+    let faces = metadataObjects.map { $0 as? AVMetadataFaceObject }.compactMap { $0 }
+    delegate?.cameraManagerDidDetect(faces: faces)
 
-    // frames may be late, check when recording ended
+    // TODO: frames may be late, so check when recording ended
     if case let .recording(_, startTime) = state {
       // add depth frame
       if let depthBuffer = depthDataConverter?.convert(depthData: synchronizedDepthData.depthData) {
@@ -453,22 +458,6 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
         )
         assetWriterVideoInput?.append(frameBuffer)
       }
-
-//      let objects = synchronizedMetadata.metadataObjects
-//      let items = objects.map { object in
-//        if object.type == .face {
-//          let timeRange = CMTimeRange(start: object.time, duration: object.duration)
-//          var item = AVMutableMetadataItem()
-//          item.identifier = .quickTimeMetadataDetectedFace
-//          item.keySpace = .common
-//          item.duration = object.duration
-      ////          item.value = object
-      ////          item.dataType
-//          return item
-//        }
-//      }
-//      let timeRange = CMTimeRange(start: object.time, duration: object.duration)
-//      let metadataGroup = AVTimedMetadataGroup(items: [items], timeRange: timeRange)
     }
 
     if let delegate = depthDelegate {
