@@ -17,8 +17,9 @@ import { StorybookAsyncWrapper } from '../../utils';
 const store = createReduxStore();
 
 const styles = {
-  flex: {
+  safeArea: {
     flex: 1,
+    backgroundColor: '#000'
   },
   camera: {
     flex: 1,
@@ -58,7 +59,7 @@ const loadAsync = async () => {
 
 storiesOf('Camera', module).add('Camera Capture', () => (
   <Provider store={store}>
-    <SafeAreaView style={styles.flex}>
+    <SafeAreaView style={styles.safeArea}>
       {/* $FlowFixMe */}
       <Component />
     </SafeAreaView>

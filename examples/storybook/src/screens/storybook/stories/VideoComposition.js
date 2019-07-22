@@ -15,6 +15,10 @@ const styles = {
   flex: {
     flex: 1,
   },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#000'
+  },
 };
 
 const onMount = async (getState, setState): Promise<void> => {
@@ -34,7 +38,7 @@ const onMount = async (getState, setState): Promise<void> => {
 };
 
 storiesOf('Media Effects', module).add('Video Composition', () => (
-  <SafeAreaView style={styles.flex}>
+  <SafeAreaView style={styles.safeArea}>
     <StorybookStateWrapper
       initialState={{ asset: null }}
       onMount={onMount}
