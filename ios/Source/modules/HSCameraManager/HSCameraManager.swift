@@ -18,7 +18,11 @@ class HSCameraManager: NSObject {
   private let videoOutput = AVCaptureVideoDataOutput()
   private let videoFileOutput = AVCaptureMovieFileOutput()
   private let depthOutput = AVCaptureDepthDataOutput()
-  private lazy var outputSynchronizer = AVCaptureDataOutputSynchronizer(dataOutputs: [depthOutput, videoOutput])
+//  private let metadataInput = AVCaptureMetadataInput()
+  private let metadataOutput = AVCaptureMetadataOutput()
+  private lazy var outputSynchronizer = AVCaptureDataOutputSynchronizer(
+    dataOutputs: [depthOutput, videoOutput, metadataOutput]
+  )
   private var videoCaptureDevice: AVCaptureDevice?
   private var videoCaptureDeviceInput: AVCaptureDeviceInput?
   private var audioCaptureDevice: AVCaptureDevice?
@@ -32,22 +36,22 @@ class HSCameraManager: NSObject {
     return HSAVDepthDataToPixelBufferConverter(size: size, pixelFormatType: kCVPixelFormatType_OneComponent8)
   }()
 
-  private lazy var assetWriterDepthInput: HSVideoWriterInput? = {
+  private lazy var assetWriterDepthInput: HSVideoWriterFrameBufferInput? = {
     guard let size = depthResolution else {
       return nil
     }
-    return HSVideoWriterInput(
+    return HSVideoWriterFrameBufferInput(
       videoSize: size,
       pixelFormatType: depthPixelFormat,
       isRealTime: true
     )
   }()
 
-  private lazy var assetWriterVideoInput: HSVideoWriterInput? = {
+  private lazy var assetWriterVideoInput: HSVideoWriterFrameBufferInput? = {
     guard let size = videoResolution else {
       return nil
     }
-    return HSVideoWriterInput(
+    return HSVideoWriterFrameBufferInput(
       videoSize: size,
       pixelFormatType: videoPixelFormat,
       isRealTime: true
@@ -134,12 +138,26 @@ class HSCameraManager: NSObject {
       return .failure
     }
 
+    if case .failure = setupMetadataOutput() {
+      return .failure
+    }
+
     if case .failure = setupDepthOutput() {
       return .failure
     }
 
     configureActiveFormat()
     outputSynchronizer.setDelegate(self, queue: sessionQueue)
+    return .success
+  }
+
+  private func setupMetadataOutput() -> HSCameraSetupResult {
+    if captureSession.canAddOutput(metadataOutput) {
+      captureSession.addOutput(metadataOutput)
+      metadataOutput.metadataObjectTypes = [.face]
+    } else {
+      return .failure
+    }
     return .success
   }
 
@@ -379,8 +397,8 @@ class HSCameraManager: NSObject {
   @objc(stopCaptureAndSaveToCameraRoll:completionHandler:)
   public func stopCapture(andSaveToCameraRoll _: Bool, _ completionHandler: (Bool) -> Void) {
     if case let .recording(_, startTime) = state {
-      assetWriterVideoInput?.markFinished()
-      assetWriterDepthInput?.markFinished()
+      assetWriterVideoInput?.finish()
+      assetWriterDepthInput?.finish()
       let clock = CMClockGetHostTimeClock()
       let endTime = CMClockGetTime(clock) - startTime
       assetWriter.stopRecording(at: endTime) { url in
@@ -389,12 +407,6 @@ class HSCameraManager: NSObject {
         })
       }
     }
-
-//    if saveToCameraRoll, let url = videoFileOutput.outputFileURL {
-//      state = .waitingForFileOutputToFinish(toURL: url)
-//      completionHandler(true)
-//      return
-//    }
     state = .stopped
     completionHandler(true)
   }
@@ -416,7 +428,8 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
   ) {
     guard
       let synchronizedDepthData = collection.synchronizedData(for: depthOutput) as? AVCaptureSynchronizedDepthData,
-      let synchronizedVideoData = collection.synchronizedData(for: videoOutput) as? AVCaptureSynchronizedSampleBufferData
+      let synchronizedVideoData = collection.synchronizedData(for: videoOutput) as? AVCaptureSynchronizedSampleBufferData,
+      let synchronizedMetadata = collection.synchronizedData(for: metadataOutput) as? AVCaptureSynchronizedMetadataObjectData
     else {
       return
     }
@@ -429,7 +442,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
         let frameBuffer = HSVideoFrameBuffer(
           pixelBuffer: depthBuffer, presentationTime: presentationTime
         )
-        assetWriterDepthInput?.add(videoFrameBuffer: frameBuffer)
+        assetWriterDepthInput?.append(frameBuffer)
       }
 
       // add video frame
@@ -438,8 +451,24 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
         let frameBuffer = HSVideoFrameBuffer(
           pixelBuffer: videoBuffer, presentationTime: presentationTime
         )
-        assetWriterVideoInput?.add(videoFrameBuffer: frameBuffer)
+        assetWriterVideoInput?.append(frameBuffer)
       }
+
+//      let objects = synchronizedMetadata.metadataObjects
+//      let items = objects.map { object in
+//        if object.type == .face {
+//          let timeRange = CMTimeRange(start: object.time, duration: object.duration)
+//          var item = AVMutableMetadataItem()
+//          item.identifier = .quickTimeMetadataDetectedFace
+//          item.keySpace = .common
+//          item.duration = object.duration
+      ////          item.value = object
+      ////          item.dataType
+//          return item
+//        }
+//      }
+//      let timeRange = CMTimeRange(start: object.time, duration: object.duration)
+//      let metadataGroup = AVTimedMetadataGroup(items: [items], timeRange: timeRange)
     }
 
     if let delegate = depthDelegate {

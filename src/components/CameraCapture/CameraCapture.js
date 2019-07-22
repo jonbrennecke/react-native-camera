@@ -34,7 +34,7 @@ const styles = {
 
 export type CameraCaptureProps = {
   style?: ?Style,
-  cameraRef: ?Camera => void,
+  cameraRef: (?Camera) => void,
   onRequestFocus: ({ x: number, y: number }) => void,
   onRequestBeginCapture: () => void,
   onRequestEndCapture: () => void,
