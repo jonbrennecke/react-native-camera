@@ -19,7 +19,7 @@ const store = createReduxStore();
 const styles = {
   safeArea: {
     flex: 1,
-    backgroundColor: '#000'
+    backgroundColor: '#000',
   },
   camera: {
     flex: 1,

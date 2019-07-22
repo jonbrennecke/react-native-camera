@@ -1,19 +1,20 @@
 // @flow
 import React from 'react';
-import { View } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 
 import { Camera } from '../Camera';
 import { CaptureButton } from '../CaptureButton';
+import { CameraFocusArea } from '../CameraFocusArea';
+import { Units } from '../../constants';
 
 import type { SFC, Style } from '../../types';
-
-const Units = {
-  small: 10
-}
 
 const styles = {
   flex: {
     flex: 1,
+  },
+  absoluteFill: {
+    ...StyleSheet.absoluteFillObject,
   },
   container: {
     backgroundColor: '#000',
@@ -45,6 +46,10 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
   <View style={[styles.container, style]}>
     <View style={styles.cameraWrap}>
       <Camera style={styles.flex} />
+      <CameraFocusArea
+        style={styles.absoluteFill}
+        onDidRequestFocusOnPoint={() => {}}
+      />
     </View>
     <View style={styles.bottomControls}>
       <CaptureButton
