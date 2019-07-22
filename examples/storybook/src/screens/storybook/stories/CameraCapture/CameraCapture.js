@@ -12,7 +12,7 @@ import {
 } from '@jonbrennecke/react-native-camera';
 
 import { createReduxStore } from './cameraStore';
-import { StorybookAsyncWrapper } from '../../utils';
+import { StorybookStateWrapper } from '../../utils';
 
 const store = createReduxStore();
 
@@ -26,28 +26,7 @@ const styles = {
   },
 };
 
-const CameraStateContainer = createCameraStateHOC();
-
-const Component = CameraStateContainer(({ startCapture, stopCapture }) => {
-  return (
-    <StorybookAsyncWrapper
-      loadAsync={loadAsync}
-      render={() => (
-        <CameraCapture
-          style={styles.camera}
-          onRequestBeginCapture={startCapture}
-          onRequestEndCapture={() =>
-            stopCapture({
-              saveToCameraRoll: true,
-            })
-          }
-        />
-      )}
-    />
-  );
-});
-
-const loadAsync = async () => {
+const loadAsync = async (): Promise<void> => {
   try {
     await requestCameraPermissions();
     startCameraPreview();
@@ -57,10 +36,40 @@ const loadAsync = async () => {
   }
 };
 
+const CameraStateContainer = createCameraStateHOC();
+
+const Component = CameraStateContainer(({ startCapture, stopCapture }) => {
+  return (
+    <StorybookStateWrapper
+      initialState={{ cameraRef: React.createRef() }}
+      onMount={loadAsync}
+      render={getState => {
+        return (
+          <CameraCapture
+            style={styles.camera}
+            cameraRef={getState().cameraRef}
+            onRequestBeginCapture={startCapture}
+            onRequestEndCapture={() =>
+              stopCapture({
+                saveToCameraRoll: true,
+              })
+            }
+            onRequestFocus={point => {
+              const { cameraRef } = getState();
+              if (cameraRef.current) {
+                cameraRef.current.focusOnPoint(point);
+              }
+            }}
+          />
+        );
+      }}
+    />
+  );
+});
+
 storiesOf('Camera', module).add('Camera Capture', () => (
   <Provider store={store}>
     <SafeAreaView style={styles.safeArea}>
-      {/* $FlowFixMe */}
       <Component />
     </SafeAreaView>
   </Provider>

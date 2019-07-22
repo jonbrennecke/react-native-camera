@@ -20,4 +20,10 @@ class HSCameraView: UIView {
     super.layoutSubviews()
     previewLayer.frame = bounds
   }
+
+  @objc(focusOnPoint:)
+  public func focus(on point: CGPoint) {
+    let focusPoint = previewLayer.captureDevicePointConverted(fromLayerPoint: point)
+    HSCameraManager.shared.focus(on: focusPoint)
+  }
 }

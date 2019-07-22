@@ -34,21 +34,25 @@ const styles = {
 
 export type CameraCaptureProps = {
   style?: ?Style,
+  cameraRef: ?Camera => void,
+  onRequestFocus: ({ x: number, y: number }) => void,
   onRequestBeginCapture: () => void,
   onRequestEndCapture: () => void,
 };
 
 export const CameraCapture: SFC<CameraCaptureProps> = ({
   style,
+  cameraRef,
+  onRequestFocus,
   onRequestBeginCapture,
   onRequestEndCapture,
 }: CameraCaptureProps) => (
   <View style={[styles.container, style]}>
     <View style={styles.cameraWrap}>
-      <Camera style={styles.flex} />
+      <Camera ref={cameraRef} style={styles.flex} />
       <CameraFocusArea
         style={styles.absoluteFill}
-        onDidRequestFocusOnPoint={() => {}}
+        onRequestFocus={onRequestFocus}
       />
     </View>
     <View style={styles.bottomControls}>

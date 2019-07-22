@@ -249,6 +249,56 @@ class HSCameraManager: NSObject {
     }
   }
 
+  private func attemptToSwitchToOppositeCamera() -> HSCameraSetupResult {
+    guard let device = getOppositeCamera(session: captureSession) else {
+      return .failure
+    }
+    captureSession.inputs.forEach { input in
+      if input.isEqual(audioCaptureDeviceInput) {
+        return
+      }
+      captureSession.removeInput(input)
+    }
+    guard let deviceInput = try? AVCaptureDeviceInput(device: device) else {
+      return .failure
+    }
+    if captureSession.canAddInput(deviceInput) {
+      captureSession.addInput(deviceInput)
+    } else {
+      return .failure
+    }
+    videoCaptureDevice = device
+    videoCaptureDeviceInput = deviceInput
+    return .success
+  }
+
+  public func focus(on point: CGPoint) {
+    guard let device = videoCaptureDevice else {
+      return
+    }
+    if case .some = try? device.lockForConfiguration() {
+      // set focus point
+      if device.isFocusModeSupported(.autoFocus) {
+        device.focusMode = .autoFocus
+      }
+      if device.isFocusPointOfInterestSupported {
+        device.focusPointOfInterest = point
+      }
+
+      // set exposure point
+      if device.isExposureModeSupported(.continuousAutoExposure) {
+        device.exposureMode = .continuousAutoExposure
+      }
+      if device.isExposurePointOfInterestSupported {
+        device.exposurePointOfInterest = point
+      }
+
+      device.unlockForConfiguration()
+    }
+  }
+
+  // MARK: - objc interface
+
   @objc
   public static func requestCameraPermissions(_ callback: @escaping (Bool) -> Void) {
     requestPermissions(for: [
@@ -356,29 +406,6 @@ class HSCameraManager: NSObject {
       // TODO:
     }
     captureSession.commitConfiguration()
-  }
-
-  private func attemptToSwitchToOppositeCamera() -> HSCameraSetupResult {
-    guard let device = getOppositeCamera(session: captureSession) else {
-      return .failure
-    }
-    captureSession.inputs.forEach { input in
-      if input.isEqual(audioCaptureDeviceInput) {
-        return
-      }
-      captureSession.removeInput(input)
-    }
-    guard let deviceInput = try? AVCaptureDeviceInput(device: device) else {
-      return .failure
-    }
-    if captureSession.canAddInput(deviceInput) {
-      captureSession.addInput(deviceInput)
-    } else {
-      return .failure
-    }
-    videoCaptureDevice = device
-    videoCaptureDeviceInput = deviceInput
-    return .success
   }
 }
 

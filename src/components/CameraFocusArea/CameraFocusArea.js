@@ -13,20 +13,20 @@ import { Units } from '../../constants';
 
 import type { Style } from '../../types/react';
 
-type Position = { x: number, y: number };
+type FocusPoint = { x: number, y: number };
 
 type Props = {
   style?: ?Style,
-  onDidRequestFocusOnPoint: Position => void,
+  onRequestFocus: FocusPoint => void,
 };
 
 type State = {
-  touchPosition: Position,
+  focusPoint: FocusPoint,
 };
 
 const styles = {
   container: {},
-  focusArea: ({ x, y }: Position, anim: Animated.Value) => ({
+  focusArea: ({ x, y }: FocusPoint, anim: Animated.Value) => ({
     height: 100,
     width: 100,
     borderWidth: 1,
@@ -59,7 +59,7 @@ const styles = {
 @autobind
 export class CameraFocusArea extends Component<Props, State> {
   state = {
-    touchPosition: { x: 0, y: 0 },
+    focusPoint: { x: 0, y: 0 },
   };
   anim: Animated.Value = new Animated.Value(0);
   touchableRef = React.createRef();
@@ -76,13 +76,13 @@ export class CameraFocusArea extends Component<Props, State> {
       return;
     }
     const { locationX, locationY } = event.nativeEvent;
-    const touchPosition = {
+    const focusPoint = {
       x: locationX,
       y: locationY,
     };
-    this.setState({ touchPosition }, () => {
+    this.setState({ focusPoint }, () => {
       this.animateFocusIn();
-      this.props.onDidRequestFocusOnPoint(touchPosition);
+      this.props.onRequestFocus(focusPoint);
     });
   }
 
@@ -117,7 +117,7 @@ export class CameraFocusArea extends Component<Props, State> {
       >
         <View style={[styles.container, this.props.style]}>
           <Animated.View
-            style={styles.focusArea(this.state.touchPosition, this.anim)}
+            style={styles.focusArea(this.state.focusPoint, this.anim)}
           />
         </View>
       </TouchableWithoutFeedback>

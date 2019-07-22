@@ -1,15 +1,40 @@
 // @flow
-import React from 'react';
-import { requireNativeComponent } from 'react-native';
+import React, { Component } from 'react';
+import {
+  requireNativeComponent,
+  findNodeHandle,
+  NativeModules,
+} from 'react-native';
 
-import type { SFC, Style } from '../../types';
+import type { Style } from '../../types';
 
 const NativeCameraView = requireNativeComponent('HSCameraView');
+
+const { HSCameraViewManager } = NativeModules;
 
 export type CameraProps = {
   style?: ?Style,
 };
 
-export const Camera: SFC<CameraProps> = ({ style }: CameraProps) => (
-  <NativeCameraView style={style} />
-);
+export class Camera extends Component<CameraProps> {
+  nativeComponentRef = React.createRef();
+
+  focusOnPoint(point: { x: number, y: number }) {
+    if (!this.nativeComponentRef) {
+      return;
+    }
+    HSCameraViewManager.focusOnPoint(
+      findNodeHandle(this.nativeComponentRef.current),
+      point
+    );
+  }
+
+  render() {
+    return (
+      <NativeCameraView
+        ref={this.nativeComponentRef}
+        style={this.props.style}
+      />
+    );
+  }
+}
