@@ -278,19 +278,19 @@ class HSCameraManager: NSObject {
     }
     if case .some = try? device.lockForConfiguration() {
       // set focus point
-      if device.isFocusModeSupported(.autoFocus) {
-        device.focusMode = .autoFocus
-      }
       if device.isFocusPointOfInterestSupported {
         device.focusPointOfInterest = point
       }
+      if device.isFocusModeSupported(.autoFocus) {
+        device.focusMode = .autoFocus
+      }
 
       // set exposure point
-      if device.isExposureModeSupported(.continuousAutoExposure) {
-        device.exposureMode = .continuousAutoExposure
-      }
       if device.isExposurePointOfInterestSupported {
         device.exposurePointOfInterest = point
+      }
+      if device.isExposureModeSupported(.continuousAutoExposure) {
+        device.exposureMode = .continuousAutoExposure
       }
 
       device.unlockForConfiguration()
