@@ -45,6 +45,7 @@ storiesOf('Media Effects', module).add('Video Composition', () => (
             style={styles.flex}
             assetID={asset?.assetID}
             enableDepthPreview={false}
+            shouldLoopVideo
           />
         );
       }}

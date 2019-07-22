@@ -17,6 +17,11 @@ class HSVideoCompositionView: UIView {
     return layer as! AVPlayerLayer
   }
 
+  override func didMoveToSuperview() {
+    super.didMoveToSuperview()
+    playerLayer.videoGravity = .resizeAspectFill
+  }
+
   private func load(asset: AVAsset) {
     asset.loadValuesAsynchronously(forKeys: ["tracks"]) {
       guard
@@ -70,7 +75,8 @@ class HSVideoCompositionView: UIView {
     ]
     instruction.backgroundColor = UIColor.black.cgColor
     instruction.enablePostProcessing = true
-    instruction.timeRange = CMTimeRangeMake(start: CMTime.zero, duration: composition.duration)
+    let timeRange = CMTimeRangeMake(start: CMTime.zero, duration: composition.duration)
+    instruction.timeRange = timeRange
     videoComposition.instructions = [instruction]
     playerItem = AVPlayerItem(asset: asset)
     playerItem?.videoComposition = videoComposition
@@ -80,21 +86,33 @@ class HSVideoCompositionView: UIView {
       compositor.isDepthPreviewEnabled = isDepthPreviewEnabled
     }
     player = AVQueuePlayer(playerItem: playerItem)
-    playerLooper = AVPlayerLooper(player: player!, templateItem: playerItem!)
+    configureLooping(timeRange: timeRange)
     DispatchQueue.main.async {
       self.playerLayer.player = self.player
       self.player?.play()
     }
   }
 
-  override func didMoveToSuperview() {
-    super.didMoveToSuperview()
-    playerLayer.videoGravity = .resizeAspectFill
+  private func configureLooping(timeRange: CMTimeRange) {
+    guard shouldLoopVideo, let player = player, let templateItem = playerItem else {
+      return
+    }
+    playerLooper = AVPlayerLooper(
+      player: player, templateItem: templateItem, timeRange: timeRange
+    )
+    if playerLooper?.status == .some(.unknown) {
+      print("Looper status is unknown")
+    }
   }
-  
+
+  // MARK: - objc interface
+
   @objc
   public var isDepthPreviewEnabled: Bool = false
-  
+
+  @objc
+  public var shouldLoopVideo: Bool = true
+
   @objc
   public var assetID: String? {
     didSet {

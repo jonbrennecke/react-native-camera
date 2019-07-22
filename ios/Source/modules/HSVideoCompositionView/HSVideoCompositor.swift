@@ -1,12 +1,12 @@
 import AVFoundation
-import HSCameraUtils
 import CoreImage
+import HSCameraUtils
 
 class HSVideoCompositor: NSObject, AVVideoCompositing {
   private var renderingQueue = DispatchQueue(label: "com.jonbrennecke.hsvideocompositor.renderingqueue")
   private var renderingContextQueue = DispatchQueue(label: "com.jonbrennecke.hsvideocompositor.rendercontextqueue")
   private var renderContext: AVVideoCompositionRenderContext?
-  
+
   internal var depthTrackID: CMPersistentTrackID = kCMPersistentTrackID_Invalid
   internal var videoTrackID: CMPersistentTrackID = kCMPersistentTrackID_Invalid
   internal var isDepthPreviewEnabled: Bool = false
@@ -26,14 +26,14 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
       renderContext = newContext
     }
   }
-  
+
   enum VideoCompositionRequestError: Error {
     case failedToComposePixelBuffer
   }
 
   func startRequest(_ request: AVAsynchronousVideoCompositionRequest) {
     autoreleasepool {
-      renderingQueue.sync { // TODO sync or async?
+      renderingQueue.sync { // TODO: sync or async?
         if self.shouldCancelAllRequests {
           request.finishCancelledRequest()
           return
@@ -55,9 +55,10 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
       self.shouldCancelAllRequests = false
     }
   }
-  
-  private lazy var context = CIContext() // TODO: use metal context
-  
+
+  private lazy var context = CIContext() // TODO: use metal context and NSNull color space
+  private lazy var depthBlurEffect = HSDepthBlurEffect()
+
   private func composePixelBuffer(with request: AVAsynchronousVideoCompositionRequest) -> CVPixelBuffer? {
     if isDepthPreviewEnabled {
       return request.sourceFrame(byTrackID: depthTrackID)
@@ -68,16 +69,13 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
     else {
       return nil
     }
-    
-    let depthBlurEffect = HSDepthBlurEffect()
-    guard let depthBlurImage = depthBlurEffect.makeEffectImage(
-      depthPixelBuffer: HSPixelBuffer(pixelBuffer: depthPixelBuffer),
-      videoPixelBuffer: HSPixelBuffer(pixelBuffer: videoPixelBuffer)
-    ) else {
-      return nil
-    }
-    
-    guard let outputPixelBuffer = renderContext?.newPixelBuffer() else {
+    guard
+      let depthBlurImage = depthBlurEffect.makeEffectImage(
+        depthPixelBuffer: HSPixelBuffer(pixelBuffer: depthPixelBuffer),
+        videoPixelBuffer: HSPixelBuffer(pixelBuffer: videoPixelBuffer)
+      ),
+      let outputPixelBuffer = renderContext?.newPixelBuffer()
+    else {
       return nil
     }
     context.render(depthBlurImage, to: outputPixelBuffer)
@@ -87,14 +85,14 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
 
 struct HSDepthBlurEffect {
   private let outputPixelBufferSize = Size<Int>(width: 480, height: 640)
-  
+
   private lazy var outputPixelBufferPool: CVPixelBufferPool? = {
-    return createCVPixelBufferPool(
+    createCVPixelBufferPool(
       size: outputPixelBufferSize,
       pixelFormatType: kCVPixelFormatType_32BGRA
     )
   }()
-  
+
   public func makeEffectImage(depthPixelBuffer: HSPixelBuffer, videoPixelBuffer: HSPixelBuffer) -> CIImage? {
     guard
       let depthBlurFilter = buildDepthBlurCIFilter(),

@@ -22,4 +22,9 @@ RCT_CUSTOM_VIEW_PROPERTY(isDepthPreviewEnabled, BOOL, HSVideoCompositionView) {
   view.isDepthPreviewEnabled = isDepthPreviewEnabled;
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(shouldLoopVideo, BOOL, HSVideoCompositionView) {
+  BOOL shouldLoopVideo = [RCTConvert BOOL:json];
+  view.shouldLoopVideo = shouldLoopVideo;
+}
+
 @end
