@@ -17,21 +17,6 @@ class HSVideoCompositionView: UIView {
     return layer as! AVPlayerLayer
   }
 
-  @objc
-  public var assetID: String? {
-    didSet {
-      guard let id = assetID else {
-        return
-      }
-      loadVideoAsset(assetID: id) { asset in
-        guard let asset = asset else {
-          return
-        }
-        self.load(asset: asset)
-      }
-    }
-  }
-
   private func load(asset: AVAsset) {
     asset.loadValuesAsynchronously(forKeys: ["tracks"]) {
       guard
@@ -51,9 +36,6 @@ class HSVideoCompositionView: UIView {
       )
     }
   }
-  
-  @objc
-  public var isDepthPreviewEnabled: Bool = false
 
   private func configurePlayer(
     asset: AVAsset,
@@ -86,16 +68,16 @@ class HSVideoCompositionView: UIView {
       videoLayerInstruction,
       depthLayerInstruction,
     ]
-    instruction.backgroundColor = UIColor.red.cgColor
+    instruction.backgroundColor = UIColor.black.cgColor
+    instruction.enablePostProcessing = true
     instruction.timeRange = CMTimeRangeMake(start: CMTime.zero, duration: composition.duration)
     videoComposition.instructions = [instruction]
-
     playerItem = AVPlayerItem(asset: asset)
     playerItem?.videoComposition = videoComposition
     if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
       compositor.depthTrackID = depthTrackID
       compositor.videoTrackID = videoTrackID
-      compositor.isDepthPreviewEnabled = false
+      compositor.isDepthPreviewEnabled = isDepthPreviewEnabled
     }
     player = AVQueuePlayer(playerItem: playerItem)
     playerLooper = AVPlayerLooper(player: player!, templateItem: playerItem!)
@@ -108,6 +90,24 @@ class HSVideoCompositionView: UIView {
   override func didMoveToSuperview() {
     super.didMoveToSuperview()
     playerLayer.videoGravity = .resizeAspectFill
+  }
+  
+  @objc
+  public var isDepthPreviewEnabled: Bool = false
+  
+  @objc
+  public var assetID: String? {
+    didSet {
+      guard let id = assetID else {
+        return
+      }
+      loadVideoAsset(assetID: id) { asset in
+        guard let asset = asset else {
+          return
+        }
+        self.load(asset: asset)
+      }
+    }
   }
 }
 

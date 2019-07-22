@@ -41,7 +41,11 @@ storiesOf('Media Effects', module).add('Video Composition', () => (
       render={getState => {
         const { asset } = getState();
         return (
-          <VideoComposition style={styles.flex} assetID={asset?.assetID} />
+          <VideoComposition
+            style={styles.flex}
+            assetID={asset?.assetID}
+            enableDepthPreview={false}
+          />
         );
       }}
     />

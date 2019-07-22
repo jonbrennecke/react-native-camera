@@ -16,16 +16,14 @@ struct HSPortraitMask {
     let maskImageBuffer = HSImageBuffer(pixelBuffer: maskBuffer)
     let cameraImageBuffer = HSImageBuffer(pixelBuffer: cameraBuffer)
     guard
-      let maskCGImage = maskImageBuffer.makeImage(),
-      let cameraCGImage = cameraImageBuffer.makeImage()
+      let maskImage = maskImageBuffer.makeCIImage(),
+      let cameraImage = cameraImageBuffer.makeCIImage()
     else {
       return nil
     }
-    let cameraCIImage = CIImage(cgImage: cameraCGImage)
-    let maskCIImage = CIImage(cgImage: maskCGImage)
-    return cameraCIImage
+    return cameraImage
       .applyingFilter("CIBlendWithMask", parameters: [
-        "inputMaskImage": maskCIImage,
+        "inputMaskImage": maskImage,
         "inputBackgroundImage": backgroundImage,
       ])
   }

@@ -44,13 +44,10 @@ class HSEffectManager: NSObject {
   }()
 
   private lazy var backgroundImage: CIImage? = {
-    guard
-      let backgroundBuffer = backgroundBuffer,
-      let backgroundCGImage = HSImageBuffer(pixelBuffer: backgroundBuffer).makeImage()
-    else {
+    guard let backgroundBuffer = backgroundBuffer else {
       return nil
     }
-    return CIImage(cgImage: backgroundCGImage)
+    return HSImageBuffer(pixelBuffer: backgroundBuffer).makeCIImage()
   }()
 
   internal lazy var effectLayer: CALayer = {
