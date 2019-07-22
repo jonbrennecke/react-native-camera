@@ -12,14 +12,14 @@ export type VideoCompositionProps = {
   style?: ?Style,
   assetID: ?string,
   enableDepthPreview?: boolean,
-  shouldLoopVideo?: boolean
+  shouldLoopVideo?: boolean,
 };
 
 export const VideoComposition: SFC<VideoCompositionProps> = ({
   style,
   assetID,
   enableDepthPreview = true,
-  shouldLoopVideo = true
+  shouldLoopVideo = true,
 }: VideoCompositionProps) => (
   <NativeVideoCompositionView
     style={style}

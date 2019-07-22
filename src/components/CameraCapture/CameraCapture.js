@@ -7,18 +7,27 @@ import { CaptureButton } from '../CaptureButton';
 
 import type { SFC, Style } from '../../types';
 
+const Units = {
+  small: 10
+}
+
 const styles = {
   flex: {
     flex: 1,
   },
+  container: {
+    backgroundColor: '#000',
+  },
   bottomControls: {
-    position: 'absolute',
-    bottom: 10,
-    left: 0,
-    right: 0,
+    paddingVertical: Units.small,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  cameraWrap: {
+    flex: 1,
+    borderRadius: Units.small,
+    overflow: 'hidden',
   },
 };
 
@@ -33,8 +42,10 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
   onRequestBeginCapture,
   onRequestEndCapture,
 }: CameraCaptureProps) => (
-  <View style={style}>
-    <Camera style={styles.flex} />
+  <View style={[styles.container, style]}>
+    <View style={styles.cameraWrap}>
+      <Camera style={styles.flex} />
+    </View>
     <View style={styles.bottomControls}>
       <CaptureButton
         onRequestBeginCapture={onRequestBeginCapture}

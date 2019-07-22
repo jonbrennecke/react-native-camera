@@ -8,7 +8,6 @@ import {
   Easing,
 } from 'react-native';
 import { autobind } from 'core-decorators';
-import { BlurView } from '@react-native-community/blur';
 
 import type { Style } from '../../types';
 
@@ -18,16 +17,7 @@ type Props = {
   onRequestEndCapture: () => void,
 };
 
-const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
-
 const styles = {
-  blurView: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
   outerViewAnim: (anim: Animated.Value) => ({
     height: 75,
     width: 75,
@@ -43,18 +33,19 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
   }),
-  blurViewContainer: {
-    height: 75,
-    width: 75,
-    borderRadius: 37.5,
+  center: {
+    height: 65,
+    width: 65,
+    borderRadius: 32.5,
     overflow: 'hidden',
+    backgroundColor: '#fff',
   },
   border: {
     height: 75,
     width: 75,
     borderRadius: 37.5,
     borderWidth: 4,
-    borderColor: 'red',
+    borderColor: '#fff',
     position: 'absolute',
   },
   borderMask: {
@@ -111,12 +102,9 @@ export class CaptureButton extends Component<Props> {
         onPressOut={this.touchableOnPressOut}
       >
         <Animated.View style={styles.outerViewAnim(this.outerViewAnim)}>
-          <View style={styles.blurViewContainer}>
-            <AnimatedBlurView
-              style={[styles.blurView, this.props.style]}
-              blurType="light"
-            />
-          </View>
+          <View
+            style={[styles.center, this.props.style]}
+          />
           <MaskedViewIOS
             style={styles.borderMask}
             maskElement={<View style={styles.border} />}
