@@ -5,11 +5,15 @@ import type { RecordOf, RecordInstance } from 'immutable';
 
 export type CameraCaptureStatus = 'started' | 'stopped';
 
-export type CameraISORange = { min: number, max: number };
+export type Range = { min: number, max: number }
+
+export type CameraISORange = Range;
+export type CameraExposureRange = Range;
 
 export type CameraStateObject = {
   captureStatus: CameraCaptureStatus,
   supportedISORange: CameraISORange,
+  supportedExposureRange: CameraExposureRange,
 };
 
 export type CameraStateRecord = RecordOf<CameraStateObject>;
@@ -20,6 +24,9 @@ export interface ICameraState {
 
   getSupportedISORange(): CameraISORange;
   setSupportedISORange(range: CameraISORange): ICameraState;
+
+  getSupportedExposureRange(): CameraExposureRange;
+  setSupportedExposureRange(range: CameraExposureRange): ICameraState;
 }
 
 // eslint-disable-next-line flowtype/generic-spacing
@@ -41,5 +48,13 @@ export const createCameraState: CameraStateObject => Class<
 
     setSupportedISORange(range: CameraISORange): ICameraState {
       return this.set('supportedISORange', range);
+    }
+
+    getSupportedExposureRange(): CameraExposureRange {
+      return this.get('supportedExposureRange');
+    }
+
+    setSupportedExposureRange(range: CameraExposureRange): ICameraState {
+      return this.set('supportedExposureRange', range);
     }
   };

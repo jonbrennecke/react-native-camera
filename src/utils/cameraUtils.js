@@ -50,3 +50,10 @@ export const getSupportedISORange = async (): Promise<{
 }> => {
   return await CameraManager.getSupportedISORangeAsync();
 };
+
+export const getSupportedExposureRange = async (): Promise<{
+  min: number,
+  max: number,
+}> => {
+  return await CameraManager.getSupportedExposureRangeAsync();
+};

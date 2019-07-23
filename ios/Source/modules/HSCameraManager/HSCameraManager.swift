@@ -492,7 +492,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
 @available(iOS 11.1, *)
 extension HSCameraManager: AVCaptureDepthDataOutputDelegate {
   func depthDataOutput(_: AVCaptureDepthDataOutput, didOutput depthData: AVDepthData, timestamp _: CMTime, connection _: AVCaptureConnection) {
-//    Unused
+    /// deliberately unused
   }
 }
 

@@ -29,12 +29,18 @@ const styles = {
 const CameraStateContainer = createCameraStateHOC();
 
 const Component = CameraStateContainer(
-  ({ startCapture, stopCapture, supportedISORange, loadSupportedISORange }) => {
+  ({
+    startCapture,
+    stopCapture,
+    supportedISORange,
+    supportedExposureRange,
+    loadSupportedFeatures,
+  }) => {
     const loadAsync = async (): Promise<void> => {
       try {
         await requestCameraPermissions();
         startCameraPreview();
-        await loadSupportedISORange();
+        await loadSupportedFeatures();
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error(error);

@@ -7,24 +7,28 @@ import {
   actionCreators,
   selectCaptureStatus,
   selectSupportedISORange,
+  selectSupportedExposureRange
 } from './';
 
 import type { ComponentType } from 'react';
 
 import type { Dispatch } from '../types';
-import type { ICameraState, CameraCaptureStatus, CameraISORange } from './';
+import type { ICameraState, CameraCaptureStatus, CameraISORange, CameraExposureRange } from './';
 
 type OwnProps = {};
 
 type StateProps = {
   captureStatus: CameraCaptureStatus,
   supportedISORange: CameraISORange,
+  supportedExposureRange: CameraExposureRange
 };
 
 type DispatchProps = {
   startCapture: () => any,
   stopCapture: ({ saveToCameraRoll: boolean }) => any,
   loadSupportedISORange: () => any,
+  loadSupportedExposureRange: () => any,
+  loadSupportedFeatures: () => any
 };
 
 export type CameraStateHOCProps = OwnProps & StateProps & DispatchProps;
@@ -33,6 +37,7 @@ function mapCameraStateToProps(state: ICameraState): StateProps {
   return {
     captureStatus: selectCaptureStatus(state),
     supportedISORange: selectSupportedISORange(state),
+    supportedExposureRange: selectSupportedExposureRange(state)
   };
 }
 
@@ -43,6 +48,10 @@ function mapCameraDispatchToProps(dispatch: Dispatch<any>): DispatchProps {
       dispatch(actionCreators.stopCapture(args)),
     loadSupportedISORange: () =>
       dispatch(actionCreators.loadSupportedISORange()),
+    loadSupportedExposureRange: () =>
+      dispatch(actionCreators.loadSupportedExposureRange()),
+    loadSupportedFeatures: () =>
+      dispatch(actionCreators.loadSupportedFeatures()),
   };
 }
 

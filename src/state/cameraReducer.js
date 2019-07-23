@@ -5,6 +5,7 @@ import {
   startCameraCapture,
   stopCameraCapture,
   getSupportedISORange,
+  getSupportedExposureRange,
 } from '../utils';
 
 import type { Action, Dispatch } from '../types';
@@ -12,11 +13,13 @@ import type {
   ICameraState,
   CameraCaptureStatus,
   CameraISORange,
+  CameraExposureRange,
 } from './cameraState';
 
 const CameraState = createCameraState({
   captureStatus: 'stopped',
   supportedISORange: { min: 0, max: 16000 },
+  supportedExposureRange: { min: 0, max: 16000 },
 });
 
 export const initialState = new CameraState();
@@ -40,6 +43,16 @@ const reducers = {
       return state;
     }
     return state.setSupportedISORange(payload.range);
+  },
+
+  setSupportedExposureRange: (
+    state,
+    { payload }: Action<{ range: CameraExposureRange }>
+  ): ICameraState => {
+    if (!payload) {
+      return state;
+    }
+    return state.setSupportedExposureRange(payload.range);
   },
 };
 
@@ -69,4 +82,14 @@ export const actionCreators = {
     const range = await getSupportedISORange();
     dispatch(actionCreators.setSupportedISORange({ range }));
   },
+
+  loadSupportedExposureRange: () => async (dispatch: Dispatch<*>) => {
+    const range = await getSupportedExposureRange();
+    dispatch(actionCreators.setSupportedExposureRange({ range }));
+  },
+
+  loadSupportedFeatures: () => async (dispatch: Dispatch<*>) => {
+    await dispatch(actionCreators.loadSupportedISORange());
+    await dispatch(actionCreators.loadSupportedExposureRange());
+  }
 };

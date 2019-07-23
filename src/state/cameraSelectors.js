@@ -9,3 +9,6 @@ export const selectIsCameraStarted = (state: ICameraState) =>
 
 export const selectSupportedISORange = (state: ICameraState) =>
   state.getSupportedISORange();
+
+export const selectSupportedExposureRange = (state: ICameraState) =>
+  state.getSupportedExposureRange();
