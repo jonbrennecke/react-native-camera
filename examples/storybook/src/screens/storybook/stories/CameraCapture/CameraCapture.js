@@ -33,6 +33,7 @@ const Component = CameraStateContainer(
   ({
     startCapture,
     stopCapture,
+    iso,
     supportedISORange,
     supportedExposureRange,
     loadSupportedFeatures,
@@ -60,6 +61,7 @@ const Component = CameraStateContainer(
             <CameraCapture
               style={styles.camera}
               cameraRef={getState().cameraRef}
+              iso={iso}
               supportedISORange={supportedISORange}
               selectedCameraSetting={getState().selectedCameraSetting}
               onRequestBeginCapture={startCapture}

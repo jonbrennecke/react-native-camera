@@ -42,6 +42,7 @@ export type CameraCaptureProps = {
   style?: ?Style,
   cameraRef: ((?Camera) => void) | ReturnType<typeof React.createRef>,
   selectedCameraSetting: $Keys<typeof CameraSettingIdentifiers>,
+  iso: number,
   supportedISORange: CameraISORange,
   onRequestFocus: ({ x: number, y: number }) => void,
   onRequestChangeISO: number => void,
@@ -55,6 +56,7 @@ export type CameraCaptureProps = {
 export const CameraCapture: SFC<CameraCaptureProps> = ({
   style,
   cameraRef,
+  iso,
   supportedISORange,
   selectedCameraSetting,
   onRequestFocus,
@@ -83,7 +85,7 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
         <CameraSettingsSelect
           options={Object.values(CameraSettingIdentifiers)}
           keyForOption={option => `${CameraSettingIdentifiers[option]}`}
-          labelTextForOption={option => abbreviatedSettingName(option)}
+          labelTextForOption={option => formatSettingName(option, iso)}
           isSelectedOption={option => selectedCameraSetting === option}
           onRequestSelectOption={onRequestChangeSelectedCameraSetting}
         />
@@ -97,6 +99,13 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
     </View>
   </View>
 );
+
+const formatSettingName = (
+  key: $Keys<typeof CameraSettingIdentifiers>,
+  value: number
+) => {
+  return `${abbreviatedSettingName(key)} ${value.toFixed()}`;
+}
 
 const abbreviatedSettingName = (
   key: $Keys<typeof CameraSettingIdentifiers>
