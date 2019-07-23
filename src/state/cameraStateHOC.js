@@ -8,6 +8,7 @@ import {
   selectCaptureStatus,
   selectSupportedISORange,
   selectSupportedExposureRange,
+  selectISO,
 } from './';
 
 import type { ComponentType } from 'react';
@@ -26,6 +27,7 @@ type StateProps = {
   captureStatus: CameraCaptureStatus,
   supportedISORange: CameraISORange,
   supportedExposureRange: CameraExposureRange,
+  iso: number,
 };
 
 type DispatchProps = {
@@ -34,6 +36,7 @@ type DispatchProps = {
   loadSupportedISORange: () => any,
   loadSupportedExposureRange: () => any,
   loadSupportedFeatures: () => any,
+  updateISO: (iso: number) => any,
 };
 
 export type CameraStateHOCProps = OwnProps & StateProps & DispatchProps;
@@ -43,6 +46,7 @@ function mapCameraStateToProps(state: ICameraState): StateProps {
     captureStatus: selectCaptureStatus(state),
     supportedISORange: selectSupportedISORange(state),
     supportedExposureRange: selectSupportedExposureRange(state),
+    iso: selectISO(state),
   };
 }
 
@@ -57,6 +61,7 @@ function mapCameraDispatchToProps(dispatch: Dispatch<any>): DispatchProps {
       dispatch(actionCreators.loadSupportedExposureRange()),
     loadSupportedFeatures: () =>
       dispatch(actionCreators.loadSupportedFeatures()),
+    updateISO: (iso: number) => dispatch(actionCreators.updateISO(iso)),
   };
 }
 

@@ -45,7 +45,9 @@ export type CameraCaptureProps = {
   supportedISORange: CameraISORange,
   onRequestFocus: ({ x: number, y: number }) => void,
   onRequestChangeISO: number => void,
-  onRequestChangeSelectedCameraSetting: $Keys<typeof CameraSettingIdentifiers> => void,
+  onRequestChangeSelectedCameraSetting: (
+    $Keys<typeof CameraSettingIdentifiers>
+  ) => void,
   onRequestBeginCapture: () => void,
   onRequestEndCapture: () => void,
 };
@@ -96,7 +98,9 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
   </View>
 );
 
-const abbreviatedSettingName = (key: $Keys<typeof CameraSettingIdentifiers>) => {
+const abbreviatedSettingName = (
+  key: $Keys<typeof CameraSettingIdentifiers>
+) => {
   return {
     [CameraSettingIdentifiers.ShutterSpeed]: 'S',
     [CameraSettingIdentifiers.ISO]: 'ISO',
@@ -104,4 +108,4 @@ const abbreviatedSettingName = (key: $Keys<typeof CameraSettingIdentifiers>) => 
     [CameraSettingIdentifiers.Focus]: 'F',
     [CameraSettingIdentifiers.WhiteBalance]: 'WB',
   }[key];
-}
+};

@@ -13,7 +13,7 @@ export type CameraSettingsSelectProps = {
   style?: ?Style,
   options: any[],
   isSelectedOption: any => boolean,
-  keyForOption: any => string,  
+  keyForOption: any => string,
   labelTextForOption: any => string,
   onRequestSelectOption: any => void,
 };

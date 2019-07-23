@@ -36,6 +36,7 @@ const Component = CameraStateContainer(
     supportedISORange,
     supportedExposureRange,
     loadSupportedFeatures,
+    updateISO
   }) => {
     const setup = async (): Promise<void> => {
       try {
@@ -73,9 +74,7 @@ const Component = CameraStateContainer(
                   cameraRef.current.focusOnPoint(point);
                 }
               }}
-              onRequestChangeISO={iso => {
-                // TODO: update iso
-              }}
+              onRequestChangeISO={iso => updateISO(iso)}
               onRequestChangeSelectedCameraSetting={cameraSetting => {
                 setState({ selectedCameraSetting: cameraSetting });
               }}

@@ -14,6 +14,7 @@ export type CameraStateObject = {
   captureStatus: CameraCaptureStatus,
   supportedISORange: CameraISORange,
   supportedExposureRange: CameraExposureRange,
+  iso: number,
 };
 
 export type CameraStateRecord = RecordOf<CameraStateObject>;
@@ -27,6 +28,9 @@ export interface ICameraState {
 
   getSupportedExposureRange(): CameraExposureRange;
   setSupportedExposureRange(range: CameraExposureRange): ICameraState;
+
+  getISO(): number;
+  setISO(iso: number): ICameraState;
 }
 
 // eslint-disable-next-line flowtype/generic-spacing
@@ -56,5 +60,13 @@ export const createCameraState: CameraStateObject => Class<
 
     setSupportedExposureRange(range: CameraExposureRange): ICameraState {
       return this.set('supportedExposureRange', range);
+    }
+
+    getISO(): number {
+      return this.get('iso');
+    }
+
+    setISO(iso: number): ICameraState {
+      return this.set('iso', iso);
     }
   };

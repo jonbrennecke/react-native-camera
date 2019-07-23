@@ -9,5 +9,5 @@ export const CameraSettingIdentifiers = {
   ISO: 'ISO',
   Exposure: 'Exposure',
   Focus: 'Focus',
-  WhiteBalance: 'WhiteBalance'
+  WhiteBalance: 'WhiteBalance',
 };

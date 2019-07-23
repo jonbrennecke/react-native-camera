@@ -336,6 +336,23 @@ class HSCameraManager: NSObject {
     return HSMinMaxInterval(min: format.minISO, max: format.maxISO)
   }
 
+  @objc(setISO:withCompletionHandler:)
+  public func setISO(_ iso: Float, _ completionHandler: @escaping () -> Void) {
+    guard let videoCaptureDevice = videoCaptureDevice else {
+      completionHandler()
+      return
+    }
+    if case .some = try? videoCaptureDevice.lockForConfiguration() {
+      let duration = videoCaptureDevice.exposureDuration
+      videoCaptureDevice.setExposureModeCustom(duration: duration, iso: iso) { _ in
+        completionHandler()
+      }
+      videoCaptureDevice.unlockForConfiguration()
+    } else {
+      completionHandler()
+    }
+  }
+
   @objc
   public var supportedExposureRange: HSMinMaxInterval {
     guard let format = videoCaptureDevice?.activeFormat else {

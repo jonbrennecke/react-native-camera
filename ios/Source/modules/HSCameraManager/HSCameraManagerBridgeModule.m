@@ -30,6 +30,16 @@ RCT_EXPORT_METHOD(getSupportedISORange : (RCTResponseSenderBlock)callback) {
   callback(@[ [NSNull null], range ]);
 }
 
+RCT_EXPORT_METHOD(setISO
+                  : (nonnull NSNumber *)iso callback
+                  : (RCTResponseSenderBlock)callback) {
+  HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
+  [cameraManager setISO:[iso floatValue]
+      withCompletionHandler:^{
+        callback(@[ [NSNull null], [NSNull null] ]);
+      }];
+}
+
 RCT_EXPORT_METHOD(getSupportedExposureRange
                   : (RCTResponseSenderBlock)callback) {
   HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
