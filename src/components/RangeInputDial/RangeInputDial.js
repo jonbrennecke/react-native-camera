@@ -6,6 +6,10 @@ import clamp from 'lodash/clamp';
 import round from 'lodash/round';
 
 import { Units } from '../../constants';
+import {
+  shouldDisplayIntegerValues,
+  makeDefaultValueFormatter,
+} from '../../utils';
 
 import type { SFC, Style } from '../../types';
 
@@ -45,25 +49,18 @@ export type RangeInputDialProps = {
   min: number,
   max: number,
   numberOfTicks?: number,
+  isIntegerValued?: boolean,
   formatValue?: number => string,
   onSelectValue: number => void,
 };
-
-const shouldDisplayIntegerValues = (min: number, max: number, numberOfTicks: number) =>
-  Math.abs(max - min) >= numberOfTicks;
-
-const makeDefaultValueFormatter = (isIntegerValued: boolean) =>
-  (iso: number) =>
-    `${parseFloat(iso)
-      .toFixed(isIntegerValued ? 0 : 1)
-      .toLocaleUpperCase()}`;
 
 export const RangeInputDial: SFC<RangeInputDialProps> = ({
   style,
   min,
   max,
   numberOfTicks = 101,
-  formatValue = makeDefaultValueFormatter(shouldDisplayIntegerValues(min, max, numberOfTicks)),
+  isIntegerValued = shouldDisplayIntegerValues(min, max, numberOfTicks),
+  formatValue = makeDefaultValueFormatter(isIntegerValued),
   onSelectValue,
 }: RangeInputDialProps) => {
   const onScroll = ({ nativeEvent }) => {
@@ -73,7 +70,8 @@ export const RangeInputDial: SFC<RangeInputDialProps> = ({
     const { contentOffset, contentSize, layoutMeasurement } = nativeEvent;
     const percent =
       contentOffset.x / (contentSize.width - layoutMeasurement.width);
-    const value = clamp(round(percent * (max - min) + min), min, max);
+    const scaled = percent * (max - min) + min;
+    const value = clamp(isIntegerValued ? round(scaled) : scaled, min, max);
     onSelectValue(value);
   };
   const tickWidth = 2 + Units.extraSmall * 2;

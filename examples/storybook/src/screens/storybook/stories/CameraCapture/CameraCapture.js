@@ -55,7 +55,7 @@ const Component = CameraStateContainer(
       <StorybookStateWrapper
         initialState={{
           cameraRef: React.createRef(),
-          selectedCameraSetting: CameraSettingIdentifiers.Exposure,
+          activeCameraSetting: CameraSettingIdentifiers.Exposure,
         }}
         onMount={setup}
         render={(getState, setState) => {
@@ -86,7 +86,7 @@ const Component = CameraStateContainer(
                 }, // TODO
               }}
               supportedISORange={supportedISORange}
-              selectedCameraSetting={getState().selectedCameraSetting}
+              activeCameraSetting={getState().activeCameraSetting}
               onRequestBeginCapture={startCapture}
               onRequestEndCapture={() =>
                 stopCapture({
@@ -101,8 +101,8 @@ const Component = CameraStateContainer(
               }}
               onRequestChangeISO={iso => updateISO(iso)}
               onRequestChangeExposure={exposure => updateExposure(exposure)}
-              onRequestChangeSelectedCameraSetting={cameraSetting => {
-                setState({ selectedCameraSetting: cameraSetting });
+              onRequestSelectActiveCameraSetting={cameraSetting => {
+                setState({ activeCameraSetting: cameraSetting });
               }}
             />
           );

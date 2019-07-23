@@ -8,6 +8,10 @@ import { CameraFocusArea } from '../CameraFocusArea';
 import { RangeInputDial } from '../RangeInputDial';
 import { CameraSettingsSelect } from '../CameraSettingsSelect';
 import { Units, CameraSettingIdentifiers } from '../../constants';
+import {
+  shouldDisplayIntegerValues,
+  makeDefaultValueFormatter,
+} from '../../utils';
 
 import type { SFC, Style, ReturnType } from '../../types';
 import type { CameraISORange } from '../../state';
@@ -48,13 +52,13 @@ export type CameraSettings = {
 export type CameraCaptureProps = {
   style?: ?Style,
   cameraRef: ((?Camera) => void) | ReturnType<typeof React.createRef>,
-  selectedCameraSetting: $Keys<typeof CameraSettingIdentifiers>,
+  activeCameraSetting: $Keys<typeof CameraSettingIdentifiers>,
   cameraSettings: CameraSettings,
   supportedISORange: CameraISORange,
   onRequestFocus: ({ x: number, y: number }) => void,
   onRequestChangeISO: number => void,
   onRequestChangeExposure: number => void,
-  onRequestChangeSelectedCameraSetting: (
+  onRequestSelectActiveCameraSetting: (
     $Keys<typeof CameraSettingIdentifiers>
   ) => void,
   onRequestBeginCapture: () => void,
@@ -65,16 +69,16 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
   style,
   cameraRef,
   cameraSettings,
-  selectedCameraSetting,
+  activeCameraSetting,
   onRequestFocus,
   onRequestChangeISO,
   onRequestChangeExposure,
-  onRequestChangeSelectedCameraSetting, // TODO: onRequestSelectActiveCameraSetting
+  onRequestSelectActiveCameraSetting,
   onRequestBeginCapture,
   onRequestEndCapture,
 }: CameraCaptureProps) => {
   const updateSelectedCameraSettingValue = (value: number) => {
-    switch (selectedCameraSetting) {
+    switch (activeCameraSetting) {
       case CameraSettingIdentifiers.ISO:
         onRequestChangeISO(value);
         return;
@@ -95,8 +99,8 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
       <View style={styles.bottomControls}>
         <View style={styles.cameraControlsRow}>
           <RangeInputDial
-            min={cameraSettings[selectedCameraSetting].supportedRange.min}
-            max={cameraSettings[selectedCameraSetting].supportedRange.max}
+            min={cameraSettings[activeCameraSetting].supportedRange.min}
+            max={cameraSettings[activeCameraSetting].supportedRange.max}
             onSelectValue={updateSelectedCameraSettingValue}
           />
         </View>
@@ -107,8 +111,8 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
             labelTextForOption={option =>
               formatSettingName(option, cameraSettings)
             }
-            isSelectedOption={option => selectedCameraSetting === option}
-            onRequestSelectOption={onRequestChangeSelectedCameraSetting}
+            isSelectedOption={option => activeCameraSetting === option}
+            onRequestSelectOption={onRequestSelectActiveCameraSetting}
           />
         </View>
         <View style={styles.cameraControlsRow}>
@@ -124,10 +128,27 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
 
 const formatSettingName = (
   key: $Keys<typeof CameraSettingIdentifiers>,
+  settings: CameraSettings,
+  isIntegerValued?: boolean = shouldDisplayIntegerValuesForCameraSettings(
+    key,
+    settings
+  ),
+  formatValue?: number => string = makeDefaultValueFormatter(isIntegerValued)
+) => {
+  return `${abbreviatedSettingName(key)} ${formatValue(
+    settings[key].currentValue
+  )}`;
+};
+
+const shouldDisplayIntegerValuesForCameraSettings = (
+  key: $Keys<typeof CameraSettingIdentifiers>,
   settings: CameraSettings
 ) => {
-  const value = settings[key].currentValue;
-  return `${abbreviatedSettingName(key)} ${(value || 0).toFixed()}`;
+  return shouldDisplayIntegerValues(
+    settings[key].supportedRange.min,
+    settings[key].supportedRange.max,
+    101
+  );
 };
 
 const abbreviatedSettingName = (
