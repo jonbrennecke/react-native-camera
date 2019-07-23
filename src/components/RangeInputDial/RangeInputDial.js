@@ -44,20 +44,26 @@ export type RangeInputDialProps = {
   style?: ?Style,
   min: number,
   max: number,
+  numberOfTicks?: number,
   formatValue?: number => string,
   onSelectValue: number => void,
 };
 
-const defaultValueFormatter = (iso: number) =>
-  `${parseInt(iso)
-    .toString()
-    .toLocaleUpperCase()}`;
+const shouldDisplayIntegerValues = (min: number, max: number, numberOfTicks: number) =>
+  Math.abs(max - min) >= numberOfTicks;
+
+const makeDefaultValueFormatter = (isIntegerValued: boolean) =>
+  (iso: number) =>
+    `${parseFloat(iso)
+      .toFixed(isIntegerValued ? 0 : 1)
+      .toLocaleUpperCase()}`;
 
 export const RangeInputDial: SFC<RangeInputDialProps> = ({
   style,
   min,
   max,
-  formatValue = defaultValueFormatter,
+  numberOfTicks = 101,
+  formatValue = makeDefaultValueFormatter(shouldDisplayIntegerValues(min, max, numberOfTicks)),
   onSelectValue,
 }: RangeInputDialProps) => {
   const onScroll = ({ nativeEvent }) => {
@@ -82,8 +88,8 @@ export const RangeInputDial: SFC<RangeInputDialProps> = ({
       scrollEventThrottle={16}
     >
       <View style={{ width: contentOffset }} />
-      {times(101).map((n, i) => {
-        const value = n / 101 * max + min;
+      {times(numberOfTicks).map((n, i) => {
+        const value = n / numberOfTicks * (max - min) + min;
         return (
           <View key={`${n}`}>
             <View style={styles.tick(i)} />
