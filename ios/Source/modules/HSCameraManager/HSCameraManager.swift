@@ -15,7 +15,8 @@ class HSCameraManager: NSObject {
   }
 
   private var state: State = .none
-  private let sessionQueue = DispatchQueue(label: "camera session queue")
+  private let cameraOutputQueue = DispatchQueue(label: "com.jonbrennecke.HSCameraManager.cameraOutputQueue")
+  private let cameraSetupQueue = DispatchQueue(label: "com.jonbrennecke.HSCameraManager.cameraSetupQueue")
   private let videoOutput = AVCaptureVideoDataOutput()
   private let videoFileOutput = AVCaptureMovieFileOutput()
   private let depthOutput = AVCaptureDepthDataOutput()
@@ -39,6 +40,10 @@ class HSCameraManager: NSObject {
   }()
 
   internal var captureSession = AVCaptureSession()
+
+  private var clock: CMClock {
+    return captureSession.masterClock ?? CMClockGetHostTimeClock()
+  }
 
   // kCVPixelFormatType_32BGRA is required because of compatability with depth effects, but
   // if depth is disabled, this should be left as the default YpCbCr
@@ -100,13 +105,13 @@ class HSCameraManager: NSObject {
     assetWriterDepthInput = HSVideoWriterFrameBufferInput(
       videoSize: depthSize,
       pixelFormatType: depthPixelFormat,
-      isRealTime: true
+      isRealTime: false
     )
     assetWriterDepthInput?.isEnabled = false
     assetWriterVideoInput = HSVideoWriterFrameBufferInput(
       videoSize: videoSize,
       pixelFormatType: videoPixelFormat,
-      isRealTime: true
+      isRealTime: false
     )
     guard
       case .success = assetWriter.prepareToRecord(to: outputURL),
@@ -158,7 +163,7 @@ class HSCameraManager: NSObject {
     }
 
     configureActiveFormat()
-    outputSynchronizer.setDelegate(self, queue: sessionQueue)
+    outputSynchronizer.setDelegate(self, queue: cameraOutputQueue)
     return .success
   }
 
@@ -424,7 +429,7 @@ class HSCameraManager: NSObject {
 
   @objc
   public func startCapture(completionHandler: @escaping (Error?, Bool) -> Void) {
-    sessionQueue.async {
+    cameraSetupQueue.async {
       guard self.videoCaptureDevice != nil else {
         completionHandler(nil, false)
         return
@@ -435,8 +440,7 @@ class HSCameraManager: NSObject {
           completionHandler(nil, false)
           return
         }
-        let clock = CMClockGetHostTimeClock()
-        let startTime = CMClockGetTime(clock)
+        let startTime = CMClockGetTime(self.clock)
         guard case .success = self.assetWriter.startRecording(at: startTime) else {
           completionHandler(nil, false)
           return
@@ -451,20 +455,21 @@ class HSCameraManager: NSObject {
 
   @objc(stopCaptureAndSaveToCameraRoll:completionHandler:)
   public func stopCapture(andSaveToCameraRoll _: Bool, _ completionHandler: @escaping (Bool) -> Void) {
-    if case let .recording(_, startTime) = state {
-      let clock = CMClockGetHostTimeClock()
-      let endTime = CMClockGetTime(clock)
-      state = .stopped(startTime: startTime, endTime: endTime)
-      assetWriterVideoInput?.finish()
-      assetWriterDepthInput?.finish()
-      assetWriter.stopRecording(at: endTime) { url in
-        PHPhotoLibrary.shared().performChanges({
-          PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
-          completionHandler(true)
-        })
+    cameraSetupQueue.async {
+      if case let .recording(_, startTime) = self.state {
+        self.assetWriterVideoInput?.finish()
+        self.assetWriterDepthInput?.finish()
+        let endTime = CMClockGetTime(self.clock)
+        self.state = .stopped(startTime: startTime, endTime: endTime)
+        self.assetWriter.stopRecording(at: endTime) { url in
+          PHPhotoLibrary.shared().performChanges({
+            PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
+            completionHandler(true)
+          })
+        }
+      } else {
+        completionHandler(false)
       }
-    } else {
-      completionHandler(false)
     }
   }
 
@@ -485,8 +490,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
   ) {
     guard
       let synchronizedDepthData = collection.synchronizedData(for: depthOutput) as? AVCaptureSynchronizedDepthData,
-      let synchronizedVideoData = collection.synchronizedData(for: videoOutput) as? AVCaptureSynchronizedSampleBufferData,
-      let synchronizedMetadata = collection.synchronizedData(for: metadataOutput) as? AVCaptureSynchronizedMetadataObjectData
+      let synchronizedVideoData = collection.synchronizedData(for: videoOutput) as? AVCaptureSynchronizedSampleBufferData
     else {
       return
     }
@@ -496,7 +500,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
 //      startTime = time
 //    }
 //
-//    if case let .recording(_, startTime) = state {
+//    if case let .recording(_, time) = state {
 //      startTime = time
 //    }
 
@@ -533,9 +537,11 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
     }
 
     // send detected faces to delegate method
-    let metadataObjects = synchronizedMetadata.metadataObjects
-    let faces = metadataObjects.map { $0 as? AVMetadataFaceObject }.compactMap { $0 }
-    delegate?.cameraManagerDidDetect(faces: faces)
+//    if let synchronizedMetadata = collection.synchronizedData(for: metadataOutput) as? AVCaptureSynchronizedMetadataObjectData {
+//      let metadataObjects = synchronizedMetadata.metadataObjects
+//      let faces = metadataObjects.map { $0 as? AVMetadataFaceObject }.compactMap { $0 }
+//      delegate?.cameraManagerDidDetect(faces: faces)
+//    }
   }
 }
 
