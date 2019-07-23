@@ -91,5 +91,5 @@ export const actionCreators = {
   loadSupportedFeatures: () => async (dispatch: Dispatch<*>) => {
     await dispatch(actionCreators.loadSupportedISORange());
     await dispatch(actionCreators.loadSupportedExposureRange());
-  }
+  },
 };

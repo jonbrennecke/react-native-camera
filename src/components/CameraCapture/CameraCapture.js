@@ -5,9 +5,11 @@ import { View, StyleSheet } from 'react-native';
 import { Camera } from '../Camera';
 import { CaptureButton } from '../CaptureButton';
 import { CameraFocusArea } from '../CameraFocusArea';
+import { RangeInputDial } from '../RangeInputDial';
 import { Units } from '../../constants';
 
-import type { SFC, Style } from '../../types';
+import type { SFC, Style, ReturnType } from '../../types';
+import type { CameraISORange } from '../../state';
 
 const styles = {
   flex: {
@@ -20,21 +22,28 @@ const styles = {
     backgroundColor: '#000',
   },
   bottomControls: {
-    paddingVertical: Units.small,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: 'column',
   },
   cameraWrap: {
     flex: 1,
     borderRadius: Units.small,
     overflow: 'hidden',
   },
+  cameraControlsRow: {
+    paddingVertical: Units.small,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  isoText: {
+    color: '#fff',
+  },
 };
 
 export type CameraCaptureProps = {
   style?: ?Style,
-  cameraRef: (?Camera) => void,
+  cameraRef: ((?Camera) => void) | ReturnType<typeof React.createRef>,
+  supportedISORange: CameraISORange,
   onRequestFocus: ({ x: number, y: number }) => void,
   onRequestBeginCapture: () => void,
   onRequestEndCapture: () => void,
@@ -43,6 +52,7 @@ export type CameraCaptureProps = {
 export const CameraCapture: SFC<CameraCaptureProps> = ({
   style,
   cameraRef,
+  supportedISORange,
   onRequestFocus,
   onRequestBeginCapture,
   onRequestEndCapture,
@@ -56,10 +66,15 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
       />
     </View>
     <View style={styles.bottomControls}>
-      <CaptureButton
-        onRequestBeginCapture={onRequestBeginCapture}
-        onRequestEndCapture={onRequestEndCapture}
-      />
+      <View style={styles.cameraControlsRow}>
+        <RangeInputDial supportedISORange={supportedISORange} />
+      </View>
+      <View style={styles.cameraControlsRow}>
+        <CaptureButton
+          onRequestBeginCapture={onRequestBeginCapture}
+          onRequestEndCapture={onRequestEndCapture}
+        />
+      </View>
     </View>
   </View>
 );

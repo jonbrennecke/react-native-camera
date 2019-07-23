@@ -13,4 +13,5 @@
                                             error:(NSError *)error;
 - (void)cameraManagerDidReceiveCameraDataOutputWithVideoData:
     (CMSampleBufferRef)videoData;
+- (void)cameraManagerDidDetectFaces:(NSArray<AVMetadataFaceObject *> *)faces;
 @end

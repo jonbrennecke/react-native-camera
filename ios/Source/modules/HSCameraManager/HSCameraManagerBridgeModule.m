@@ -136,4 +136,7 @@ RCT_EXPORT_METHOD(switchToOppositeCamera) {
   // unimplemented
 }
 
+- (void)cameraManagerDidDetectFaces:(NSArray<AVMetadataFaceObject *> *)faces {
+}
+
 @end

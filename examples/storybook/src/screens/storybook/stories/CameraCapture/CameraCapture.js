@@ -36,7 +36,7 @@ const Component = CameraStateContainer(
     supportedExposureRange,
     loadSupportedFeatures,
   }) => {
-    const loadAsync = async (): Promise<void> => {
+    const setup = async (): Promise<void> => {
       try {
         await requestCameraPermissions();
         startCameraPreview();
@@ -49,12 +49,13 @@ const Component = CameraStateContainer(
     return (
       <StorybookStateWrapper
         initialState={{ cameraRef: React.createRef() }}
-        onMount={loadAsync}
+        onMount={setup}
         render={getState => {
           return (
             <CameraCapture
               style={styles.camera}
               cameraRef={getState().cameraRef}
+              supportedISORange={supportedISORange}
               onRequestBeginCapture={startCapture}
               onRequestEndCapture={() =>
                 stopCapture({

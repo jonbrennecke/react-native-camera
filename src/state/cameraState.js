@@ -5,7 +5,7 @@ import type { RecordOf, RecordInstance } from 'immutable';
 
 export type CameraCaptureStatus = 'started' | 'stopped';
 
-export type Range = { min: number, max: number }
+export type Range = { min: number, max: number };
 
 export type CameraISORange = Range;
 export type CameraExposureRange = Range;

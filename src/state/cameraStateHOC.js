@@ -7,20 +7,25 @@ import {
   actionCreators,
   selectCaptureStatus,
   selectSupportedISORange,
-  selectSupportedExposureRange
+  selectSupportedExposureRange,
 } from './';
 
 import type { ComponentType } from 'react';
 
 import type { Dispatch } from '../types';
-import type { ICameraState, CameraCaptureStatus, CameraISORange, CameraExposureRange } from './';
+import type {
+  ICameraState,
+  CameraCaptureStatus,
+  CameraISORange,
+  CameraExposureRange,
+} from './';
 
 type OwnProps = {};
 
 type StateProps = {
   captureStatus: CameraCaptureStatus,
   supportedISORange: CameraISORange,
-  supportedExposureRange: CameraExposureRange
+  supportedExposureRange: CameraExposureRange,
 };
 
 type DispatchProps = {
@@ -28,7 +33,7 @@ type DispatchProps = {
   stopCapture: ({ saveToCameraRoll: boolean }) => any,
   loadSupportedISORange: () => any,
   loadSupportedExposureRange: () => any,
-  loadSupportedFeatures: () => any
+  loadSupportedFeatures: () => any,
 };
 
 export type CameraStateHOCProps = OwnProps & StateProps & DispatchProps;
@@ -37,7 +42,7 @@ function mapCameraStateToProps(state: ICameraState): StateProps {
   return {
     captureStatus: selectCaptureStatus(state),
     supportedISORange: selectSupportedISORange(state),
-    supportedExposureRange: selectSupportedExposureRange(state)
+    supportedExposureRange: selectSupportedExposureRange(state),
   };
 }
 
