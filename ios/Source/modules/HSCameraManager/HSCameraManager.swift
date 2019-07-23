@@ -18,7 +18,6 @@ class HSCameraManager: NSObject {
   private let videoOutput = AVCaptureVideoDataOutput()
   private let videoFileOutput = AVCaptureMovieFileOutput()
   private let depthOutput = AVCaptureDepthDataOutput()
-//  private let metadataInput = AVCaptureMetadataInput()
   private let metadataOutput = AVCaptureMetadataOutput()
   private lazy var outputSynchronizer = AVCaptureDataOutputSynchronizer(
     dataOutputs: [depthOutput, videoOutput, metadataOutput]
@@ -355,13 +354,29 @@ class HSCameraManager: NSObject {
 
   @objc
   public var supportedExposureRange: HSMinMaxInterval {
-    guard let format = videoCaptureDevice?.activeFormat else {
+    guard let videoCaptureDevice = videoCaptureDevice else {
       return HSMinMaxInterval.zero
     }
     return HSMinMaxInterval(
-      min: Float(CMTimeGetSeconds(format.minExposureDuration)),
-      max: Float(CMTimeGetSeconds(format.maxExposureDuration))
+      min: videoCaptureDevice.minExposureTargetBias,
+      max: videoCaptureDevice.maxExposureTargetBias
     )
+  }
+
+  @objc(setExposure:withCompletionHandler:)
+  public func setExposure(_ exposureBias: Float, _ completionHandler: @escaping () -> Void) {
+    guard let videoCaptureDevice = videoCaptureDevice else {
+      completionHandler()
+      return
+    }
+    if case .some = try? videoCaptureDevice.lockForConfiguration() {
+      videoCaptureDevice.setExposureTargetBias(exposureBias) { _ in
+        completionHandler()
+      }
+      videoCaptureDevice.unlockForConfiguration()
+    } else {
+      completionHandler()
+    }
   }
 
   @objc

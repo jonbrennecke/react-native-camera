@@ -34,10 +34,12 @@ const Component = CameraStateContainer(
     startCapture,
     stopCapture,
     iso,
+    exposure,
     supportedISORange,
     supportedExposureRange,
     loadSupportedFeatures,
-    updateISO
+    updateISO,
+    updateExposure
   }) => {
     const setup = async (): Promise<void> => {
       try {
@@ -61,7 +63,28 @@ const Component = CameraStateContainer(
             <CameraCapture
               style={styles.camera}
               cameraRef={getState().cameraRef}
-              iso={iso}
+              cameraSettings={{
+                [CameraSettingIdentifiers.ISO]: {
+                  currentValue: iso,
+                  supportedRange: supportedISORange,
+                },
+                [CameraSettingIdentifiers.Exposure]: {
+                  currentValue: exposure,
+                  supportedRange: supportedExposureRange,
+                },
+                [CameraSettingIdentifiers.ShutterSpeed]: {
+                  currentValue: exposure,
+                  supportedRange: supportedExposureRange,
+                }, // TODO
+                [CameraSettingIdentifiers.Focus]: {
+                  currentValue: exposure,
+                  supportedRange: supportedExposureRange,
+                }, // TODO
+                [CameraSettingIdentifiers.WhiteBalance]: {
+                  currentValue: exposure,
+                  supportedRange: supportedExposureRange,
+                }, // TODO
+              }}
               supportedISORange={supportedISORange}
               selectedCameraSetting={getState().selectedCameraSetting}
               onRequestBeginCapture={startCapture}
@@ -77,6 +100,7 @@ const Component = CameraStateContainer(
                 }
               }}
               onRequestChangeISO={iso => updateISO(iso)}
+              onRequestChangeExposure={exposure => updateExposure(exposure)}
               onRequestChangeSelectedCameraSetting={cameraSetting => {
                 setState({ selectedCameraSetting: cameraSetting });
               }}

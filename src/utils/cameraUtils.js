@@ -61,3 +61,7 @@ export const getSupportedExposureRange = async (): Promise<{
 export const setISO = async (iso: number): Promise<void> => {
   return await CameraManager.setISOAsync(iso);
 };
+
+export const setExposure = async (exposure: number): Promise<void> => {
+  return await CameraManager.setExposureAsync(exposure);
+};

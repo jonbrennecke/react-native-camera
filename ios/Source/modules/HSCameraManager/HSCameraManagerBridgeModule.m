@@ -47,6 +47,16 @@ RCT_EXPORT_METHOD(getSupportedExposureRange
   callback(@[ [NSNull null], range ]);
 }
 
+RCT_EXPORT_METHOD(setExposure
+                  : (nonnull NSNumber *)exposure callback
+                  : (RCTResponseSenderBlock)callback) {
+  HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
+  [cameraManager setExposure:[exposure floatValue]
+       withCompletionHandler:^{
+         callback(@[ [NSNull null], [NSNull null] ]);
+       }];
+}
+
 RCT_EXPORT_METHOD(startCameraPreview) {
   HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
   [cameraManager setupCameraCaptureSession];

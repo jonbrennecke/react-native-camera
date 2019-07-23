@@ -14,3 +14,5 @@ export const selectSupportedExposureRange = (state: ICameraState) =>
   state.getSupportedExposureRange();
 
 export const selectISO = (state: ICameraState) => state.getISO();
+
+export const selectExposure = (state: ICameraState) => state.getExposure();

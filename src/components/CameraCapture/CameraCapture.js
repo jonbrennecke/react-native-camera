@@ -38,14 +38,22 @@ const styles = {
   },
 };
 
+export type CameraSettings = {
+  [key: $Keys<typeof CameraSettingIdentifiers>]: {
+    currentValue: number,
+    supportedRange: { min: number, max: number },
+  },
+};
+
 export type CameraCaptureProps = {
   style?: ?Style,
   cameraRef: ((?Camera) => void) | ReturnType<typeof React.createRef>,
   selectedCameraSetting: $Keys<typeof CameraSettingIdentifiers>,
-  iso: number,
+  cameraSettings: CameraSettings,
   supportedISORange: CameraISORange,
   onRequestFocus: ({ x: number, y: number }) => void,
   onRequestChangeISO: number => void,
+  onRequestChangeExposure: number => void,
   onRequestChangeSelectedCameraSetting: (
     $Keys<typeof CameraSettingIdentifiers>
   ) => void,
@@ -56,56 +64,71 @@ export type CameraCaptureProps = {
 export const CameraCapture: SFC<CameraCaptureProps> = ({
   style,
   cameraRef,
-  iso,
-  supportedISORange,
+  cameraSettings,
   selectedCameraSetting,
   onRequestFocus,
   onRequestChangeISO,
-  onRequestChangeSelectedCameraSetting,
+  onRequestChangeExposure,
+  onRequestChangeSelectedCameraSetting, // TODO: onRequestSelectActiveCameraSetting
   onRequestBeginCapture,
   onRequestEndCapture,
-}: CameraCaptureProps) => (
-  <View style={[styles.container, style]}>
-    <View style={styles.cameraWrap}>
-      <Camera ref={cameraRef} style={styles.flex} />
-      <CameraFocusArea
-        style={styles.absoluteFill}
-        onRequestFocus={onRequestFocus}
-      />
+}: CameraCaptureProps) => {
+  const updateSelectedCameraSettingValue = (value: number) => {
+    switch (selectedCameraSetting) {
+      case CameraSettingIdentifiers.ISO:
+        onRequestChangeISO(value);
+        return;
+      case CameraSettingIdentifiers.Exposure:
+        onRequestChangeExposure(value);
+        return;
+    }
+  };
+  return (
+    <View style={[styles.container, style]}>
+      <View style={styles.cameraWrap}>
+        <Camera ref={cameraRef} style={styles.flex} />
+        <CameraFocusArea
+          style={styles.absoluteFill}
+          onRequestFocus={onRequestFocus}
+        />
+      </View>
+      <View style={styles.bottomControls}>
+        <View style={styles.cameraControlsRow}>
+          <RangeInputDial
+            min={cameraSettings[selectedCameraSetting].supportedRange.min}
+            max={cameraSettings[selectedCameraSetting].supportedRange.max}
+            onSelectValue={updateSelectedCameraSettingValue}
+          />
+        </View>
+        <View style={styles.cameraControlsRow}>
+          <CameraSettingsSelect
+            options={Object.values(CameraSettingIdentifiers)}
+            keyForOption={option => `${CameraSettingIdentifiers[option]}`}
+            labelTextForOption={option =>
+              formatSettingName(option, cameraSettings)
+            }
+            isSelectedOption={option => selectedCameraSetting === option}
+            onRequestSelectOption={onRequestChangeSelectedCameraSetting}
+          />
+        </View>
+        <View style={styles.cameraControlsRow}>
+          <CaptureButton
+            onRequestBeginCapture={onRequestBeginCapture}
+            onRequestEndCapture={onRequestEndCapture}
+          />
+        </View>
+      </View>
     </View>
-    <View style={styles.bottomControls}>
-      <View style={styles.cameraControlsRow}>
-        <RangeInputDial
-          min={supportedISORange.min}
-          max={supportedISORange.max}
-          onSelectValue={onRequestChangeISO}
-        />
-      </View>
-      <View style={styles.cameraControlsRow}>
-        <CameraSettingsSelect
-          options={Object.values(CameraSettingIdentifiers)}
-          keyForOption={option => `${CameraSettingIdentifiers[option]}`}
-          labelTextForOption={option => formatSettingName(option, iso)}
-          isSelectedOption={option => selectedCameraSetting === option}
-          onRequestSelectOption={onRequestChangeSelectedCameraSetting}
-        />
-      </View>
-      <View style={styles.cameraControlsRow}>
-        <CaptureButton
-          onRequestBeginCapture={onRequestBeginCapture}
-          onRequestEndCapture={onRequestEndCapture}
-        />
-      </View>
-    </View>
-  </View>
-);
+  );
+};
 
 const formatSettingName = (
   key: $Keys<typeof CameraSettingIdentifiers>,
-  value: number
+  settings: CameraSettings
 ) => {
-  return `${abbreviatedSettingName(key)} ${value.toFixed()}`;
-}
+  const value = settings[key].currentValue;
+  return `${abbreviatedSettingName(key)} ${(value || 0).toFixed()}`;
+};
 
 const abbreviatedSettingName = (
   key: $Keys<typeof CameraSettingIdentifiers>

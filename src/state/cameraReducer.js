@@ -1,13 +1,7 @@
 // @flow
 import { createReducer } from './createReducer';
 import { createCameraState } from './cameraState';
-import {
-  startCameraCapture,
-  stopCameraCapture,
-  getSupportedISORange,
-  getSupportedExposureRange,
-  setISO,
-} from '../utils';
+import * as cameraUtils from '../utils';
 
 import type { Action, Dispatch } from '../types';
 import type {
@@ -22,6 +16,7 @@ const CameraState = createCameraState({
   supportedISORange: { min: 0, max: 16000 },
   supportedExposureRange: { min: 0, max: 16000 },
   iso: 0,
+  exposure: 0,
 });
 
 export const initialState = new CameraState();
@@ -63,6 +58,16 @@ const reducers = {
     }
     return state.setISO(payload.iso);
   },
+
+  setExposure: (
+    state,
+    { payload }: Action<{ exposure: number }>
+  ): ICameraState => {
+    if (!payload) {
+      return state;
+    }
+    return state.setExposure(payload.exposure);
+  },
 };
 
 export const {
@@ -74,7 +79,7 @@ export const actionCreators = {
   ...identityActionCreators,
 
   startCapture: () => async (dispatch: Dispatch<*>) => {
-    await startCameraCapture();
+    await cameraUtils.startCameraCapture();
     dispatch(actionCreators.setCaptureStatus({ captureStatus: 'started' }));
   },
 
@@ -83,17 +88,17 @@ export const actionCreators = {
   }: {
     saveToCameraRoll: boolean,
   }) => async (dispatch: Dispatch<*>) => {
-    await stopCameraCapture({ saveToCameraRoll });
+    await cameraUtils.stopCameraCapture({ saveToCameraRoll });
     dispatch(actionCreators.setCaptureStatus({ captureStatus: 'stopped' }));
   },
 
   loadSupportedISORange: () => async (dispatch: Dispatch<*>) => {
-    const range = await getSupportedISORange();
+    const range = await cameraUtils.getSupportedISORange();
     dispatch(actionCreators.setSupportedISORange({ range }));
   },
 
   loadSupportedExposureRange: () => async (dispatch: Dispatch<*>) => {
-    const range = await getSupportedExposureRange();
+    const range = await cameraUtils.getSupportedExposureRange();
     dispatch(actionCreators.setSupportedExposureRange({ range }));
   },
 
@@ -103,7 +108,12 @@ export const actionCreators = {
   },
 
   updateISO: (iso: number) => async (dispatch: Dispatch<*>) => {
-    await setISO(iso);
+    await cameraUtils.setISO(iso);
     dispatch(actionCreators.setISO({ iso }));
+  },
+
+  updateExposure: (exposure: number) => async (dispatch: Dispatch<*>) => {
+    await cameraUtils.setExposure(exposure);
+    dispatch(actionCreators.setExposure({ exposure }));
   },
 };
