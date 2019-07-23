@@ -7,9 +7,9 @@ export type StorybookStateWrapperProps<S: Object> = {
   initialState: S,
   // eslint-disable-next-line flowtype/space-after-type-colon
   onMount?:
-    | ((getState: () => S, setState: (S) => void) => void)
-    | ((getState: () => S, setState: (S) => void) => Promise<void>),
-  render: (getState: () => S, setState: (S) => void) => ?Element<*>,
+    | ((getState: () => S, setState: ($Shape<S>) => void) => void)
+    | ((getState: () => S, setState: ($Shape<S>) => void) => Promise<void>),
+  render: (getState: () => S, setState: ($Shape<S>) => void) => ?Element<*>,
 };
 
 export type StorybookStateWrapperState<S: Object> = S;

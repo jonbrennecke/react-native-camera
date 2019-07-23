@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native';
 import { Provider } from 'react-redux';
 
 import {
+  CameraSettingIdentifiers,
   createCameraStateHOC,
   CameraCapture,
   requestCameraPermissions,
@@ -48,14 +49,18 @@ const Component = CameraStateContainer(
     };
     return (
       <StorybookStateWrapper
-        initialState={{ cameraRef: React.createRef() }}
+        initialState={{
+          cameraRef: React.createRef(),
+          selectedCameraSetting: CameraSettingIdentifiers.Exposure,
+        }}
         onMount={setup}
-        render={getState => {
+        render={(getState, setState) => {
           return (
             <CameraCapture
               style={styles.camera}
               cameraRef={getState().cameraRef}
               supportedISORange={supportedISORange}
+              selectedCameraSetting={getState().selectedCameraSetting}
               onRequestBeginCapture={startCapture}
               onRequestEndCapture={() =>
                 stopCapture({
@@ -67,6 +72,12 @@ const Component = CameraStateContainer(
                 if (cameraRef.current) {
                   cameraRef.current.focusOnPoint(point);
                 }
+              }}
+              onRequestChangeISO={iso => {
+                // TODO: update iso
+              }}
+              onRequestChangeSelectedCameraSetting={cameraSetting => {
+                setState({ selectedCameraSetting: cameraSetting });
               }}
             />
           );

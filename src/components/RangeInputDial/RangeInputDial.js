@@ -1,12 +1,15 @@
 // @flow
 import React from 'react';
-import { ScrollView, View, Text } from 'react-native';
+import { ScrollView, View, Text, Dimensions } from 'react-native';
 import times from 'lodash/times';
+import clamp from 'lodash/clamp';
+import round from 'lodash/round';
 
 import { Units } from '../../constants';
 
 import type { SFC, Style } from '../../types';
-import type { CameraISORange } from '../../state';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const styles = {
   scrollView: {
@@ -15,7 +18,6 @@ const styles = {
   scrollViewContent: {
     alignItems: 'center',
     paddingBottom: 15,
-    paddingHorizontal: Units.small,
   },
   isoText: {
     color: '#fff',
@@ -26,39 +28,72 @@ const styles = {
     left: -10,
     width: 30,
   },
-  verticalBar: (index: number) => ({
+  tick: (index: number) => ({
     width: 2,
     height: index % 5 === 0 ? 30 : 10,
     borderRadius: 2,
     backgroundColor: '#fff',
     marginHorizontal: Units.extraSmall,
   }),
+  padding: (width: number) => ({
+    width,
+  }),
 };
 
 export type RangeInputDialProps = {
   style?: ?Style,
-  supportedISORange: CameraISORange,
+  min: number,
+  max: number,
+  formatValue?: number => string,
+  onSelectValue: number => void,
 };
+
+const defaultValueFormatter = (iso: number) =>
+  `${parseInt(iso)
+    .toString()
+    .toLocaleUpperCase()}`;
 
 export const RangeInputDial: SFC<RangeInputDialProps> = ({
   style,
-  supportedISORange,
-}: RangeInputDialProps) => (
-  <ScrollView
-    style={[style, styles.scrollView]}
-    contentContainerStyle={styles.scrollViewContent}
-    horizontal
-  >
-    {times(101).map((n, i) => {
-      const iso = n / 101 * supportedISORange.max + supportedISORange.min;
-      return (
-        <View key={`${n}`}>
-          <View style={styles.verticalBar(i)} />
-          {i % 5 === 0 && <Text style={styles.isoText}>{formatISO(iso)}</Text>}
-        </View>
-      );
-    })}
-  </ScrollView>
-);
-
-const formatISO = (iso: number) => `${parseInt(iso).toString().toLocaleUpperCase()}`;
+  min,
+  max,
+  formatValue = defaultValueFormatter,
+  onSelectValue,
+}: RangeInputDialProps) => {
+  const onScroll = ({ nativeEvent }) => {
+    if (!nativeEvent) {
+      return;
+    }
+    const { contentOffset, contentSize, layoutMeasurement } = nativeEvent;
+    const percent =
+      contentOffset.x / (contentSize.width - layoutMeasurement.width);
+    const value = clamp(round(percent * (max - min) + min), min, max);
+    onSelectValue(value);
+  };
+  const tickWidth = 2 + Units.extraSmall * 2;
+  const contentOffset = SCREEN_WIDTH / 2 - tickWidth * 0.5;
+  return (
+    <ScrollView
+      style={[style, styles.scrollView]}
+      contentContainerStyle={styles.scrollViewContent}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      onScroll={onScroll}
+      scrollEventThrottle={16}
+    >
+      <View style={{ width: contentOffset }} />
+      {times(101).map((n, i) => {
+        const value = n / 101 * max + min;
+        return (
+          <View key={`${n}`}>
+            <View style={styles.tick(i)} />
+            {i % 5 === 0 && (
+              <Text style={styles.isoText}>{formatValue(value)}</Text>
+            )}
+          </View>
+        );
+      })}
+      <View style={{ width: contentOffset }} />
+    </ScrollView>
+  );
+};

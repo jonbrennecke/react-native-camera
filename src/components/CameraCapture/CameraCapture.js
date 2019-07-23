@@ -6,7 +6,8 @@ import { Camera } from '../Camera';
 import { CaptureButton } from '../CaptureButton';
 import { CameraFocusArea } from '../CameraFocusArea';
 import { RangeInputDial } from '../RangeInputDial';
-import { Units } from '../../constants';
+import { CameraSettingsSelect } from '../CameraSettingsSelect';
+import { Units, CameraSettingIdentifiers } from '../../constants';
 
 import type { SFC, Style, ReturnType } from '../../types';
 import type { CameraISORange } from '../../state';
@@ -35,16 +36,16 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
   },
-  isoText: {
-    color: '#fff',
-  },
 };
 
 export type CameraCaptureProps = {
   style?: ?Style,
   cameraRef: ((?Camera) => void) | ReturnType<typeof React.createRef>,
+  selectedCameraSetting: $Keys<typeof CameraSettingIdentifiers>,
   supportedISORange: CameraISORange,
   onRequestFocus: ({ x: number, y: number }) => void,
+  onRequestChangeISO: number => void,
+  onRequestChangeSelectedCameraSetting: $Keys<typeof CameraSettingIdentifiers> => void,
   onRequestBeginCapture: () => void,
   onRequestEndCapture: () => void,
 };
@@ -53,7 +54,10 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
   style,
   cameraRef,
   supportedISORange,
+  selectedCameraSetting,
   onRequestFocus,
+  onRequestChangeISO,
+  onRequestChangeSelectedCameraSetting,
   onRequestBeginCapture,
   onRequestEndCapture,
 }: CameraCaptureProps) => (
@@ -67,7 +71,20 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
     </View>
     <View style={styles.bottomControls}>
       <View style={styles.cameraControlsRow}>
-        <RangeInputDial supportedISORange={supportedISORange} />
+        <RangeInputDial
+          min={supportedISORange.min}
+          max={supportedISORange.max}
+          onSelectValue={onRequestChangeISO}
+        />
+      </View>
+      <View style={styles.cameraControlsRow}>
+        <CameraSettingsSelect
+          options={Object.values(CameraSettingIdentifiers)}
+          keyForOption={option => `${CameraSettingIdentifiers[option]}`}
+          labelTextForOption={option => abbreviatedSettingName(option)}
+          isSelectedOption={option => selectedCameraSetting === option}
+          onRequestSelectOption={onRequestChangeSelectedCameraSetting}
+        />
       </View>
       <View style={styles.cameraControlsRow}>
         <CaptureButton
@@ -78,3 +95,13 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
     </View>
   </View>
 );
+
+const abbreviatedSettingName = (key: $Keys<typeof CameraSettingIdentifiers>) => {
+  return {
+    [CameraSettingIdentifiers.ShutterSpeed]: 'S',
+    [CameraSettingIdentifiers.ISO]: 'ISO',
+    [CameraSettingIdentifiers.Exposure]: 'EV',
+    [CameraSettingIdentifiers.Focus]: 'F',
+    [CameraSettingIdentifiers.WhiteBalance]: 'WB',
+  }[key];
+}
