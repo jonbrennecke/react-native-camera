@@ -6,3 +6,6 @@ export const selectCaptureStatus = (state: ICameraState) =>
 
 export const selectIsCameraStarted = (state: ICameraState) =>
   selectCaptureStatus(state) === 'started';
+
+export const selectSupportedISORange = (state: ICameraState) =>
+  state.getSupportedISORange();

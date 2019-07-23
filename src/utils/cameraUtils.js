@@ -43,3 +43,10 @@ export const stopCameraCapture = async ({
 export const switchToOppositeCamera = () => {
   CameraManager.switchToOppositeCamera();
 };
+
+export const getSupportedISORange = async (): Promise<{
+  min: number,
+  max: number,
+}> => {
+  return await CameraManager.getSupportedISORangeAsync();
+};

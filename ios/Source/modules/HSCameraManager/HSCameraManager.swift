@@ -329,6 +329,25 @@ class HSCameraManager: NSObject {
   }
 
   @objc
+  public var supportedISORange: HSMinMaxInterval {
+    guard let format = videoCaptureDevice?.activeFormat else {
+      return HSMinMaxInterval.zero
+    }
+    return HSMinMaxInterval(min: format.minISO, max: format.maxISO)
+  }
+
+  @objc
+  public var supportedExposureRange: HSMinMaxInterval {
+    guard let format = videoCaptureDevice?.activeFormat else {
+      return HSMinMaxInterval.zero
+    }
+    return HSMinMaxInterval(
+      min: Float(CMTimeGetSeconds(format.minExposureDuration)),
+      max: Float(CMTimeGetSeconds(format.maxExposureDuration))
+    )
+  }
+
+  @objc
   public func setupCameraCaptureSession() {
     if captureSession.isRunning {
       return
@@ -378,12 +397,10 @@ class HSCameraManager: NSObject {
           completionHandler(nil, false)
           return
         }
-
         guard case .success = self.assetWriter.startRecording() else {
           completionHandler(nil, false)
           return
         }
-
         let clock = CMClockGetHostTimeClock()
         let startTime = CMClockGetTime(clock)
         self.state = .recording(toURL: outputURL, startTime: startTime)
@@ -433,7 +450,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
     else {
       return
     }
-    
+
     // send detected faces to delegate method
     let metadataObjects = synchronizedMetadata.metadataObjects
     let faces = metadataObjects.map { $0 as? AVMetadataFaceObject }.compactMap { $0 }

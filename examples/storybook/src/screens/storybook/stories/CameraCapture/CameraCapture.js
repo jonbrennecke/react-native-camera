@@ -26,46 +26,48 @@ const styles = {
   },
 };
 
-const loadAsync = async (): Promise<void> => {
-  try {
-    await requestCameraPermissions();
-    startCameraPreview();
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-  }
-};
-
 const CameraStateContainer = createCameraStateHOC();
 
-const Component = CameraStateContainer(({ startCapture, stopCapture }) => {
-  return (
-    <StorybookStateWrapper
-      initialState={{ cameraRef: React.createRef() }}
-      onMount={loadAsync}
-      render={getState => {
-        return (
-          <CameraCapture
-            style={styles.camera}
-            cameraRef={getState().cameraRef}
-            onRequestBeginCapture={startCapture}
-            onRequestEndCapture={() =>
-              stopCapture({
-                saveToCameraRoll: true,
-              })
-            }
-            onRequestFocus={point => {
-              const { cameraRef } = getState();
-              if (cameraRef.current) {
-                cameraRef.current.focusOnPoint(point);
+const Component = CameraStateContainer(
+  ({ startCapture, stopCapture, supportedISORange, loadSupportedISORange }) => {
+    const loadAsync = async (): Promise<void> => {
+      try {
+        await requestCameraPermissions();
+        startCameraPreview();
+        await loadSupportedISORange();
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error);
+      }
+    };
+    return (
+      <StorybookStateWrapper
+        initialState={{ cameraRef: React.createRef() }}
+        onMount={loadAsync}
+        render={getState => {
+          return (
+            <CameraCapture
+              style={styles.camera}
+              cameraRef={getState().cameraRef}
+              onRequestBeginCapture={startCapture}
+              onRequestEndCapture={() =>
+                stopCapture({
+                  saveToCameraRoll: true,
+                })
               }
-            }}
-          />
-        );
-      }}
-    />
-  );
-});
+              onRequestFocus={point => {
+                const { cameraRef } = getState();
+                if (cameraRef.current) {
+                  cameraRef.current.focusOnPoint(point);
+                }
+              }}
+            />
+          );
+        }}
+      />
+    );
+  }
+);
 
 storiesOf('Camera', module).add('Camera Capture', () => (
   <Provider store={store}>

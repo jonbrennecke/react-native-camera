@@ -26,7 +26,7 @@ class HSDepthBlurEffect {
     else {
       return nil
     }
-    
+
     let faces = faceDetector.features(in: videoImage)
     if let face = faces.first as? CIFaceFeature {
       if face.hasRightEyePosition {
@@ -36,7 +36,7 @@ class HSDepthBlurEffect {
         depthBlurFilter.setValue(CIVector(cgPoint: face.leftEyePosition), forKey: "inputLeftEyePositions")
       }
     }
-    
+
     depthBlurFilter.setValue(videoImage, forKey: kCIInputImageKey)
     depthBlurFilter.setValue(depthImage, forKey: kCIInputDisparityImageKey)
     return depthBlurFilter.outputImage

@@ -1,13 +1,22 @@
 // @flow
 import { createReducer } from './createReducer';
 import { createCameraState } from './cameraState';
-import { startCameraCapture, stopCameraCapture } from '../utils';
+import {
+  startCameraCapture,
+  stopCameraCapture,
+  getSupportedISORange,
+} from '../utils';
 
 import type { Action, Dispatch } from '../types';
-import type { ICameraState, CameraCaptureStatus } from './cameraState';
+import type {
+  ICameraState,
+  CameraCaptureStatus,
+  CameraISORange,
+} from './cameraState';
 
 const CameraState = createCameraState({
   captureStatus: 'stopped',
+  supportedISORange: { min: 0, max: 16000 },
 });
 
 export const initialState = new CameraState();
@@ -21,6 +30,16 @@ const reducers = {
       return state;
     }
     return state.setCaptureStatus(payload.captureStatus);
+  },
+
+  setSupportedISORange: (
+    state,
+    { payload }: Action<{ range: CameraISORange }>
+  ): ICameraState => {
+    if (!payload) {
+      return state;
+    }
+    return state.setSupportedISORange(payload.range);
   },
 };
 
@@ -44,5 +63,10 @@ export const actionCreators = {
   }) => async (dispatch: Dispatch<*>) => {
     await stopCameraCapture({ saveToCameraRoll });
     dispatch(actionCreators.setCaptureStatus({ captureStatus: 'stopped' }));
+  },
+
+  loadSupportedISORange: () => async (dispatch: Dispatch<*>) => {
+    const range = await getSupportedISORange();
+    dispatch(actionCreators.setSupportedISORange({ range }));
   },
 };

@@ -24,6 +24,19 @@ RCT_EXPORT_METHOD(requestCameraPermissions : (RCTResponseSenderBlock)callback) {
   }];
 }
 
+RCT_EXPORT_METHOD(getSupportedISORange : (RCTResponseSenderBlock)callback) {
+  HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
+  NSDictionary *range = [cameraManager.supportedISORange asDictionary];
+  callback(@[ [NSNull null], range ]);
+}
+
+RCT_EXPORT_METHOD(getSupportedExposureRange
+                  : (RCTResponseSenderBlock)callback) {
+  HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
+  NSDictionary *range = [cameraManager.supportedExposureRange asDictionary];
+  callback(@[ [NSNull null], range ]);
+}
+
 RCT_EXPORT_METHOD(startCameraPreview) {
   HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
   [cameraManager setupCameraCaptureSession];

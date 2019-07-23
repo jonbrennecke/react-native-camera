@@ -3,22 +3,28 @@ import React from 'react';
 import { connect } from 'react-redux';
 import identity from 'lodash/identity';
 
-import { actionCreators, selectCaptureStatus } from './';
+import {
+  actionCreators,
+  selectCaptureStatus,
+  selectSupportedISORange,
+} from './';
 
 import type { ComponentType } from 'react';
 
 import type { Dispatch } from '../types';
-import type { ICameraState, CameraCaptureStatus } from './';
+import type { ICameraState, CameraCaptureStatus, CameraISORange } from './';
 
 type OwnProps = {};
 
 type StateProps = {
   captureStatus: CameraCaptureStatus,
+  supportedISORange: CameraISORange,
 };
 
 type DispatchProps = {
   startCapture: () => any,
   stopCapture: ({ saveToCameraRoll: boolean }) => any,
+  loadSupportedISORange: () => any,
 };
 
 export type CameraStateHOCProps = OwnProps & StateProps & DispatchProps;
@@ -26,14 +32,17 @@ export type CameraStateHOCProps = OwnProps & StateProps & DispatchProps;
 function mapCameraStateToProps(state: ICameraState): StateProps {
   return {
     captureStatus: selectCaptureStatus(state),
+    supportedISORange: selectSupportedISORange(state),
   };
 }
 
-function mapCameraDispatchToProps(dispatch: Dispatch<*>): DispatchProps {
+function mapCameraDispatchToProps(dispatch: Dispatch<any>): DispatchProps {
   return {
     startCapture: () => dispatch(actionCreators.startCapture()),
     stopCapture: (args: { saveToCameraRoll: boolean }) =>
       dispatch(actionCreators.stopCapture(args)),
+    loadSupportedISORange: () =>
+      dispatch(actionCreators.loadSupportedISORange()),
   };
 }
 
