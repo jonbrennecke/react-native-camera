@@ -5,6 +5,7 @@ import noop from 'lodash/noop';
 
 import { Seekbar } from '@jonbrennecke/react-native-media';
 
+import { SelectableButton } from '../buttons';
 import { VideoComposition } from '../VideoComposition';
 import { Units } from '../../constants';
 
@@ -20,6 +21,7 @@ export type VideoCompositionEditProps = {
   enablePortraitMode: boolean,
   onRequestTogglePortraitMode: () => void,
   onRequestToggleDepthPreview: () => void,
+  onRequestExport: () => void,
 };
 
 const styles = {
@@ -46,21 +48,21 @@ const styles = {
   seekbarBackground: {
     borderRadius: 0,
   },
-  button: (isSelected: boolean) => ({
-    backgroundColor: isSelected ? '#fff' : 'transparent',
+  button: {
+    backgroundColor: '#fff',
     borderRadius: Units.extraSmall,
     paddingVertical: Units.small,
     paddingHorizontal: Units.large,
-  }),
-  buttonText: (isSelected: boolean) => ({
-    color: isSelected ? '#000' : '#fff',
+  },
+  buttonText: {
+    color: '#000',
     fontSize: 10,
     fontWeight: 'bold',
     textAlign: 'center',
-  }),
+  },
   buttonSeparator: {
-    width: Units.small
-  }
+    width: Units.small,
+  },
 };
 
 export const VideoCompositionEdit: SFC<VideoCompositionEditProps> = ({
@@ -70,9 +72,15 @@ export const VideoCompositionEdit: SFC<VideoCompositionEditProps> = ({
   enableDepthPreview = true,
   enablePortraitMode,
   onRequestTogglePortraitMode,
-  onRequestToggleDepthPreview
+  onRequestToggleDepthPreview,
+  onRequestExport,
 }: VideoCompositionEditProps) => (
   <View style={[styles.container, style]}>
+    <View style={styles.toolbar}>
+      <TouchableOpacity style={styles.button} onPress={onRequestExport}>
+        <Text style={styles.buttonText}>{'Export'.toLocaleUpperCase()}</Text>
+      </TouchableOpacity>
+    </View>
     <VideoComposition
       style={styles.flex}
       assetID={asset?.assetID}
@@ -96,23 +104,17 @@ export const VideoCompositionEdit: SFC<VideoCompositionEditProps> = ({
       )}
     </View>
     <View style={styles.toolbar}>
-      <TouchableOpacity
-        style={styles.button(enablePortraitMode)}
+      <SelectableButton
+        text="Portrait"
+        isSelected={enablePortraitMode}
         onPress={onRequestTogglePortraitMode}
-      >
-        <Text style={styles.buttonText(enablePortraitMode)}>
-          {'Portrait'.toLocaleUpperCase()}
-        </Text>
-      </TouchableOpacity>
-      <View style={styles.buttonSeparator}/>
-      <TouchableOpacity
-        style={styles.button(enableDepthPreview)}
+      />
+      <View style={styles.buttonSeparator} />
+      <SelectableButton
+        text="Depth"
+        isSelected={enableDepthPreview}
         onPress={onRequestToggleDepthPreview}
-      >
-        <Text style={styles.buttonText(enableDepthPreview)}>
-          {'Depth'.toLocaleUpperCase()}
-        </Text>
-      </TouchableOpacity>
+      />
     </View>
   </View>
 );

@@ -52,8 +52,8 @@ export function wrapWithVideoCompositionEditState<
 
       toggleDepthPreview() {
         this.setState({
-          isDepthPreviewEnabled: !this.state.isDepthPreviewEnabled
-        })
+          isDepthPreviewEnabled: !this.state.isDepthPreviewEnabled,
+        });
       }
 
       render() {
