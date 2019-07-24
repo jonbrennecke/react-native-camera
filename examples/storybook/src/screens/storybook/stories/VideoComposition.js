@@ -11,6 +11,8 @@ import { VideoComposition } from '@jonbrennecke/react-native-camera';
 
 import { StorybookStateWrapper } from '../utils';
 
+import type { MediaObject } from '@jonbrennecke/react-native-media';
+
 const styles = {
   flex: {
     flex: 1,
@@ -20,6 +22,8 @@ const styles = {
     backgroundColor: '#000',
   },
 };
+
+const initialState: { asset: ?MediaObject } = { asset: null };
 
 const onMount = async (getState, setState): Promise<void> => {
   try {
@@ -40,7 +44,7 @@ const onMount = async (getState, setState): Promise<void> => {
 storiesOf('Media Effects', module).add('Video Composition', () => (
   <SafeAreaView style={styles.safeArea}>
     <StorybookStateWrapper
-      initialState={{ asset: null }}
+      initialState={initialState}
       onMount={onMount}
       render={getState => {
         const { asset } = getState();

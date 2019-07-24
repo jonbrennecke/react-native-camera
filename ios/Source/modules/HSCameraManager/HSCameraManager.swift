@@ -17,6 +17,7 @@ class HSCameraManager: NSObject {
   private var state: State = .none
   private let cameraOutputQueue = DispatchQueue(label: "com.jonbrennecke.HSCameraManager.cameraOutputQueue")
   private let cameraSetupQueue = DispatchQueue(label: "com.jonbrennecke.HSCameraManager.cameraSetupQueue")
+  private let outputProcessingQueue = DispatchQueue(label: "com.jonbrennecke.HSCameraManager.outputProcessingQueue")
   private let videoOutput = AVCaptureVideoDataOutput()
   private let videoFileOutput = AVCaptureMovieFileOutput()
   private let depthOutput = AVCaptureDepthDataOutput()
@@ -107,18 +108,18 @@ class HSCameraManager: NSObject {
       pixelFormatType: depthPixelFormat,
       isRealTime: false
     )
-    assetWriterDepthInput?.isEnabled = false
     assetWriterVideoInput = HSVideoWriterFrameBufferInput(
       videoSize: videoSize,
       pixelFormatType: videoPixelFormat,
       isRealTime: false
     )
+    // order is important here, if the video track is added first it will be the one visible in Photos app
     guard
       case .success = assetWriter.prepareToRecord(to: outputURL),
-      let depthInput = assetWriterDepthInput,
-      case .success = assetWriter.add(input: depthInput),
       let videoInput = assetWriterVideoInput,
-      case .success = assetWriter.add(input: videoInput)
+      case .success = assetWriter.add(input: videoInput),
+      let depthInput = assetWriterDepthInput,
+      case .success = assetWriter.add(input: depthInput)
     else {
       return .failure
     }
@@ -127,7 +128,12 @@ class HSCameraManager: NSObject {
 
   private func makeEmptyVideoOutputFile() throws -> URL {
     let outputTemporaryDirectoryURL = try FileManager.default
-      .url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: FileManager.default.temporaryDirectory, create: true)
+      .url(
+        for: .itemReplacementDirectory,
+        in: .userDomainMask,
+        appropriateFor: FileManager.default.temporaryDirectory,
+        create: true
+      )
     let outputURL = outputTemporaryDirectoryURL
       .appendingPathComponent(makeRandomFileName())
       .appendingPathExtension("mov")
@@ -485,56 +491,51 @@ class HSCameraManager: NSObject {
 
 @available(iOS 11.1, *)
 extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
+  private func record(depthData: AVDepthData, at presentationTime: CMTime) {
+    if let depthBuffer = depthDataConverter?.convert(depthData: depthData) {
+      let frameBuffer = HSVideoFrameBuffer(
+        pixelBuffer: depthBuffer, presentationTime: presentationTime
+      )
+      assetWriterDepthInput?.append(frameBuffer)
+    }
+  }
+
+  private func record(sampleBuffer: CMSampleBuffer, at presentationTime: CMTime) {
+    if let videoBuffer = HSPixelBuffer(sampleBuffer: sampleBuffer) {
+      let frameBuffer = HSVideoFrameBuffer(
+        pixelBuffer: videoBuffer, presentationTime: presentationTime
+      )
+      assetWriterVideoInput?.append(frameBuffer)
+    }
+  }
+
   func dataOutputSynchronizer(
     _: AVCaptureDataOutputSynchronizer, didOutput collection: AVCaptureSynchronizedDataCollection
   ) {
-    guard
-      let synchronizedDepthData = collection.synchronizedData(for: depthOutput) as? AVCaptureSynchronizedDepthData,
-      let synchronizedVideoData = collection.synchronizedData(for: videoOutput) as? AVCaptureSynchronizedSampleBufferData
-    else {
-      return
-    }
-
-//    var startTime: CMTime?
-//    if case let .stopped(time, _) = state {
-//      startTime = time
-//    }
-//
-//    if case let .recording(_, time) = state {
-//      startTime = time
-//    }
-
     if case let .recording(_, startTime) = state {
-      // add depth frame
-      if let depthBuffer = depthDataConverter?.convert(depthData: synchronizedDepthData.depthData) {
-        let presentationTime = synchronizedDepthData.timestamp - startTime
-        let frameBuffer = HSVideoFrameBuffer(
-          pixelBuffer: depthBuffer, presentationTime: presentationTime
-        )
-        assetWriterDepthInput?.append(frameBuffer)
-      }
-
-      // add video frame
-      if let videoBuffer = HSPixelBuffer(sampleBuffer: synchronizedVideoData.sampleBuffer) {
-        let presentationTime = synchronizedVideoData.timestamp - startTime
-        let frameBuffer = HSVideoFrameBuffer(
-          pixelBuffer: videoBuffer, presentationTime: presentationTime
-        )
-        assetWriterVideoInput?.append(frameBuffer)
+      outputProcessingQueue.async {
+        if let synchronizedDepthData = collection.synchronizedData(for: self.depthOutput) as? AVCaptureSynchronizedDepthData {
+          let presentationTime = synchronizedDepthData.timestamp - startTime
+          self.record(depthData: synchronizedDepthData.depthData, at: presentationTime)
+        }
+        if let synchronizedVideoData = collection.synchronizedData(for: self.videoOutput) as? AVCaptureSynchronizedSampleBufferData {
+          let presentationTime = synchronizedVideoData.timestamp - startTime
+          self.record(sampleBuffer: synchronizedVideoData.sampleBuffer, at: presentationTime)
+        }
       }
     }
 
     // MARK: - send data to delegates
 
-    if let delegate = depthDelegate {
-      if !synchronizedDepthData.depthDataWasDropped {
-        delegate.cameraManagerDidOutput(depthData: synchronizedDepthData.depthData)
-      }
-
-      if !synchronizedVideoData.sampleBufferWasDropped {
-        delegate.cameraManagerDidOutput(videoSampleBuffer: synchronizedVideoData.sampleBuffer)
-      }
-    }
+//    if let delegate = depthDelegate {
+//      if !synchronizedDepthData.depthDataWasDropped {
+//        delegate.cameraManagerDidOutput(depthData: synchronizedDepthData.depthData)
+//      }
+//
+//      if !synchronizedVideoData.sampleBufferWasDropped {
+//        delegate.cameraManagerDidOutput(videoSampleBuffer: synchronizedVideoData.sampleBuffer)
+//      }
+//    }
 
     // send detected faces to delegate method
 //    if let synchronizedMetadata = collection.synchronizedData(for: metadataOutput) as? AVCaptureSynchronizedMetadataObjectData {

@@ -5,6 +5,7 @@ import UIKit
 
 @objc
 class HSVideoCompositionView: UIView {
+  private let loadingQueue = DispatchQueue(label: "com.jonbrennecke.HSVideoCompositionView.loadingQueue")
   private var player: AVQueuePlayer?
   private var playerItem: AVPlayerItem?
   private var playerLooper: AVPlayerLooper?
@@ -23,20 +24,18 @@ class HSVideoCompositionView: UIView {
   }
 
   private func load(asset: AVAsset) {
-    asset.loadValuesAsynchronously(forKeys: ["tracks"]) {
+    asset.loadValuesAsynchronously(forKeys: ["tracks", "playable"]) {
       guard
         let depthTrack = asset.tracks.first(where: { isGrayscaleVideoTrack($0) }),
         let videoTrack = asset.tracks.first(where: { isColorVideoTrack($0) })
       else {
         return
       }
-      let videoTrackID = videoTrack.trackID
-      let depthTrackID = depthTrack.trackID
       let renderSize = dimensions(with: videoTrack.formatDescriptions.first as! CMFormatDescription)
       self.configurePlayer(
         asset: asset,
-        videoTrackID: videoTrackID,
-        depthTrackID: depthTrackID,
+        videoTrackID: videoTrack.trackID,
+        depthTrackID: depthTrack.trackID,
         renderSize: renderSize
       )
     }
@@ -54,20 +53,21 @@ class HSVideoCompositionView: UIView {
     else {
       return
     }
-
     let videoComposition = AVMutableVideoComposition()
-    videoComposition.customVideoCompositorClass = HSVideoCompositor.self
     videoComposition.renderSize = CGSize(width: renderSize.width, height: renderSize.height)
     videoComposition.frameDuration = CMTimeMake(value: 1, timescale: CMTimeScale(videoTrack.nominalFrameRate))
     let composition = AVMutableComposition()
-    let compositionVideoTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid)
-    try? compositionVideoTrack?.insertTimeRange(videoTrack.timeRange, of: videoTrack, at: CMTime.zero)
-    let compositionDepthTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid)
-    try? compositionDepthTrack?.insertTimeRange(depthTrack.timeRange, of: depthTrack, at: CMTime.zero)
+
+    let compositionVideoTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: videoTrackID)
+    try? compositionVideoTrack?.insertTimeRange(videoTrack.timeRange, of: videoTrack, at: .zero)
     let videoLayerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoTrack)
-    videoLayerInstruction.setTransform(videoTrack.preferredTransform, at: CMTime.zero)
+    videoLayerInstruction.setTransform(videoTrack.preferredTransform, at: .zero)
+
+    let compositionDepthTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: depthTrackID)
+    try? compositionDepthTrack?.insertTimeRange(depthTrack.timeRange, of: depthTrack, at: .zero)
     let depthLayerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: depthTrack)
-    depthLayerInstruction.setTransform(depthTrack.preferredTransform, at: CMTime.zero)
+    depthLayerInstruction.setTransform(depthTrack.preferredTransform, at: .zero)
+
     let instruction = AVMutableVideoCompositionInstruction()
     instruction.layerInstructions = [
       videoLayerInstruction,
@@ -78,6 +78,7 @@ class HSVideoCompositionView: UIView {
     let timeRange = CMTimeRangeMake(start: CMTime.zero, duration: composition.duration)
     instruction.timeRange = timeRange
     videoComposition.instructions = [instruction]
+    videoComposition.customVideoCompositorClass = HSVideoCompositor.self
     playerItem = AVPlayerItem(asset: asset)
     playerItem?.videoComposition = videoComposition
     if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
@@ -119,11 +120,13 @@ class HSVideoCompositionView: UIView {
       guard let id = assetID else {
         return
       }
-      loadVideoAsset(assetID: id) { asset in
-        guard let asset = asset else {
-          return
+      loadingQueue.async {
+        loadVideoAsset(assetID: id) { asset in
+          guard let asset = asset else {
+            return
+          }
+          self.load(asset: asset)
         }
-        self.load(asset: asset)
       }
     }
   }
@@ -178,6 +181,6 @@ fileprivate func dimensions(of track: AVAssetTrack) -> Size<Int>? {
 }
 
 fileprivate func dimensions(with formatDescription: CMFormatDescription) -> Size<Int> {
-  let dim = CMVideoFormatDescriptionGetDimensions(formatDescription as! CMFormatDescription)
+  let dim = CMVideoFormatDescriptionGetDimensions(formatDescription)
   return Size(width: Int(dim.width), height: Int(dim.height))
 }
