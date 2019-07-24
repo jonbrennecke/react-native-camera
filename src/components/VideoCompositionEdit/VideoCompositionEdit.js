@@ -19,6 +19,7 @@ export type VideoCompositionEditProps = {
   enableDepthPreview?: boolean,
   enablePortraitMode: boolean,
   onRequestTogglePortraitMode: () => void,
+  onRequestToggleDepthPreview: () => void,
 };
 
 const styles = {
@@ -57,6 +58,9 @@ const styles = {
     fontWeight: 'bold',
     textAlign: 'center',
   }),
+  buttonSeparator: {
+    width: Units.small
+  }
 };
 
 export const VideoCompositionEdit: SFC<VideoCompositionEditProps> = ({
@@ -66,6 +70,7 @@ export const VideoCompositionEdit: SFC<VideoCompositionEditProps> = ({
   enableDepthPreview = true,
   enablePortraitMode,
   onRequestTogglePortraitMode,
+  onRequestToggleDepthPreview
 }: VideoCompositionEditProps) => (
   <View style={[styles.container, style]}>
     <VideoComposition
@@ -97,6 +102,15 @@ export const VideoCompositionEdit: SFC<VideoCompositionEditProps> = ({
       >
         <Text style={styles.buttonText(enablePortraitMode)}>
           {'Portrait'.toLocaleUpperCase()}
+        </Text>
+      </TouchableOpacity>
+      <View style={styles.buttonSeparator}/>
+      <TouchableOpacity
+        style={styles.button(enableDepthPreview)}
+        onPress={onRequestToggleDepthPreview}
+      >
+        <Text style={styles.buttonText(enableDepthPreview)}>
+          {'Depth'.toLocaleUpperCase()}
         </Text>
       </TouchableOpacity>
     </View>

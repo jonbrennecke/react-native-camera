@@ -14,10 +14,12 @@ import type {
 export type VideoCompositionEditState = {
   playbackTime: number,
   isPortraitModeEnabled: boolean,
+  isDepthPreviewEnabled: boolean,
 };
 
 export type VideoCompositionEditStateExtraProps = {
   togglePortraitMode: () => void,
+  toggleDepthPreview: () => void,
 } & VideoCompositionEditState;
 
 export function wrapWithVideoCompositionEditState<
@@ -38,7 +40,8 @@ export function wrapWithVideoCompositionEditState<
     > {
       state: VideoCompositionEditState = {
         playbackTime: 0,
-        isPortraitModeEnabled: false,
+        isPortraitModeEnabled: true,
+        isDepthPreviewEnabled: false,
       };
 
       togglePortraitMode() {
@@ -47,12 +50,19 @@ export function wrapWithVideoCompositionEditState<
         });
       }
 
+      toggleDepthPreview() {
+        this.setState({
+          isDepthPreviewEnabled: !this.state.isDepthPreviewEnabled
+        })
+      }
+
       render() {
         return (
           <WrappedComponent
             {...this.props}
             {...this.state}
             togglePortraitMode={this.togglePortraitMode}
+            toggleDepthPreview={this.toggleDepthPreview}
           />
         );
       }
