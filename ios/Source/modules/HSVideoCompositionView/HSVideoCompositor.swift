@@ -13,13 +13,17 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
   private lazy var context = CIContext() // TODO: use metal context and NSNull color space
   private lazy var depthBlurEffect = HSDepthBlurEffect()
 
-  internal var depthTrackID: CMPersistentTrackID = kCMPersistentTrackID_Invalid
-  internal var videoTrackID: CMPersistentTrackID = kCMPersistentTrackID_Invalid
-  internal var isDepthPreviewEnabled: Bool = false
+  public var depthTrackID: CMPersistentTrackID = kCMPersistentTrackID_Invalid
+  public var videoTrackID: CMPersistentTrackID = kCMPersistentTrackID_Invalid
+  public var isDepthPreviewEnabled: Bool = false
+  public var isPortraitModeEnabled: Bool = false
 
   private func composePixelBuffer(with request: AVAsynchronousVideoCompositionRequest) -> CVPixelBuffer? {
     if isDepthPreviewEnabled {
       return request.sourceFrame(byTrackID: depthTrackID)
+    }
+    if !isPortraitModeEnabled {
+      return request.sourceFrame(byTrackID: videoTrackID)
     }
     guard
       let videoPixelBuffer = request.sourceFrame(byTrackID: videoTrackID),

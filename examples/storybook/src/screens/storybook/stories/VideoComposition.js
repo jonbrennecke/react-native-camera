@@ -34,7 +34,6 @@ const onMount = async (getState, setState): Promise<void> => {
     }
     const asset = assets[0];
     setState({ asset });
-    // asset.assetID
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);

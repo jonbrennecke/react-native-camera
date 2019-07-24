@@ -12,6 +12,7 @@ export type VideoCompositionProps = {
   style?: ?Style,
   assetID: ?string,
   enableDepthPreview?: boolean,
+  enablePortraitMode?: boolean,
   shouldLoopVideo?: boolean,
 };
 
@@ -19,12 +20,14 @@ export const VideoComposition: SFC<VideoCompositionProps> = ({
   style,
   assetID,
   enableDepthPreview = true,
+  enablePortraitMode = true,
   shouldLoopVideo = true,
 }: VideoCompositionProps) => (
   <NativeVideoCompositionView
     style={style}
     assetID={assetID}
     isDepthPreviewEnabled={enableDepthPreview}
+    isPortraitModeEnabled={enablePortraitMode}
     shouldLoopVideo={shouldLoopVideo}
   />
 );

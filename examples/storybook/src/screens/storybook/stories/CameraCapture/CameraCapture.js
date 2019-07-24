@@ -39,7 +39,7 @@ const Component = CameraStateContainer(
     supportedExposureRange,
     loadSupportedFeatures,
     updateISO,
-    updateExposure
+    updateExposure,
   }) => {
     const setup = async (): Promise<void> => {
       try {

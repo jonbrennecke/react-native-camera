@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@jonbrennecke/react-native-camera": "../../",
-    "@jonbrennecke/react-native-media": "1.0.15",
+    "@jonbrennecke/react-native-media": "1.0.18",
     "lodash": "4.17.11",
     "react": "16.6.3",
     "react-native": "0.58.6",

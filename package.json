@@ -28,7 +28,8 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "^0.57.0",
-    "redux": "^3.7.2"
+    "redux": "^3.7.2",
+    "@jonbrennecke/react-native-media": "^1.0.18"
   },
   "repository": {
     "url": "https://github.com/jonbrennecke/react-native-camera",
@@ -39,6 +40,7 @@
     "@babel/plugin-proposal-class-properties": "^7.2.3",
     "@babel/plugin-proposal-decorators": "7.2.3",
     "@babel/plugin-transform-flow-strip-types": "7.2.3",
+    "@jonbrennecke/react-native-media": "^1.0.18",
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "23.6.0",
     "babel-loader": "7.1.5",
@@ -61,9 +63,9 @@
     "prettier": "1.12.0",
     "react": "16.6.3",
     "react-native": "0.57.8",
+    "redux": "3.7.2",
     "webpack": "4.17.1",
-    "webpack-cli": "^2.1.4",
-    "redux": "3.7.2"
+    "webpack-cli": "^2.1.4"
   },
   "dependencies": {
     "@react-native-community/blur": "^3.3.1",

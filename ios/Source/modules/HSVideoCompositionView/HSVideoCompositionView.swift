@@ -10,6 +10,14 @@ class HSVideoCompositionView: UIView {
   private var playerItem: AVPlayerItem?
   private var playerLooper: AVPlayerLooper?
 
+  private var asset: AVAsset? {
+    didSet {
+      if let asset = asset {
+        configure(asset: asset)
+      }
+    }
+  }
+
   override class var layerClass: AnyClass {
     return AVPlayerLayer.self
   }
@@ -23,7 +31,7 @@ class HSVideoCompositionView: UIView {
     playerLayer.videoGravity = .resizeAspectFill
   }
 
-  private func load(asset: AVAsset) {
+  private func configure(asset: AVAsset) {
     asset.loadValuesAsynchronously(forKeys: ["tracks", "playable"]) {
       guard
         let depthTrack = asset.tracks.first(where: { isGrayscaleVideoTrack($0) }),
@@ -32,7 +40,7 @@ class HSVideoCompositionView: UIView {
         return
       }
       let renderSize = dimensions(with: videoTrack.formatDescriptions.first as! CMFormatDescription)
-      self.configurePlayer(
+      self.configure(
         asset: asset,
         videoTrackID: videoTrack.trackID,
         depthTrackID: depthTrack.trackID,
@@ -41,7 +49,7 @@ class HSVideoCompositionView: UIView {
     }
   }
 
-  private func configurePlayer(
+  private func configure(
     asset: AVAsset,
     videoTrackID: CMPersistentTrackID,
     depthTrackID: CMPersistentTrackID,
@@ -85,6 +93,7 @@ class HSVideoCompositionView: UIView {
       compositor.depthTrackID = depthTrackID
       compositor.videoTrackID = videoTrackID
       compositor.isDepthPreviewEnabled = isDepthPreviewEnabled
+      compositor.isPortraitModeEnabled = isPortraitModeEnabled
     }
     player = AVQueuePlayer(playerItem: playerItem)
     configureLooping(timeRange: timeRange)
@@ -109,24 +118,31 @@ class HSVideoCompositionView: UIView {
   // MARK: - objc interface
 
   @objc
-  public var isDepthPreviewEnabled: Bool = false
+  public var isDepthPreviewEnabled: Bool = false {
+    didSet {
+      if let asset = asset {
+        configure(asset: asset)
+      }
+    }
+  }
+
+  @objc
+  public var isPortraitModeEnabled: Bool = false {
+    didSet {
+      if let asset = asset {
+        configure(asset: asset)
+      }
+    }
+  }
 
   @objc
   public var shouldLoopVideo: Bool = true
 
-  @objc
-  public var assetID: String? {
-    didSet {
-      guard let id = assetID else {
-        return
-      }
-      loadingQueue.async {
-        loadVideoAsset(assetID: id) { asset in
-          guard let asset = asset else {
-            return
-          }
-          self.load(asset: asset)
-        }
+  @objc(loadAssetByID:)
+  public func loadAsset(byID assetID: String) {
+    loadingQueue.async {
+      loadVideoAsset(assetID: assetID) { asset in
+        self.asset = asset
       }
     }
   }

@@ -54,7 +54,8 @@ const resolve = {
 module.exports = {
   externals: {
     'react-native': 'react-native',
-    'react': 'react'
+    'react': 'react',
+    '@jonbrennecke/react-native-media': '@jonbrennecke/react-native-media'
   },
   mode: 'production',
   target: 'web',

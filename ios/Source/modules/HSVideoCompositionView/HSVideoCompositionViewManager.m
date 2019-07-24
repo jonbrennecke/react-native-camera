@@ -14,12 +14,17 @@ RCT_EXPORT_MODULE()
 
 RCT_CUSTOM_VIEW_PROPERTY(assetID, NSString, HSVideoCompositionView) {
   NSString *assetID = [RCTConvert NSString:json];
-  view.assetID = assetID;
+  [view loadAssetByID:assetID];
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(isDepthPreviewEnabled, BOOL, HSVideoCompositionView) {
   BOOL isDepthPreviewEnabled = [RCTConvert BOOL:json];
   view.isDepthPreviewEnabled = isDepthPreviewEnabled;
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(isPortraitModeEnabled, BOOL, HSVideoCompositionView) {
+  BOOL isPortraitModeEnabled = [RCTConvert BOOL:json];
+  view.isPortraitModeEnabled = isPortraitModeEnabled;
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(shouldLoopVideo, BOOL, HSVideoCompositionView) {
