@@ -41,7 +41,14 @@ const VideoCompositionEditStateContainer = wrapWithVideoCompositionEditState(
 );
 
 const Component = VideoCompositionEditStateContainer(
-  ({ playbackTime, isDepthPreviewEnabled, isPortraitModeEnabled, togglePortraitMode, toggleDepthPreview }) => {
+  ({
+    playbackTime,
+    isDepthPreviewEnabled,
+    isPortraitModeEnabled,
+    togglePortraitMode,
+    toggleDepthPreview,
+    exportAsset,
+  }) => {
     const setup = async (getState, setState): Promise<void> => {
       try {
         await authorizeMediaLibrary();
@@ -70,7 +77,11 @@ const Component = VideoCompositionEditStateContainer(
             onRequestTogglePortraitMode={togglePortraitMode}
             onRequestToggleDepthPreview={toggleDepthPreview}
             onRequestExport={() => {
-              
+              const { asset } = getState();
+              if (!asset) {
+                return;
+              }
+              exportAsset(asset.assetID);
             }}
           />
         )}

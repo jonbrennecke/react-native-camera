@@ -1,4 +1,5 @@
 import Foundation
+import Photos
 
 @objc
 class HSVideoCompositionExportManager: NSObject {
@@ -21,7 +22,10 @@ class HSVideoCompositionExportManager: NSObject {
 extension HSVideoCompositionExportManager: HSExportManagerDelegate {
   func videoExportManager(didFinishTask task: HSExportTask) {
     if let task = task as? HSVideoCompositionExportTask, let url = task.outputURL {
-      delegate?.videoExportManager(didFinishExporting: url)
+      PHPhotoLibrary.shared().performChanges({
+        PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
+        self.delegate?.videoExportManager(didFinishExporting: url)
+      })
     }
   }
 

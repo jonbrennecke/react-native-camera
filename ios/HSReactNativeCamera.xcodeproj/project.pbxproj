@@ -96,7 +96,7 @@
 		FC2FB8EF22CBCEA5007CE0AF /* HSSegmentationModelLoader.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSSegmentationModelLoader.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC31DAB322E6279700D1FADD /* HSDepthBlurEffect.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSDepthBlurEffect.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC552C9822E9320C00775729 /* fileUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = fileUtils.swift; sourceTree = "<group>"; };
-		FC552C9A22E937A000775729 /* HSVideoCompositionExportManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSVideoCompositionExportManager.swift; sourceTree = "<group>"; };
+		FC552C9A22E937A000775729 /* HSVideoCompositionExportManager.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSVideoCompositionExportManager.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC552C9F22E9390900775729 /* HSVideoCompositionExportManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSVideoCompositionExportManagerDelegate.swift; sourceTree = "<group>"; };
 		FC552CA122E939F800775729 /* HSVideoCompositionExportManagerBridgeModule.m */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.c.objc; path = HSVideoCompositionExportManagerBridgeModule.m; sourceTree = "<group>"; tabWidth = 2; };
 		FC552CA322E93A0000775729 /* HSVideoCompositionExportManagerBridgeModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSVideoCompositionExportManagerBridgeModule.h; sourceTree = "<group>"; };
@@ -168,8 +168,6 @@
 				FC03B64E22DFF25500E283B3 /* HSVideoCompositionViewManager.h */,
 				FC03B64B22DFF1F000E283B3 /* HSVideoCompositionViewManager.m */,
 				FC03B63122DFEA0000E283B3 /* HSVideoCompositionView.swift */,
-				FCADFE2822E1521B00E3C76A /* HSVideoCompositor.swift */,
-				FC0511F222E178C300DA531E /* HSVideoCompositionInstruction.swift */,
 			);
 			path = HSVideoCompositionView;
 			sourceTree = "<group>";
@@ -218,6 +216,15 @@
 			path = HSExportManager;
 			sourceTree = "<group>";
 		};
+		FC552CA422E9491C00775729 /* HSVideoCompositor */ = {
+			isa = PBXGroup;
+			children = (
+				FC0511F222E178C300DA531E /* HSVideoCompositionInstruction.swift */,
+				FCADFE2822E1521B00E3C76A /* HSVideoCompositor.swift */,
+			);
+			path = HSVideoCompositor;
+			sourceTree = "<group>";
+		};
 		FC71B6C522CAB236003EA230 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
@@ -247,6 +254,7 @@
 		FC73F2F622B02D56009B6D9F /* modules */ = {
 			isa = PBXGroup;
 			children = (
+				FC552CA422E9491C00775729 /* HSVideoCompositor */,
 				FCEF516B22E8F48400672D6A /* HSVideoCompositionExportManager */,
 				FC552C9E22E9388500775729 /* HSExportManager */,
 				FC20ADFB22E9121600181579 /* HSVideoComposition */,

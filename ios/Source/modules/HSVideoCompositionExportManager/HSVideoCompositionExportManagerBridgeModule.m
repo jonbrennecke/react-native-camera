@@ -4,7 +4,33 @@
 #import <React/RCTConvert.h>
 #import <React/RCTUtils.h>
 
-@implementation HSVideoCompositionExportManagerBridgeModule
+@implementation HSVideoCompositionExportManagerBridgeModule {
+  bool hasListeners;
+}
+
+- (instancetype)init {
+  self = [super init];
+  if (self) {
+    HSVideoCompositionExportManager.sharedInstance.delegate = self;
+  }
+  return self;
+}
+
+- (void)startObserving {
+  hasListeners = YES;
+}
+
+- (void)stopObserving {
+  hasListeners = NO;
+}
+
++ (BOOL)requiresMainQueueSetup {
+  return NO;
+}
+
+- (NSArray<NSString *> *)supportedEvents {
+  return @[];
+}
 
 RCT_EXPORT_MODULE(HSVideoCompositionExportManager)
 
@@ -58,13 +84,15 @@ RCT_EXPORT_METHOD(export
                }];
 }
 
+#pragma MARK - HSVideoCompositionExportManagerDelegate methods
+
 - (void)videoExportManagerDidDidUpdateProgress:(float)progress {
 }
 
 - (void)videoExportManagerDidFailWithError:(NSError *_Nonnull)error {
 }
 
-- (void)videoExportManagerDidFinishExporting:(NSURL *_Nonnull)progress {
+- (void)videoExportManagerDidFinishExporting:(NSURL *_Nonnull)url {
 }
 
 @end

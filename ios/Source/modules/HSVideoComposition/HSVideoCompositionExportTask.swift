@@ -30,6 +30,11 @@ class HSVideoCompositionExportTask: HSExportTask {
       asset: avComposition, presetName: AVAssetExportPresetHighestQuality
     )
     assetExportSession?.videoComposition = avVideoComposition
+    if let compositor = assetExportSession?.customVideoCompositor as? HSVideoCompositor {
+      compositor.depthTrackID = composition.depthTrackID
+      compositor.videoTrackID = composition.videoTrackID
+      compositor.isPortraitModeEnabled = true // TODO:
+    }
     assetExportSession?.outputFileType = .mov
     assetExportSession?.outputURL = try? makeEmptyVideoOutputFile()
     assetExportSession?.exportAsynchronously {

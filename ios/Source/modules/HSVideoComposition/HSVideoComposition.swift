@@ -3,8 +3,9 @@ import AVFoundation
 @objc
 class HSVideoComposition: NSObject {
   private let asset: AVAsset
-  private let videoTrackID: CMPersistentTrackID
-  private let depthTrackID: CMPersistentTrackID
+
+  internal let videoTrackID: CMPersistentTrackID
+  internal let depthTrackID: CMPersistentTrackID
 
   @objc
   public init(asset: AVAsset, videoTrackID: CMPersistentTrackID, depthTrackID: CMPersistentTrackID) {

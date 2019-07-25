@@ -5,6 +5,8 @@ import { createMediaStateHOC } from '@jonbrennecke/react-native-media';
 import { autobind } from 'core-decorators';
 import identity from 'lodash/identity';
 
+import { exportComposition } from '../../utils';
+
 import type { ComponentType } from 'react';
 import type {
   MediaStateHOCProps,
@@ -20,6 +22,7 @@ export type VideoCompositionEditState = {
 export type VideoCompositionEditStateExtraProps = {
   togglePortraitMode: () => void,
   toggleDepthPreview: () => void,
+  exportAsset: (assetID: string) => Promise<void>,
 } & VideoCompositionEditState;
 
 export function wrapWithVideoCompositionEditState<
@@ -56,6 +59,10 @@ export function wrapWithVideoCompositionEditState<
         });
       }
 
+      async exportAsset(assetID: string) {
+        await exportComposition(assetID);
+      }
+
       render() {
         return (
           <WrappedComponent
@@ -63,6 +70,7 @@ export function wrapWithVideoCompositionEditState<
             {...this.state}
             togglePortraitMode={this.togglePortraitMode}
             toggleDepthPreview={this.toggleDepthPreview}
+            exportAsset={this.exportAsset}
           />
         );
       }
