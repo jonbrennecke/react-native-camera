@@ -16,6 +16,7 @@ import type {
 import type { ReturnType } from '../../types';
 
 export type VideoCompositionEditState = {
+  exportProgress: number,
   playbackTime: number,
   isPortraitModeEnabled: boolean,
   isDepthPreviewEnabled: boolean,
@@ -44,6 +45,7 @@ export function wrapWithVideoCompositionEditState<
       VideoCompositionEditState
     > {
       state: VideoCompositionEditState = {
+        exportProgress: 0,
         playbackTime: 0,
         isPortraitModeEnabled: true,
         isDepthPreviewEnabled: false,
@@ -68,7 +70,7 @@ export function wrapWithVideoCompositionEditState<
       }
 
       onExportProgress(progress: number) {
-        console.log(progress);
+        this.setState({ exportProgress: progress })
       }
 
       render() {

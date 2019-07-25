@@ -31,12 +31,17 @@ const styles = {
   container: {
     backgroundColor: '#000',
   },
-  toolbar: {
+  toolbar: ({ align = 'center' }: { align?: 'left' | 'right' | 'center' }) => ({
     paddingVertical: Units.small,
+    paddingHorizontal: align !== 'center' ? Units.small : 0,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: {
+      'left': 'flex-start',
+      'right': 'flex-end',
+      'center': 'center'
+    }[align],
     flexDirection: 'row',
-  },
+  }),
   seekbar: {
     height: 50,
     width: '100%',
@@ -76,7 +81,7 @@ export const VideoCompositionEdit: SFC<VideoCompositionEditProps> = ({
   onRequestExport,
 }: VideoCompositionEditProps) => (
   <View style={[styles.container, style]}>
-    <View style={styles.toolbar}>
+    <View style={styles.toolbar({ align: 'right' })}>
       <TouchableOpacity style={styles.button} onPress={onRequestExport}>
         <Text style={styles.buttonText}>{'Export'.toLocaleUpperCase()}</Text>
       </TouchableOpacity>
@@ -88,7 +93,7 @@ export const VideoCompositionEdit: SFC<VideoCompositionEditProps> = ({
       enablePortraitMode={enablePortraitMode}
       shouldLoopVideo
     />
-    <View style={styles.toolbar}>
+    <View style={styles.toolbar({})}>
       {asset && (
         <Seekbar
           style={styles.seekbar}
@@ -103,7 +108,7 @@ export const VideoCompositionEdit: SFC<VideoCompositionEditProps> = ({
         />
       )}
     </View>
-    <View style={styles.toolbar}>
+    <View style={styles.toolbar({})}>
       <SelectableButton
         text="Portrait"
         isSelected={enablePortraitMode}
