@@ -340,6 +340,10 @@ class HSCameraManager: NSObject {
     }
     return HSMinMaxInterval(min: format.minISO, max: format.maxISO)
   }
+  
+  public var iso: Float {
+    return videoCaptureDevice?.iso ?? 0
+  }
 
   @objc(setISO:withCompletionHandler:)
   public func setISO(_ iso: Float, _ completionHandler: @escaping () -> Void) {
@@ -385,6 +389,10 @@ class HSCameraManager: NSObject {
     } else {
       completionHandler()
     }
+  }
+  
+  public var aperture: Float {
+    return videoCaptureDevice?.lensAperture ?? 0
   }
 
   @objc
