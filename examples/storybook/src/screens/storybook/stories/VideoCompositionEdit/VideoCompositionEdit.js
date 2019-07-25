@@ -69,6 +69,9 @@ const Component = VideoCompositionEditStateContainer(
             enablePortraitMode={isPortraitModeEnabled}
             onRequestTogglePortraitMode={togglePortraitMode}
             onRequestToggleDepthPreview={toggleDepthPreview}
+            onRequestExport={() => {
+              
+            }}
           />
         )}
       />

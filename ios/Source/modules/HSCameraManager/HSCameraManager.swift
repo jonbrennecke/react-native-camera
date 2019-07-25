@@ -126,21 +126,6 @@ class HSCameraManager: NSObject {
     return .success
   }
 
-  private func makeEmptyVideoOutputFile() throws -> URL {
-    let outputTemporaryDirectoryURL = try FileManager.default
-      .url(
-        for: .itemReplacementDirectory,
-        in: .userDomainMask,
-        appropriateFor: FileManager.default.temporaryDirectory,
-        create: true
-      )
-    let outputURL = outputTemporaryDirectoryURL
-      .appendingPathComponent(makeRandomFileName())
-      .appendingPathExtension("mov")
-    try? FileManager.default.removeItem(at: outputURL)
-    return outputURL
-  }
-
   private func attemptToSetupCameraCaptureSession() -> HSCameraSetupResult {
     let preset: AVCaptureSession.Preset = .vga640x480
     if captureSession.canSetSessionPreset(preset) {
@@ -441,7 +426,7 @@ class HSCameraManager: NSObject {
         return
       }
       do {
-        let outputURL = try self.makeEmptyVideoOutputFile()
+        let outputURL = try makeEmptyVideoOutputFile()
         guard case .success = self.setupAssetWriter(to: outputURL) else {
           completionHandler(nil, false)
           return
@@ -544,9 +529,4 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
 //      delegate?.cameraManagerDidDetect(faces: faces)
 //    }
   }
-}
-
-fileprivate func makeRandomFileName() -> String {
-  let random_int = arc4random_uniform(.max)
-  return NSString(format: "%x", random_int) as String
 }
