@@ -9,11 +9,19 @@ class HSVideoCompositionView: UIView {
   private var player: AVQueuePlayer?
   private var playerItem: AVPlayerItem?
   private var playerLooper: AVPlayerLooper?
+  
+  private var composition: HSVideoComposition? {
+    didSet {
+      configurePlayer()
+    }
+  }
 
   private var asset: AVAsset? {
     didSet {
       if let asset = asset {
-        configure(asset: asset)
+        HSVideoComposition.composition(ByLoading: asset) { composition in
+          self.composition = composition
+        }
       }
     }
   }
@@ -31,72 +39,23 @@ class HSVideoCompositionView: UIView {
     playerLayer.videoGravity = .resizeAspectFill
   }
 
-  private func configure(asset: AVAsset) {
-    asset.loadValuesAsynchronously(forKeys: ["tracks", "playable"]) {
-      guard
-        let depthTrack = asset.tracks.first(where: { isGrayscaleVideoTrack($0) }),
-        let videoTrack = asset.tracks.first(where: { isColorVideoTrack($0) })
-      else {
-        return
-      }
-      let renderSize = dimensions(with: videoTrack.formatDescriptions.first as! CMFormatDescription)
-      self.configure(
-        asset: asset,
-        videoTrackID: videoTrack.trackID,
-        depthTrackID: depthTrack.trackID,
-        renderSize: renderSize
-      )
-    }
-  }
-
-  private func configure(
-    asset: AVAsset,
-    videoTrackID: CMPersistentTrackID,
-    depthTrackID: CMPersistentTrackID,
-    renderSize: Size<Int>
-  ) {
+  private func configurePlayer() {
     guard
-      let videoTrack = asset.track(withTrackID: videoTrackID),
-      let depthTrack = asset.track(withTrackID: depthTrackID)
+      let composition = composition,
+      let (avComposition, avVideoComposition) = composition.makeAVComposition()
     else {
-      return
+        return
     }
-    let videoComposition = AVMutableVideoComposition()
-    videoComposition.renderSize = CGSize(width: renderSize.width, height: renderSize.height)
-    videoComposition.frameDuration = CMTimeMake(value: 1, timescale: CMTimeScale(videoTrack.nominalFrameRate))
-    let composition = AVMutableComposition()
-
-    let compositionVideoTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: videoTrackID)
-    try? compositionVideoTrack?.insertTimeRange(videoTrack.timeRange, of: videoTrack, at: .zero)
-    let videoLayerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoTrack)
-    videoLayerInstruction.setTransform(videoTrack.preferredTransform, at: .zero)
-
-    let compositionDepthTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: depthTrackID)
-    try? compositionDepthTrack?.insertTimeRange(depthTrack.timeRange, of: depthTrack, at: .zero)
-    let depthLayerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: depthTrack)
-    depthLayerInstruction.setTransform(depthTrack.preferredTransform, at: .zero)
-
-    let instruction = AVMutableVideoCompositionInstruction()
-    instruction.layerInstructions = [
-      videoLayerInstruction,
-      depthLayerInstruction,
-    ]
-    instruction.backgroundColor = UIColor.black.cgColor
-    instruction.enablePostProcessing = true
-    let timeRange = CMTimeRangeMake(start: CMTime.zero, duration: composition.duration)
-    instruction.timeRange = timeRange
-    videoComposition.instructions = [instruction]
-    videoComposition.customVideoCompositorClass = HSVideoCompositor.self
-    playerItem = AVPlayerItem(asset: asset)
-    playerItem?.videoComposition = videoComposition
+    playerItem = AVPlayerItem(asset: avComposition)
+    playerItem?.videoComposition = avVideoComposition
     if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
-      compositor.depthTrackID = depthTrackID
-      compositor.videoTrackID = videoTrackID
+      compositor.depthTrackID = composition.depthTrackID
+      compositor.videoTrackID = composition.videoTrackID
       compositor.isDepthPreviewEnabled = isDepthPreviewEnabled
       compositor.isPortraitModeEnabled = isPortraitModeEnabled
     }
     player = AVQueuePlayer(playerItem: playerItem)
-    configureLooping(timeRange: timeRange)
+    configureLooping(timeRange: CMTimeRangeMake(start: CMTime.zero, duration: avComposition.duration))
     DispatchQueue.main.async {
       self.playerLayer.player = self.player
       self.player?.play()
@@ -120,18 +79,14 @@ class HSVideoCompositionView: UIView {
   @objc
   public var isDepthPreviewEnabled: Bool = false {
     didSet {
-      if let asset = asset {
-        configure(asset: asset)
-      }
+      configurePlayer()
     }
   }
 
   @objc
   public var isPortraitModeEnabled: Bool = false {
     didSet {
-      if let asset = asset {
-        configure(asset: asset)
-      }
+      configurePlayer()
     }
   }
 

@@ -13,6 +13,14 @@ class HSCameraManager: NSObject {
     case recording(toURL: URL, startTime: CMTime)
     case waitingForFileOutputToFinish(toURL: URL)
   }
+  
+  internal enum MetadataKeys: String {
+    case aperture = "HS/aperture"
+    
+    public var identifier: AVMetadataIdentifier {
+      return AVMetadataIdentifier(rawValue: rawValue)
+    }
+  }
 
   private var state: State = .none
   private let cameraOutputQueue = DispatchQueue(label: "com.jonbrennecke.HSCameraManager.cameraOutputQueue")
@@ -32,6 +40,7 @@ class HSCameraManager: NSObject {
   private var assetWriter = HSVideoWriter()
   private var assetWriterDepthInput: HSVideoWriterFrameBufferInput?
   private var assetWriterVideoInput: HSVideoWriterFrameBufferInput?
+  private var assetWriterMetadataInput: HSVideoWriterMetadataInput?
 
   private lazy var depthDataConverter: HSAVDepthDataToPixelBufferConverter? = {
     guard let size = depthResolution else {
@@ -113,13 +122,16 @@ class HSCameraManager: NSObject {
       pixelFormatType: videoPixelFormat,
       isRealTime: false
     )
+    assetWriterMetadataInput = HSVideoWriterMetadataInput()
     // order is important here, if the video track is added first it will be the one visible in Photos app
     guard
       case .success = assetWriter.prepareToRecord(to: outputURL),
       let videoInput = assetWriterVideoInput,
       case .success = assetWriter.add(input: videoInput),
       let depthInput = assetWriterDepthInput,
-      case .success = assetWriter.add(input: depthInput)
+      case .success = assetWriter.add(input: depthInput),
+      let metadataInput = assetWriterMetadataInput,
+      case .success = assetWriter.add(input: metadataInput)
     else {
       return .failure
     }
@@ -458,9 +470,16 @@ class HSCameraManager: NSObject {
       if case let .recording(_, startTime) = self.state {
         self.assetWriterVideoInput?.finish()
         self.assetWriterDepthInput?.finish()
+        self.assetWriterMetadataInput?.finish()
         let endTime = CMClockGetTime(self.clock)
         self.state = .stopped(startTime: startTime, endTime: endTime)
         self.assetWriter.stopRecording(at: endTime) { url in
+          if let metadataInput = self.assetWriterMetadataInput {
+            let item = AVMutableMetadataItem()
+            item.identifier = MetadataKeys.aperture.identifier
+            item.value = String(format: "%.2f", self.aperture) as NSString
+            metadataInput.append(item)
+          }
           PHPhotoLibrary.shared().performChanges({
             PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
             completionHandler(true)
