@@ -377,8 +377,7 @@ class HSCameraManager: NSObject {
   @objc(setExposure:withCompletionHandler:)
   public func setExposure(_ exposureBias: Float, _ completionHandler: @escaping () -> Void) {
     guard let videoCaptureDevice = videoCaptureDevice else {
-      completionHandler()
-      return
+      return completionHandler()
     }
     if case .some = try? videoCaptureDevice.lockForConfiguration() {
       videoCaptureDevice.exposureMode = .locked
@@ -403,6 +402,21 @@ class HSCameraManager: NSObject {
     return videoCaptureDevice.formats
       .filter({ $0.mediaType == .video })
       .map({ HSCameraFormat(format: $0) })
+  }
+  
+  @objc
+  public func setFormat(_ format: HSCameraFormat, _ completionHandler: @escaping () -> Void) {
+    guard let videoCaptureDevice = videoCaptureDevice else {
+      return completionHandler()
+    }
+    if let activeFormat = videoCaptureDevice.formats.first(where: { fmt in
+      let formatDescription = fmt.formatDescription
+      return CMFormatDescriptionGetMediaType(formatDescription) == format.mediaType
+       && CMFormatDescriptionGetMediaSubType(formatDescription) == format.mediaSubType
+       && Int(CMVideoFormatDescriptionGetDimensions(formatDescription).width) == format.dimensions.width
+    }) {
+      videoCaptureDevice.activeFormat = activeFormat
+    }
   }
 
   @objc

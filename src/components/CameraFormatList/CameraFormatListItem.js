@@ -1,6 +1,8 @@
 // @flow
 import React from 'react';
-import { View, Text } from 'react-native';
+import { TouchableOpacity, Text } from 'react-native';
+
+import { Units } from '../../constants';
 
 import type { SFC, Style } from '../../types';
 import type { CameraFormat } from '../../state';
@@ -9,22 +11,37 @@ export type CameraFormatListItemProps = {
   style?: ?Style,
   format: CameraFormat,
   depthFormat: CameraFormat,
+  onPress: () => void,
 };
 
 const styles = {
-  container: {},
+  container: {
+    paddingVertical: Units.small,
+  },
+  formatText: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: 'bold',
+    textAlign: 'left',
+  },
 };
 
 export const CameraFormatListItem: SFC<CameraFormatListItemProps> = ({
   style,
   format,
   depthFormat,
+  onPress,
 }: CameraFormatListItemProps) => (
-  <View style={[styles.container, style]}>
-    <Text>
-      {`${format.dimensions.width}x${format.dimensions.height} - ${
-        depthFormat.dimensions.width
-      }x${depthFormat.dimensions.height}`}
+  <TouchableOpacity style={[styles.container, style]} onPress={onPress}>
+    <Text style={styles.formatText}>
+      {`Video: ${formatDimensions(
+        format.dimensions
+      )} - Depth: ${formatDimensions(depthFormat.dimensions)}`}
     </Text>
-  </View>
+  </TouchableOpacity>
 );
+
+const formatDimensions = (dimensions: {
+  height: number,
+  width: number,
+}): string => `${dimensions.width}x${dimensions.height}`;

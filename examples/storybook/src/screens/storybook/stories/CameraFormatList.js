@@ -2,14 +2,15 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react-native';
 import { View, SafeAreaView } from 'react-native';
-import mapValues from 'lodash/mapValues';
+import noop from 'lodash/noop';
 
 import {
   CameraFormatList,
   CameraFormatListItem,
   requestCameraPermissions,
   getSupportedFormats,
-  filterBestAvailableFormats
+  filterBestAvailableFormats,
+  uniqueKeyForFormat
 } from '@jonbrennecke/react-native-camera';
 
 import { StorybookStateWrapper } from '../utils';
@@ -24,6 +25,10 @@ const styles = {
   flex: {
     flex: 1,
   },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#000',
+  }
 };
 
 const initialState: State = { bestAvailableFormats: [] };
@@ -41,7 +46,7 @@ const setup = async (getState, setState): Promise<void> => {
 };
 
 storiesOf('Camera', module).add('Camera Format List', () => (
-  <SafeAreaView style={styles.flex}>
+  <SafeAreaView style={styles.safeArea}>
     <StorybookStateWrapper
       initialState={initialState}
       onMount={setup}
@@ -50,11 +55,12 @@ storiesOf('Camera', module).add('Camera Format List', () => (
           <CameraFormatList
             style={styles.flex}
             items={Object.values(getState().bestAvailableFormats)}
-            keyForItem={({ format, depthFormat }) => `${format.dimensions.width}-${format.mediaSubType}-${depthFormat.mediaSubType}`}
+            keyForItem={({ format, depthFormat }) => uniqueKeyForFormat(format, depthFormat)}
             renderItem={({ format, depthFormat }) => (
               <CameraFormatListItem
                 format={format}
                 depthFormat={depthFormat}
+                onPress={noop}
               />
             )}
           />

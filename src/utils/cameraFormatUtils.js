@@ -27,3 +27,11 @@ export const filterBestAvailableFormats = (
     ),
   }));
 };
+
+export const uniqueKeyForFormat = (
+  format: CameraFormat,
+  depthFormat: CameraFormat
+) =>
+  `${format.dimensions.width}-${format.mediaSubType}-${
+    depthFormat.mediaSubType
+  }`;
