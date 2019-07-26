@@ -65,6 +65,7 @@ const Component = CameraStateContainer(
         fmt => fmt.dimensions.width
       )
     }));
+    
     bestFormatPairs
     return (
       <StorybookStateWrapper

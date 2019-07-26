@@ -7,14 +7,14 @@ public class HSCameraFormat: NSObject {
   let mediaType: CMMediaType
   let mediaSubType: FourCharCode
   let supportedFrameRates: [HSMinMaxInterval]
-  let supportedDepthFormats: [HSFormatInfo]
+  let supportedDepthFormats: [HSCameraFormat]
 
   public init(
     dimensions: Size<Int>,
     mediaType: CMMediaType,
     mediaSubType: FourCharCode,
     supportedFrameRates: [HSMinMaxInterval],
-    supportedDepthFormats: [HSFormatInfo]
+    supportedDepthFormats: [HSCameraFormat]
   ) {
     self.dimensions = dimensions
     self.mediaType = mediaType
@@ -31,7 +31,7 @@ public class HSCameraFormat: NSObject {
     let frameRates = format.videoSupportedFrameRateRanges.map {
       HSMinMaxInterval(min: Float($0.minFrameRate), max: Float($0.maxFrameRate))
     }
-    let depthFormats = format.supportedDepthDataFormats.map { HSFormatInfo(format: $0) }
+    let depthFormats = format.supportedDepthDataFormats.map { HSCameraFormat(format: $0) }
     self.init(
       dimensions: Size(width: Int(dimensions.width), height: Int(dimensions.height)),
       mediaType: mediaType,

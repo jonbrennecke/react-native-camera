@@ -61,7 +61,7 @@ RCT_EXPORT_METHOD(getSupportedFormats : (RCTResponseSenderBlock)callback) {
   HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
   NSMutableArray<id> *formats = [[NSMutableArray alloc]
       initWithCapacity:cameraManager.supportedFormats.count];
-  for (HSFormatInfo *format in cameraManager.supportedFormats) {
+  for (HSCameraFormat *format in cameraManager.supportedFormats) {
     [formats addObject:[format asDictionary]];
   }
   callback(@[ [NSNull null], formats ]);
