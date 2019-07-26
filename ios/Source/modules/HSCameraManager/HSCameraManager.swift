@@ -396,6 +396,16 @@ class HSCameraManager: NSObject {
   }
 
   @objc
+  public var supportedFormats: [HSCameraFormat]? {
+    guard let videoCaptureDevice = videoCaptureDevice else {
+      return nil
+    }
+    return videoCaptureDevice.formats
+      .filter({ $0.mediaType == .video })
+      .map({ HSCameraFormat(format: $0) })
+  }
+
+  @objc
   public func setupCameraCaptureSession() {
     if captureSession.isRunning {
       return

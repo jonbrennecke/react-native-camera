@@ -1,7 +1,7 @@
 // @flow
 import { createReducer } from './createReducer';
 import { createCameraState } from './cameraState';
-import * as cameraUtils from '../utils';
+import * as cameraUtils from '../utils/cameraUtils';
 
 import type { Action, Dispatch } from '../types';
 import type {
@@ -9,12 +9,14 @@ import type {
   CameraCaptureStatus,
   CameraISORange,
   CameraExposureRange,
+  CameraFormat,
 } from './cameraState';
 
 const CameraState = createCameraState({
   captureStatus: 'stopped',
   supportedISORange: { min: 0, max: 16000 },
   supportedExposureRange: { min: 0, max: 16000 },
+  supportedFormats: [],
   iso: 0,
   exposure: 0,
 });
@@ -50,6 +52,16 @@ const reducers = {
       return state;
     }
     return state.setSupportedExposureRange(payload.range);
+  },
+
+  setSupportedFormats: (
+    state,
+    { payload }: Action<{ formats: CameraFormat[] }>
+  ): ICameraState => {
+    if (!payload) {
+      return state;
+    }
+    return state.setSupportedFormats(payload.formats);
   },
 
   setISO: (state, { payload }: Action<{ iso: number }>): ICameraState => {
@@ -105,6 +117,7 @@ export const actionCreators = {
   loadSupportedFeatures: () => async (dispatch: Dispatch<*>) => {
     await dispatch(actionCreators.loadSupportedISORange());
     await dispatch(actionCreators.loadSupportedExposureRange());
+    await dispatch(actionCreators.loadSupportedFormats());
   },
 
   updateISO: (iso: number) => async (dispatch: Dispatch<*>) => {
@@ -115,5 +128,10 @@ export const actionCreators = {
   updateExposure: (exposure: number) => async (dispatch: Dispatch<*>) => {
     await cameraUtils.setExposure(exposure);
     dispatch(actionCreators.setExposure({ exposure }));
+  },
+
+  loadSupportedFormats: () => async (dispatch: Dispatch<any>) => {
+    const formats = await cameraUtils.getSupportedFormats();
+    dispatch(actionCreators.setSupportedFormats({ formats }));
   },
 };

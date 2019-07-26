@@ -57,6 +57,16 @@ RCT_EXPORT_METHOD(setExposure
        }];
 }
 
+RCT_EXPORT_METHOD(getSupportedFormats : (RCTResponseSenderBlock)callback) {
+  HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
+  NSMutableArray<id> *formats = [[NSMutableArray alloc]
+      initWithCapacity:cameraManager.supportedFormats.count];
+  for (HSFormatInfo *format in cameraManager.supportedFormats) {
+    [formats addObject:[format asDictionary]];
+  }
+  callback(@[ [NSNull null], formats ]);
+}
+
 RCT_EXPORT_METHOD(startCameraPreview) {
   HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
   [cameraManager setupCameraCaptureSession];

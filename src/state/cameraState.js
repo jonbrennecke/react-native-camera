@@ -9,11 +9,21 @@ export type Range = { min: number, max: number };
 
 export type CameraISORange = Range;
 export type CameraExposureRange = Range;
+export type CameraFrameRateRange = Range;
+
+export type CameraFormat = {
+  dimensions: { width: number, height: number },
+  mediaType: string,
+  mediaSubType: string,
+  supportedFrameRates: CameraFrameRateRange,
+  supportedDepthFormats: CameraFormat[],
+};
 
 export type CameraStateObject = {
   captureStatus: CameraCaptureStatus,
   supportedISORange: CameraISORange,
   supportedExposureRange: CameraExposureRange,
+  supportedFormats: CameraFormat[],
   iso: number,
   exposure: number,
 };
@@ -29,6 +39,9 @@ export interface ICameraState {
 
   getSupportedExposureRange(): CameraExposureRange;
   setSupportedExposureRange(range: CameraExposureRange): ICameraState;
+
+  getSupportedFormats(): CameraFormat[];
+  setSupportedFormats(formats: CameraFormat[]): ICameraState;
 
   getISO(): number;
   setISO(iso: number): ICameraState;
@@ -64,6 +77,14 @@ export const createCameraState: CameraStateObject => Class<
 
     setSupportedExposureRange(range: CameraExposureRange): ICameraState {
       return this.set('supportedExposureRange', range);
+    }
+
+    getSupportedFormats(): CameraFormat[] {
+      return this.get('supportedFormats');
+    }
+
+    setSupportedFormats(formats: CameraFormat[]) {
+      return this.set('supportedFormats', formats);
     }
 
     getISO(): number {

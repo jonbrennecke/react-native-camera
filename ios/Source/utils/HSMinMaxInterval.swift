@@ -1,7 +1,7 @@
 import Foundation
 
 @objc
-class HSMinMaxInterval: NSObject {
+public class HSMinMaxInterval: NSObject {
   public let min: Float
   public let max: Float
 

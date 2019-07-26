@@ -10,6 +10,7 @@ import {
   selectSupportedExposureRange,
   selectISO,
   selectExposure,
+  selectSupportedFormats,
 } from './';
 
 import type { ComponentType } from 'react';
@@ -34,8 +35,6 @@ type StateProps = {
 type DispatchProps = {
   startCapture: () => any,
   stopCapture: ({ saveToCameraRoll: boolean }) => any,
-  loadSupportedISORange: () => any,
-  loadSupportedExposureRange: () => any,
   loadSupportedFeatures: () => any,
   updateISO: (iso: number) => any,
 };
@@ -47,6 +46,7 @@ function mapCameraStateToProps(state: ICameraState): StateProps {
     captureStatus: selectCaptureStatus(state),
     supportedISORange: selectSupportedISORange(state),
     supportedExposureRange: selectSupportedExposureRange(state),
+    supportedFormats: selectSupportedFormats(state),
     iso: selectISO(state),
     exposure: selectExposure(state),
   };
@@ -57,10 +57,6 @@ function mapCameraDispatchToProps(dispatch: Dispatch<any>): DispatchProps {
     startCapture: () => dispatch(actionCreators.startCapture()),
     stopCapture: (args: { saveToCameraRoll: boolean }) =>
       dispatch(actionCreators.stopCapture(args)),
-    loadSupportedISORange: () =>
-      dispatch(actionCreators.loadSupportedISORange()),
-    loadSupportedExposureRange: () =>
-      dispatch(actionCreators.loadSupportedExposureRange()),
     loadSupportedFeatures: () =>
       dispatch(actionCreators.loadSupportedFeatures()),
     updateISO: (iso: number) => dispatch(actionCreators.updateISO(iso)),

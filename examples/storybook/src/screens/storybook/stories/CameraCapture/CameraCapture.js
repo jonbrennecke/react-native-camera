@@ -3,6 +3,9 @@ import React from 'react';
 import { storiesOf } from '@storybook/react-native';
 import { SafeAreaView } from 'react-native';
 import { Provider } from 'react-redux';
+import groupBy from 'lodash/groupBy';
+import maxBy from 'lodash/maxBy';
+import mapValues from 'lodash/mapValues';
 
 import {
   CameraSettingIdentifiers,
@@ -37,6 +40,7 @@ const Component = CameraStateContainer(
     exposure,
     supportedISORange,
     supportedExposureRange,
+    supportedFormats,
     loadSupportedFeatures,
     updateISO,
     updateExposure,
@@ -51,6 +55,17 @@ const Component = CameraStateContainer(
         console.error(error);
       }
     };
+
+    const formatsWithDepth = supportedFormats.filter(fmt => !!fmt.supportedDepthFormats.length);
+    const groupedFormats = groupBy(formatsWithDepth, fmt => `${fmt.dimensions.width},${fmt.dimensions.height}`)
+    const bestFormatPairs = mapValues(groupedFormats, formats => ({
+      format: formats.find(fmt => maxBy(fmt.supportedDepthFormats, depthFmt => depthFmt.dimensions.width)),
+      depthFormat: maxBy(
+        formats.map(fmt => maxBy(fmt.supportedDepthFormats, depthFmt => depthFmt.dimensions.width)),
+        fmt => fmt.dimensions.width
+      )
+    }));
+    bestFormatPairs
     return (
       <StorybookStateWrapper
         initialState={{

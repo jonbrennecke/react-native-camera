@@ -65,3 +65,9 @@ export const setISO = async (iso: number): Promise<void> => {
 export const setExposure = async (exposure: number): Promise<void> => {
   return await CameraManager.setExposureAsync(exposure);
 };
+
+export const getSupportedFormats = async (): Promise<
+  { [key: string]: any }[]
+> => {
+  return await CameraManager.getSupportedFormatsAsync();
+};
