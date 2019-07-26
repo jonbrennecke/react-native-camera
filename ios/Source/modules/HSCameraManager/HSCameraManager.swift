@@ -313,6 +313,7 @@ class HSCameraManager: NSObject {
         device.exposurePointOfInterest = point
       }
       if device.isExposureModeSupported(.continuousAutoExposure) {
+        device.setExposureTargetBias(0)
         device.exposureMode = .continuousAutoExposure
       }
 
@@ -403,7 +404,7 @@ class HSCameraManager: NSObject {
       .filter({ $0.mediaType == .video })
       .map({ HSCameraFormat(format: $0) })
   }
-  
+
   @objc
   public func setFormat(_ format: HSCameraFormat, _ completionHandler: @escaping () -> Void) {
     guard let videoCaptureDevice = videoCaptureDevice else {
@@ -412,8 +413,8 @@ class HSCameraManager: NSObject {
     if let activeFormat = videoCaptureDevice.formats.first(where: { fmt in
       let formatDescription = fmt.formatDescription
       return CMFormatDescriptionGetMediaType(formatDescription) == format.mediaType
-       && CMFormatDescriptionGetMediaSubType(formatDescription) == format.mediaSubType
-       && Int(CMVideoFormatDescriptionGetDimensions(formatDescription).width) == format.dimensions.width
+        && CMFormatDescriptionGetMediaSubType(formatDescription) == format.mediaSubType
+        && Int(CMVideoFormatDescriptionGetDimensions(formatDescription).width) == format.dimensions.width
     }) {
       videoCaptureDevice.activeFormat = activeFormat
     }
