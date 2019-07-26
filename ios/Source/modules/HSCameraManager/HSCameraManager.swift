@@ -13,10 +13,10 @@ class HSCameraManager: NSObject {
     case recording(toURL: URL, startTime: CMTime)
     case waitingForFileOutputToFinish(toURL: URL)
   }
-  
+
   internal enum MetadataKeys: String {
     case aperture = "HS/aperture"
-    
+
     public var identifier: AVMetadataIdentifier {
       return AVMetadataIdentifier(rawValue: rawValue)
     }
@@ -348,7 +348,7 @@ class HSCameraManager: NSObject {
     }
     return HSMinMaxInterval(min: format.minISO, max: format.maxISO)
   }
-  
+
   public var iso: Float {
     return videoCaptureDevice?.iso ?? 0
   }
@@ -398,7 +398,7 @@ class HSCameraManager: NSObject {
       completionHandler()
     }
   }
-  
+
   public var aperture: Float {
     return videoCaptureDevice?.lensAperture ?? 0
   }
@@ -460,12 +460,12 @@ class HSCameraManager: NSObject {
       }
     }
   }
-  
+
   private func setupMetadata() {
     let item = AVMutableMetadataItem()
     item.identifier = MetadataKeys.aperture.identifier
-    item.value = String(format: "%.2f", self.aperture) as NSString
-    guard case .success = self.assetWriter.add(metadataItem: item) else {
+    item.value = String(format: "%.2f", aperture) as NSString
+    guard case .success = assetWriter.add(metadataItem: item) else {
       return
     }
   }

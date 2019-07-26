@@ -5,7 +5,10 @@ import { createMediaStateHOC } from '@jonbrennecke/react-native-media';
 import { autobind } from 'core-decorators';
 import identity from 'lodash/identity';
 
-import { exportComposition, addVideoCompositionExportProgressListener } from '../../utils';
+import {
+  exportComposition,
+  addVideoCompositionExportProgressListener,
+} from '../../utils';
 
 import type { ComponentType } from 'react';
 import type {
@@ -50,7 +53,9 @@ export function wrapWithVideoCompositionEditState<
         isPortraitModeEnabled: true,
         isDepthPreviewEnabled: false,
       };
-      exportListener: ?ReturnType<typeof addVideoCompositionExportProgressListener>;
+      exportListener: ?ReturnType<
+        typeof addVideoCompositionExportProgressListener
+      >;
 
       togglePortraitMode() {
         this.setState({
@@ -65,12 +70,14 @@ export function wrapWithVideoCompositionEditState<
       }
 
       async exportAsset(assetID: string) {
-        this.exportListener = addVideoCompositionExportProgressListener(this.onExportProgress)
+        this.exportListener = addVideoCompositionExportProgressListener(
+          this.onExportProgress
+        );
         await exportComposition(assetID);
       }
 
       onExportProgress(progress: number) {
-        this.setState({ exportProgress: progress })
+        this.setState({ exportProgress: progress });
       }
 
       render() {

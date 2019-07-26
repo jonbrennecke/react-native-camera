@@ -36,9 +36,9 @@ const styles = {
     paddingHorizontal: align !== 'center' ? Units.small : 0,
     alignItems: 'center',
     justifyContent: {
-      'left': 'flex-start',
-      'right': 'flex-end',
-      'center': 'center'
+      left: 'flex-start',
+      right: 'flex-end',
+      center: 'center',
     }[align],
     flexDirection: 'row',
   }),

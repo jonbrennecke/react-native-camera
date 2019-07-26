@@ -29,9 +29,7 @@
 }
 
 - (NSArray<NSString *> *)supportedEvents {
-  return @[
-    @"videoExportManagerDidUpdateProgress"
-  ];
+  return @[ @"videoExportManagerDidUpdateProgress" ];
 }
 
 RCT_EXPORT_MODULE(HSVideoCompositionExportManager)
@@ -92,7 +90,7 @@ RCT_EXPORT_METHOD(export
   if (!hasListeners) {
     return;
   }
-  id body = @{ @"progess": @(progress) };
+  id body = @{ @"progess" : @(progress) };
   [self sendEventWithName:@"videoExportManagerDidUpdateProgress" body:body];
 }
 

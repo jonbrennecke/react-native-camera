@@ -23,11 +23,11 @@ export const exportComposition = async (assetID: string) => {
   await VideoCompositionExportManager.exportAsync(assetID);
 };
 
-export const addVideoCompositionExportProgressListener = (listener: (progress: number) => void) => {
+export const addVideoCompositionExportProgressListener = (
+  listener: (progress: number) => void
+) => {
   return VideoCompositionExportManagerEventEmitter.addListener(
     VideoCompositionExportManagerEvents.DidUpdateProgress,
     listener
   );
-}
-
-
+};

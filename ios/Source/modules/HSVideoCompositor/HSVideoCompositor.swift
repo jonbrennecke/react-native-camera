@@ -8,16 +8,15 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
   }
 
   private var renderingQueue = DispatchQueue(label: "com.jonbrennecke.hsvideocompositor.renderingqueue")
-  private var renderingContextQueue = DispatchQueue(label: "com.jonbrennecke.hsvideocompositor.rendercontextqueue")
   private var renderContext: AVVideoCompositionRenderContext?
-  
+
   private lazy var mtlDevice: MTLDevice! = {
     guard let mtlDevice = MTLCreateSystemDefaultDevice() else {
       fatalError("Failed to create Metal device")
     }
     return mtlDevice
   }()
-  
+
   private lazy var context = CIContext(mtlDevice: mtlDevice)
   private lazy var depthBlurEffect = HSDepthBlurEffect()
 
@@ -65,33 +64,37 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
   var shouldCancelAllRequests: Bool = false
 
   func renderContextChanged(_ newContext: AVVideoCompositionRenderContext) {
-    renderingContextQueue.sync {
-      renderContext = newContext
+    renderingQueue.sync { [weak self] in
+      self?.renderContext = newContext
     }
   }
 
   func startRequest(_ request: AVAsynchronousVideoCompositionRequest) {
     autoreleasepool {
-      renderingQueue.sync { // TODO: sync or async?
-        if self.shouldCancelAllRequests {
+      renderingQueue.async { [weak self] in
+        guard let strongSelf = self else { return }
+        if strongSelf.shouldCancelAllRequests {
           request.finishCancelledRequest()
           return
         }
-        guard let pixelBuffer = self.composePixelBuffer(with: request) else {
+        if let pixelBuffer = strongSelf.composePixelBuffer(with: request) {
+          request.finish(withComposedVideoFrame: pixelBuffer)
+        } else {
+          // at least try to generate a blank pixel buffer
+          if let pixelBuffer = strongSelf.renderContext?.newPixelBuffer() {
+            request.finish(withComposedVideoFrame: pixelBuffer)
+            return
+          }
           request.finish(with: VideoCompositionRequestError.failedToComposePixelBuffer)
-          return
         }
-        request.finish(withComposedVideoFrame: pixelBuffer)
       }
     }
   }
 
   func cancelAllPendingVideoCompositionRequests() {
-    renderingQueue.sync {
-      shouldCancelAllRequests = true
-    }
-    renderingQueue.async {
-      self.shouldCancelAllRequests = false
+    shouldCancelAllRequests = true
+    renderingQueue.async { [weak self] in
+      self?.shouldCancelAllRequests = false
     }
   }
 }

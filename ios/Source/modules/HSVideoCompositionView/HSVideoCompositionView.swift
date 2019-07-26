@@ -9,7 +9,7 @@ class HSVideoCompositionView: UIView {
   private var player: AVQueuePlayer?
   private var playerItem: AVPlayerItem?
   private var playerLooper: AVPlayerLooper?
-  
+
   private var composition: HSVideoComposition? {
     didSet {
       configurePlayer()
@@ -46,9 +46,10 @@ class HSVideoCompositionView: UIView {
       let composition = composition,
       let (avComposition, avVideoComposition) = composition.makeAVComposition()
     else {
-        return
+      return
     }
     playerItem = AVPlayerItem(asset: avComposition)
+    playerItem?.addObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), options: [.old, .new], context: nil)
     playerItem?.videoComposition = avVideoComposition
     if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
       compositor.depthTrackID = composition.depthTrackID
@@ -57,10 +58,28 @@ class HSVideoCompositionView: UIView {
       compositor.isPortraitModeEnabled = isPortraitModeEnabled
     }
     player = AVQueuePlayer(playerItem: playerItem)
+    player?.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.old, .new], context: nil)
     // TODO: configureLooping(timeRange: CMTimeRangeMake(start: CMTime.zero, duration: avComposition.duration))
     DispatchQueue.main.async {
       self.playerLayer.player = self.player
       self.player?.play()
+    }
+  }
+
+  override func observeValue(
+    forKeyPath keyPath: String?, of _: Any?, change: [NSKeyValueChangeKey: Any]?, context _: UnsafeMutableRawPointer?
+  ) {
+    if
+      keyPath == #keyPath(AVPlayer.status),
+      let statusRawValue = change?[.newKey] as? NSNumber,
+      let status = AVPlayer.Status(rawValue: statusRawValue.intValue) {
+      // TODO:
+    }
+    if
+      keyPath == #keyPath(AVPlayerItem.status),
+      let statusRawValue = change?[.newKey] as? NSNumber,
+      let status = AVPlayerItem.Status(rawValue: statusRawValue.intValue) {
+      // TODO:
     }
   }
 
