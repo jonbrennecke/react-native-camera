@@ -6,17 +6,32 @@ class HSVideoComposition: NSObject {
 
   internal let videoTrackID: CMPersistentTrackID
   internal let depthTrackID: CMPersistentTrackID
+  internal let aperture: Float
 
   @objc
-  public init(asset: AVAsset, videoTrackID: CMPersistentTrackID, depthTrackID: CMPersistentTrackID) {
+  public init(asset: AVAsset, videoTrackID: CMPersistentTrackID, depthTrackID: CMPersistentTrackID, aperture: Float) {
     self.asset = asset
     self.videoTrackID = videoTrackID
     self.depthTrackID = depthTrackID
+    self.aperture = aperture
+  }
+
+  private static func parse(metadata: [AVMetadataItem]) -> Float? {
+    let keySpace = AVMetadataKeySpace.quickTimeUserData
+    let key = AVMetadataKey.quickTimeUserDataKeyInformation
+    let items = AVMetadataItem.metadataItems(from: metadata, withKey: key, keySpace: keySpace)
+    if let str = items.first?.value as? String {
+      let formatter = NumberFormatter()
+      formatter.numberStyle = .decimal
+      let aperture = formatter.number(from: str)
+      return aperture?.floatValue
+    }
+    return nil
   }
 
   @objc(compositionByLoadingAsset:withCompletionHandler:)
   public static func composition(ByLoading asset: AVAsset, _ completionHandler: @escaping (HSVideoComposition?) -> Void) {
-    asset.loadValuesAsynchronously(forKeys: ["tracks"]) {
+    asset.loadValuesAsynchronously(forKeys: ["tracks", "metadata"]) {
       guard
         let depthTrack = asset.tracks.first(where: { isGrayscaleVideoTrack($0) }),
         let videoTrack = asset.tracks.first(where: { isColorVideoTrack($0) })
@@ -24,10 +39,12 @@ class HSVideoComposition: NSObject {
         completionHandler(nil)
         return
       }
+      let aperture = parse(metadata: asset.metadata) ?? 2.2
       let composition = HSVideoComposition(
         asset: asset,
         videoTrackID: videoTrack.trackID,
-        depthTrackID: depthTrack.trackID
+        depthTrackID: depthTrack.trackID,
+        aperture: aperture
       )
       completionHandler(composition)
     }

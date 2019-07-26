@@ -14,14 +14,6 @@ class HSCameraManager: NSObject {
     case waitingForFileOutputToFinish(toURL: URL)
   }
 
-  internal enum MetadataKeys: String {
-    case aperture = "HS/aperture"
-
-    public var identifier: AVMetadataIdentifier {
-      return AVMetadataIdentifier(rawValue: rawValue)
-    }
-  }
-
   private var state: State = .none
   private let cameraOutputQueue = DispatchQueue(label: "com.jonbrennecke.HSCameraManager.cameraOutputQueue")
   private let cameraSetupQueue = DispatchQueue(label: "com.jonbrennecke.HSCameraManager.cameraSetupQueue")
@@ -463,7 +455,8 @@ class HSCameraManager: NSObject {
 
   private func setupMetadata() {
     let item = AVMutableMetadataItem()
-    item.identifier = MetadataKeys.aperture.identifier
+    item.keySpace = AVMetadataKeySpace.quickTimeUserData
+    item.key = AVMetadataKey.quickTimeUserDataKeyInformation as NSString
     item.value = String(format: "%.2f", aperture) as NSString
     guard case .success = assetWriter.add(metadataItem: item) else {
       return

@@ -19,10 +19,8 @@ class HSVideoCompositionView: UIView {
   private var asset: AVAsset? {
     didSet {
       if let asset = asset {
-        asset.loadValuesAsynchronously(forKeys: ["tracks", "metadata"]) {
-          HSVideoComposition.composition(ByLoading: asset) { composition in
-            self.composition = composition
-          }
+        HSVideoComposition.composition(ByLoading: asset) { composition in
+          self.composition = composition
         }
       }
     }
@@ -46,6 +44,7 @@ class HSVideoCompositionView: UIView {
       let composition = composition,
       let (avComposition, avVideoComposition) = composition.makeAVComposition()
     else {
+      // TODO: throw an error
       return
     }
     playerItem = AVPlayerItem(asset: avComposition)
@@ -54,12 +53,13 @@ class HSVideoCompositionView: UIView {
     if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
       compositor.depthTrackID = composition.depthTrackID
       compositor.videoTrackID = composition.videoTrackID
+      compositor.aperture = composition.aperture
       compositor.isDepthPreviewEnabled = isDepthPreviewEnabled
       compositor.isPortraitModeEnabled = isPortraitModeEnabled
     }
     player = AVQueuePlayer(playerItem: playerItem)
     player?.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.old, .new], context: nil)
-    // TODO: configureLooping(timeRange: CMTimeRangeMake(start: CMTime.zero, duration: avComposition.duration))
+//    configureLooping(timeRange: CMTimeRangeMake(start: CMTime.zero, duration: avComposition.duration))
     DispatchQueue.main.async {
       self.playerLayer.player = self.player
       self.player?.play()

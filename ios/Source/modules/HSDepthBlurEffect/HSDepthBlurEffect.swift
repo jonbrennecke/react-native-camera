@@ -17,10 +17,14 @@ class HSDepthBlurEffect {
     return CIDetector(ofType: CIDetectorTypeFace, context: nil, options: options)
   }()
 
-  public func makeEffectImage(depthPixelBuffer: HSPixelBuffer, videoPixelBuffer: HSPixelBuffer) -> CIImage? {
+  public func makeEffectImage(
+    depthPixelBuffer: HSPixelBuffer,
+    videoPixelBuffer: HSPixelBuffer,
+    aperture: Float
+  ) -> CIImage? {
     guard
       let faceDetector = faceDetector,
-      let depthBlurFilter = buildDepthBlurCIFilter(),
+      let depthBlurFilter = buildDepthBlurCIFilter(aperture: aperture),
       let videoImage = HSImageBuffer(pixelBuffer: videoPixelBuffer).makeCIImage(),
       let depthImage = HSImageBuffer(pixelBuffer: depthPixelBuffer).makeCIImage()
     else {
@@ -43,15 +47,15 @@ class HSDepthBlurEffect {
   }
 }
 
-fileprivate func buildDepthBlurCIFilter() -> CIFilter? {
+fileprivate func buildDepthBlurCIFilter(aperture: Float) -> CIFilter? {
   guard let filter = CIFilter(name: "CIDepthBlurEffect") else {
     return nil
   }
   filter.setDefaults()
   filter.setValue(1, forKey: "inputScaleFactor")
+  filter.setValue(aperture, forKey: "inputAperture")
   //    filter.setValue(inputCalibrationData, forKey: "inputCalibrationData")
   //    filter.setValue(inputAuxDataMetadata, forKey: "inputAuxDataMetadata")
-//      filter.setValue(inputAperture, forKey: "inputAperture")
   //    filter.setValue(inputFocusRect, forKey: "inputFocusRect")
   return filter
 }
