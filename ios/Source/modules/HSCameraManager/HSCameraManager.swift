@@ -40,7 +40,6 @@ class HSCameraManager: NSObject {
   private var assetWriter = HSVideoWriter()
   private var assetWriterDepthInput: HSVideoWriterFrameBufferInput?
   private var assetWriterVideoInput: HSVideoWriterFrameBufferInput?
-  private var assetWriterMetadataInput: HSVideoWriterMetadataInput?
 
   private lazy var depthDataConverter: HSAVDepthDataToPixelBufferConverter? = {
     guard let size = depthResolution else {
@@ -122,16 +121,13 @@ class HSCameraManager: NSObject {
       pixelFormatType: videoPixelFormat,
       isRealTime: false
     )
-    assetWriterMetadataInput = HSVideoWriterMetadataInput()
     // order is important here, if the video track is added first it will be the one visible in Photos app
     guard
       case .success = assetWriter.prepareToRecord(to: outputURL),
       let videoInput = assetWriterVideoInput,
       case .success = assetWriter.add(input: videoInput),
       let depthInput = assetWriterDepthInput,
-      case .success = assetWriter.add(input: depthInput),
-      let metadataInput = assetWriterMetadataInput,
-      case .success = assetWriter.add(input: metadataInput)
+      case .success = assetWriter.add(input: depthInput)
     else {
       return .failure
     }
@@ -451,6 +447,7 @@ class HSCameraManager: NSObject {
           completionHandler(nil, false)
           return
         }
+        self.setupMetadata()
         let startTime = CMClockGetTime(self.clock)
         guard case .success = self.assetWriter.startRecording(at: startTime) else {
           completionHandler(nil, false)
@@ -463,6 +460,15 @@ class HSCameraManager: NSObject {
       }
     }
   }
+  
+  private func setupMetadata() {
+    let item = AVMutableMetadataItem()
+    item.identifier = MetadataKeys.aperture.identifier
+    item.value = String(format: "%.2f", self.aperture) as NSString
+    guard case .success = self.assetWriter.add(metadataItem: item) else {
+      return
+    }
+  }
 
   @objc(stopCaptureAndSaveToCameraRoll:completionHandler:)
   public func stopCapture(andSaveToCameraRoll _: Bool, _ completionHandler: @escaping (Bool) -> Void) {
@@ -470,16 +476,9 @@ class HSCameraManager: NSObject {
       if case let .recording(_, startTime) = self.state {
         self.assetWriterVideoInput?.finish()
         self.assetWriterDepthInput?.finish()
-        self.assetWriterMetadataInput?.finish()
         let endTime = CMClockGetTime(self.clock)
         self.state = .stopped(startTime: startTime, endTime: endTime)
         self.assetWriter.stopRecording(at: endTime) { url in
-          if let metadataInput = self.assetWriterMetadataInput {
-            let item = AVMutableMetadataItem()
-            item.identifier = MetadataKeys.aperture.identifier
-            item.value = String(format: "%.2f", self.aperture) as NSString
-            metadataInput.append(item)
-          }
           PHPhotoLibrary.shared().performChanges({
             PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
             completionHandler(true)

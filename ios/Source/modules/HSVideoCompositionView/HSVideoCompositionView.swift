@@ -19,8 +19,10 @@ class HSVideoCompositionView: UIView {
   private var asset: AVAsset? {
     didSet {
       if let asset = asset {
-        HSVideoComposition.composition(ByLoading: asset) { composition in
-          self.composition = composition
+        asset.loadValuesAsynchronously(forKeys: ["tracks", "metadata"]) {
+          HSVideoComposition.composition(ByLoading: asset) { composition in
+            self.composition = composition
+          }
         }
       }
     }
@@ -55,7 +57,7 @@ class HSVideoCompositionView: UIView {
       compositor.isPortraitModeEnabled = isPortraitModeEnabled
     }
     player = AVQueuePlayer(playerItem: playerItem)
-    configureLooping(timeRange: CMTimeRangeMake(start: CMTime.zero, duration: avComposition.duration))
+    // TODO: configureLooping(timeRange: CMTimeRangeMake(start: CMTime.zero, duration: avComposition.duration))
     DispatchQueue.main.async {
       self.playerLayer.player = self.player
       self.player?.play()

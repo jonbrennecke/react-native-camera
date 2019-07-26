@@ -51,8 +51,7 @@ fileprivate func buildDepthBlurCIFilter() -> CIFilter? {
   filter.setValue(1, forKey: "inputScaleFactor")
   //    filter.setValue(inputCalibrationData, forKey: "inputCalibrationData")
   //    filter.setValue(inputAuxDataMetadata, forKey: "inputAuxDataMetadata")
-  //    filter.setValue(inputAperture, forKey: "inputAperture")
-  //    filter.setValue(inputLumaNoiseScale, forKey: "inputLumaNoiseScale")
+//      filter.setValue(inputAperture, forKey: "inputAperture")
   //    filter.setValue(inputFocusRect, forKey: "inputFocusRect")
   return filter
 }

@@ -10,7 +10,15 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
   private var renderingQueue = DispatchQueue(label: "com.jonbrennecke.hsvideocompositor.renderingqueue")
   private var renderingContextQueue = DispatchQueue(label: "com.jonbrennecke.hsvideocompositor.rendercontextqueue")
   private var renderContext: AVVideoCompositionRenderContext?
-  private lazy var context = CIContext() // TODO: use metal context and NSNull color space
+  
+  private lazy var mtlDevice: MTLDevice! = {
+    guard let mtlDevice = MTLCreateSystemDefaultDevice() else {
+      fatalError("Failed to create Metal device")
+    }
+    return mtlDevice
+  }()
+  
+  private lazy var context = CIContext(mtlDevice: mtlDevice)
   private lazy var depthBlurEffect = HSDepthBlurEffect()
 
   public var depthTrackID: CMPersistentTrackID = kCMPersistentTrackID_Invalid
