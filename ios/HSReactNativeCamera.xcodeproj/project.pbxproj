@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		799D0FD2DC19472AA95ED5C4 /* libRNBlur.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E324372C3A6249038A329A4A /* libRNBlur.a */; };
 		FC03B62D22DFD6C700E283B3 /* HSPortraitMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC03B62C22DFD6C700E283B3 /* HSPortraitMask.swift */; };
 		FC03B63022DFDB0700E283B3 /* HSPortraitMaskFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC03B62F22DFDB0700E283B3 /* HSPortraitMaskFactory.swift */; };
 		FC03B63222DFEA0000E283B3 /* HSVideoCompositionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC03B63122DFEA0000E283B3 /* HSVideoCompositionView.swift */; };
@@ -142,7 +141,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				FCBFAF0B22CBE9CB00A0AC11 /* libHSCameraUtils.a in Frameworks */,
-				799D0FD2DC19472AA95ED5C4 /* libRNBlur.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
