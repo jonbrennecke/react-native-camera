@@ -24,6 +24,11 @@ RCT_EXPORT_METHOD(requestCameraPermissions : (RCTResponseSenderBlock)callback) {
   }];
 }
 
+RCT_EXPORT_METHOD(hasCameraPermissions : (RCTResponseSenderBlock)callback) {
+  BOOL hasPermissons = [HSCameraManager hasCameraPermissions];
+  callback(@[ [NSNull null], @(hasPermissons) ]);
+}
+
 RCT_EXPORT_METHOD(getSupportedISORange : (RCTResponseSenderBlock)callback) {
   HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
   NSDictionary *range = [cameraManager.supportedISORange asDictionary];

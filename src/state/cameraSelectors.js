@@ -19,3 +19,6 @@ export const selectExposure = (state: ICameraState) => state.getExposure();
 
 export const selectSupportedFormats = (state: ICameraState) =>
   state.getSupportedFormats();
+
+export const selectHasCameraPermissions = (state: ICameraState) =>
+  state.hasCameraPermissions();

@@ -98,3 +98,22 @@ fileprivate func isAuthorized() -> Bool {
   }
   return false
 }
+
+internal func permissionStatus(for permissions: [PermissionVariant]) -> Bool {
+  return permissions.allSatisfy { permissionStatus(for: $0) }
+}
+
+internal func permissionStatus(for permission: PermissionVariant) -> Bool {
+  switch permission {
+  case .captureDevice(mediaType: .audio):
+    return .authorized == AVCaptureDevice.authorizationStatus(for: .audio)
+  case .captureDevice(mediaType: .video):
+    return .authorized == AVCaptureDevice.authorizationStatus(for: .video)
+  case .mediaLibrary:
+    return .authorized == PHPhotoLibrary.authorizationStatus()
+  case .microphone:
+    return .authorized == AVCaptureDevice.authorizationStatus(for: .audio)
+  case .captureDevice:
+    return false
+  }
+}

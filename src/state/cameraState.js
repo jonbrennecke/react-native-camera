@@ -26,6 +26,7 @@ export type CameraStateObject = {
   supportedFormats: CameraFormat[],
   iso: number,
   exposure: number,
+  hasCameraPermissions: boolean
 };
 
 export type CameraStateRecord = RecordOf<CameraStateObject>;
@@ -48,6 +49,9 @@ export interface ICameraState {
 
   getExposure(): number;
   setExposure(exposure: number): ICameraState;
+
+  hasCameraPermissions(): boolean;
+  setHasCameraPermissions(hasCameraPermissions: boolean): ICameraState;
 }
 
 // eslint-disable-next-line flowtype/generic-spacing
@@ -101,5 +105,13 @@ export const createCameraState: CameraStateObject => Class<
 
     setExposure(exposure: number): ICameraState {
       return this.set('exposure', exposure);
+    }
+
+    hasCameraPermissions(): boolean {
+      return !!this.get('hasCameraPermissions');
+    }
+
+    setHasCameraPermissions(hasCameraPermissions: boolean): ICameraState {
+      return this.set('hasCameraPermissions', hasCameraPermissions);
     }
   };

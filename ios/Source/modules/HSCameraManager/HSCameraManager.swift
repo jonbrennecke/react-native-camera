@@ -323,15 +323,22 @@ class HSCameraManager: NSObject {
 
   // MARK: - objc interface
 
+  private static let requiredPermissions: [PermissionVariant] = [
+    .captureDevice(mediaType: .video),
+    .microphone,
+    .mediaLibrary,
+  ]
+
   @objc
   public static func requestCameraPermissions(_ callback: @escaping (Bool) -> Void) {
-    requestPermissions(for: [
-      .captureDevice(mediaType: .video),
-      .microphone,
-      .mediaLibrary,
-    ]) { success in
+    requestPermissions(for: requiredPermissions) { success in
       callback(success)
     }
+  }
+
+  @objc
+  public static func hasCameraPermissions() -> Bool {
+    return permissionStatus(for: requiredPermissions)
   }
 
   @objc

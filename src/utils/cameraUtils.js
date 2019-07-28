@@ -13,6 +13,10 @@ export const requestCameraPermissions = async (): Promise<boolean> => {
   return CameraManager.requestCameraPermissionsAsync();
 };
 
+export const hasCameraPermissions = async (): Promise<boolean> => {
+  return await CameraManager.hasCameraPermissionsAsync();
+};
+
 export const startCameraPreview = () => {
   CameraManager.startCameraPreview();
 };
@@ -66,6 +70,7 @@ export const setExposure = async (exposure: number): Promise<void> => {
   return await CameraManager.setExposureAsync(exposure);
 };
 
+// eslint-disable-next-line flowtype/generic-spacing
 export const getSupportedFormats = async (): Promise<
   { [key: string]: any }[]
 > => {

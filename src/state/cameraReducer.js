@@ -19,6 +19,7 @@ const CameraState = createCameraState({
   supportedFormats: [],
   iso: 0,
   exposure: 0,
+  hasCameraPermissions: false,
 });
 
 export const initialState = new CameraState();
@@ -80,6 +81,16 @@ const reducers = {
     }
     return state.setExposure(payload.exposure);
   },
+
+  setHasCameraPermissions: (
+    state,
+    { payload }: Action<{ hasCameraPermissions: boolean }>
+  ): ICameraState => {
+    if (!payload) {
+      return state
+    }
+    return state.setHasCameraPermissions(payload.hasCameraPermissions);
+  }
 };
 
 export const {
@@ -134,4 +145,9 @@ export const actionCreators = {
     const formats = await cameraUtils.getSupportedFormats();
     dispatch(actionCreators.setSupportedFormats({ formats }));
   },
+
+  loadCameraPermissions: () => async (dispatch: Dispatch<*>) => {
+    const hasCameraPermissions = await cameraUtils.hasCameraPermissions();
+    dispatch(actionCreators.setHasCameraPermissions({ hasCameraPermissions }));
+  }
 };

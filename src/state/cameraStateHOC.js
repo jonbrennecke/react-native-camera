@@ -11,6 +11,7 @@ import {
   selectISO,
   selectExposure,
   selectSupportedFormats,
+  selectHasCameraPermissions
 } from './';
 
 import type { ComponentType } from 'react';
@@ -33,6 +34,7 @@ type StateProps = {
   supportedFormats: CameraFormat[],
   iso: number,
   exposure: number,
+  hasCameraPermissions: boolean,
 };
 
 type DispatchProps = {
@@ -41,6 +43,7 @@ type DispatchProps = {
   loadSupportedFeatures: () => any,
   updateISO: (iso: number) => any,
   updateExposure: (exposure: number) => any,
+  loadCameraPermissions: () => any
 };
 
 export type CameraStateHOCProps = OwnProps & StateProps & DispatchProps;
@@ -53,6 +56,7 @@ function mapCameraStateToProps(state: ICameraState): $Exact<StateProps> {
     supportedFormats: selectSupportedFormats(state),
     iso: selectISO(state),
     exposure: selectExposure(state),
+    hasCameraPermissions: selectHasCameraPermissions(state),
   };
 }
 
@@ -68,6 +72,8 @@ function mapCameraDispatchToProps(
     updateISO: (iso: number) => dispatch(actionCreators.updateISO(iso)),
     updateExposure: (exposure: number) =>
       dispatch(actionCreators.updateExposure(exposure)),
+    loadCameraPermissions: () =>
+      dispatch(actionCreators.loadCameraPermissions())
   };
 }
 
