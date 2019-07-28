@@ -26,7 +26,7 @@ fileprivate func requestPermission(for permission: PermissionVariant, _ callback
   case let .captureDevice(mediaType: mediaType):
     authorizeCaptureDevice(with: mediaType, callback)
   case .mediaLibrary:
-    authorizeMicrophone(callback)
+    authorizeMediaLibrary(callback)
   case .microphone:
     authorizeMicrophone(callback)
   }

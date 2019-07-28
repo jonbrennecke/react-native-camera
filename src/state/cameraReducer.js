@@ -149,5 +149,10 @@ export const actionCreators = {
   loadCameraPermissions: () => async (dispatch: Dispatch<*>) => {
     const hasCameraPermissions = await cameraUtils.hasCameraPermissions();
     dispatch(actionCreators.setHasCameraPermissions({ hasCameraPermissions }));
+  },
+
+  requestCameraPermissions: () => async (dispatch: Dispatch<*>) => {
+    await cameraUtils.requestCameraPermissions();
+    await dispatch(actionCreators.loadCameraPermissions());
   }
 };
