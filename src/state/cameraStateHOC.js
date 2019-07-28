@@ -21,6 +21,7 @@ import type {
   CameraCaptureStatus,
   CameraISORange,
   CameraExposureRange,
+  CameraFormat,
 } from './';
 
 type OwnProps = {};
@@ -29,7 +30,9 @@ type StateProps = {
   captureStatus: CameraCaptureStatus,
   supportedISORange: CameraISORange,
   supportedExposureRange: CameraExposureRange,
+  supportedFormats: CameraFormat[],
   iso: number,
+  exposure: number,
 };
 
 type DispatchProps = {
@@ -37,11 +40,12 @@ type DispatchProps = {
   stopCapture: ({ saveToCameraRoll: boolean }) => any,
   loadSupportedFeatures: () => any,
   updateISO: (iso: number) => any,
+  updateExposure: (exposure: number) => any,
 };
 
 export type CameraStateHOCProps = OwnProps & StateProps & DispatchProps;
 
-function mapCameraStateToProps(state: ICameraState): StateProps {
+function mapCameraStateToProps(state: ICameraState): $Exact<StateProps> {
   return {
     captureStatus: selectCaptureStatus(state),
     supportedISORange: selectSupportedISORange(state),
@@ -52,7 +56,9 @@ function mapCameraStateToProps(state: ICameraState): StateProps {
   };
 }
 
-function mapCameraDispatchToProps(dispatch: Dispatch<any>): DispatchProps {
+function mapCameraDispatchToProps(
+  dispatch: Dispatch<any>
+): $Exact<DispatchProps> {
   return {
     startCapture: () => dispatch(actionCreators.startCapture()),
     stopCapture: (args: { saveToCameraRoll: boolean }) =>

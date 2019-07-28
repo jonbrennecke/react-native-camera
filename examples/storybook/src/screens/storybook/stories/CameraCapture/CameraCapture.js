@@ -66,7 +66,6 @@ const Component = CameraStateContainer(
       )
     }));
     
-    bestFormatPairs
     return (
       <StorybookStateWrapper
         initialState={{
