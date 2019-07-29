@@ -26,7 +26,7 @@ export type CameraStateObject = {
   supportedFormats: CameraFormat[],
   iso: number,
   exposure: number,
-  hasCameraPermissions: boolean
+  hasCameraPermissions: boolean,
 };
 
 export type CameraStateRecord = RecordOf<CameraStateObject>;

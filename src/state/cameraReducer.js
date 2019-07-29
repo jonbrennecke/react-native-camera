@@ -87,10 +87,10 @@ const reducers = {
     { payload }: Action<{ hasCameraPermissions: boolean }>
   ): ICameraState => {
     if (!payload) {
-      return state
+      return state;
     }
     return state.setHasCameraPermissions(payload.hasCameraPermissions);
-  }
+  },
 };
 
 export const {
@@ -154,5 +154,5 @@ export const actionCreators = {
   requestCameraPermissions: () => async (dispatch: Dispatch<*>) => {
     await cameraUtils.requestCameraPermissions();
     await dispatch(actionCreators.loadCameraPermissions());
-  }
+  },
 };
