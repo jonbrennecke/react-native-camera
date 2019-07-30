@@ -1,9 +1,8 @@
 // @flow
 import { createReducer } from './createReducer';
 import { createCameraState } from './cameraState';
-import * as cameraUtils from '../utils/cameraUtils';
 
-import type { Action, Dispatch } from '../types';
+import type { Action } from '../types';
 import type {
   ICameraState,
   CameraCaptureStatus,
@@ -19,6 +18,7 @@ const CameraState = createCameraState({
   supportedFormats: [],
   iso: 0,
   exposure: 0,
+  format: null,
   hasCameraPermissions: false,
 });
 
@@ -91,68 +91,19 @@ const reducers = {
     }
     return state.setHasCameraPermissions(payload.hasCameraPermissions);
   },
+
+  setFormat: (
+    state,
+    { payload }: Action<{ format: CameraFormat }>
+  ): ICameraState => {
+    if (!payload) {
+      return state;
+    }
+    return state.setFormat(payload.format);
+  },
 };
 
 export const {
   reducer,
   actionCreators: identityActionCreators,
 } = createReducer(initialState, reducers);
-
-export const actionCreators = {
-  ...identityActionCreators,
-
-  startCapture: () => async (dispatch: Dispatch<*>) => {
-    await cameraUtils.startCameraCapture();
-    dispatch(actionCreators.setCaptureStatus({ captureStatus: 'started' }));
-  },
-
-  stopCapture: ({
-    saveToCameraRoll = false,
-  }: {
-    saveToCameraRoll: boolean,
-  }) => async (dispatch: Dispatch<*>) => {
-    await cameraUtils.stopCameraCapture({ saveToCameraRoll });
-    dispatch(actionCreators.setCaptureStatus({ captureStatus: 'stopped' }));
-  },
-
-  loadSupportedISORange: () => async (dispatch: Dispatch<*>) => {
-    const range = await cameraUtils.getSupportedISORange();
-    dispatch(actionCreators.setSupportedISORange({ range }));
-  },
-
-  loadSupportedExposureRange: () => async (dispatch: Dispatch<*>) => {
-    const range = await cameraUtils.getSupportedExposureRange();
-    dispatch(actionCreators.setSupportedExposureRange({ range }));
-  },
-
-  loadSupportedFeatures: () => async (dispatch: Dispatch<*>) => {
-    await dispatch(actionCreators.loadSupportedISORange());
-    await dispatch(actionCreators.loadSupportedExposureRange());
-    await dispatch(actionCreators.loadSupportedFormats());
-  },
-
-  updateISO: (iso: number) => async (dispatch: Dispatch<*>) => {
-    await cameraUtils.setISO(iso);
-    dispatch(actionCreators.setISO({ iso }));
-  },
-
-  updateExposure: (exposure: number) => async (dispatch: Dispatch<*>) => {
-    await cameraUtils.setExposure(exposure);
-    dispatch(actionCreators.setExposure({ exposure }));
-  },
-
-  loadSupportedFormats: () => async (dispatch: Dispatch<any>) => {
-    const formats = await cameraUtils.getSupportedFormats();
-    dispatch(actionCreators.setSupportedFormats({ formats }));
-  },
-
-  loadCameraPermissions: () => async (dispatch: Dispatch<*>) => {
-    const hasCameraPermissions = await cameraUtils.hasCameraPermissions();
-    dispatch(actionCreators.setHasCameraPermissions({ hasCameraPermissions }));
-  },
-
-  requestCameraPermissions: () => async (dispatch: Dispatch<*>) => {
-    await cameraUtils.requestCameraPermissions();
-    await dispatch(actionCreators.loadCameraPermissions());
-  },
-};

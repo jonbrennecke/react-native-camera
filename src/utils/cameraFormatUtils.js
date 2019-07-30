@@ -2,6 +2,7 @@
 import groupBy from 'lodash/groupBy';
 import maxBy from 'lodash/maxBy';
 import map from 'lodash/map';
+import isEqual from 'lodash/isEqual';
 
 import type { CameraFormat } from '../state';
 
@@ -35,3 +36,9 @@ export const uniqueKeyForFormat = (
   `${format.dimensions.width}-${format.mediaSubType}-${
     depthFormat.mediaSubType
   }`;
+
+export const areFormatsEqual = (a: CameraFormat, b: CameraFormat): boolean =>
+  a.mediaType === b.mediaType &&
+  a.mediaSubType === b.mediaSubType &&
+  isEqual(a.dimensions, b.dimensions) &&
+  isEqual(a.supportedFrameRates, b.supportedFrameRates);

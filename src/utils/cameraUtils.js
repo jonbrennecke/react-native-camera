@@ -82,3 +82,7 @@ export const getSupportedFormats = async (): Promise<
 export const setFormat = async (format: CameraFormat): Promise<void> => {
   return await CameraManager.setFormatAsync(format);
 };
+
+export const getFormat = async (): Promise<CameraFormat> => {
+  return await CameraManager.getFormatAsync();
+};

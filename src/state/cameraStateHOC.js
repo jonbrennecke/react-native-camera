@@ -3,16 +3,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import identity from 'lodash/identity';
 
-import {
-  actionCreators,
-  selectCaptureStatus,
-  selectSupportedISORange,
-  selectSupportedExposureRange,
-  selectISO,
-  selectExposure,
-  selectSupportedFormats,
-  selectHasCameraPermissions,
-} from './';
+import { actionCreators } from './cameraActionCreators';
+import * as selectors from './cameraSelectors';
 
 import type { ComponentType } from 'react';
 
@@ -34,6 +26,7 @@ type StateProps = {
   supportedFormats: CameraFormat[],
   iso: number,
   exposure: number,
+  format: ?CameraFormat,
   hasCameraPermissions: boolean,
 };
 
@@ -43,6 +36,7 @@ type DispatchProps = {
   loadSupportedFeatures: () => any,
   updateISO: (iso: number) => any,
   updateExposure: (exposure: number) => any,
+  updateFormat: (format: CameraFormat) => any,
   loadCameraPermissions: () => any,
   requestCameraPermissions: () => any,
 };
@@ -51,13 +45,14 @@ export type CameraStateHOCProps = OwnProps & StateProps & DispatchProps;
 
 function mapCameraStateToProps(state: ICameraState): $Exact<StateProps> {
   return {
-    captureStatus: selectCaptureStatus(state),
-    supportedISORange: selectSupportedISORange(state),
-    supportedExposureRange: selectSupportedExposureRange(state),
-    supportedFormats: selectSupportedFormats(state),
-    iso: selectISO(state),
-    exposure: selectExposure(state),
-    hasCameraPermissions: selectHasCameraPermissions(state),
+    captureStatus: selectors.selectCaptureStatus(state),
+    supportedISORange: selectors.selectSupportedISORange(state),
+    supportedExposureRange: selectors.selectSupportedExposureRange(state),
+    supportedFormats: selectors.selectSupportedFormats(state),
+    iso: selectors.selectISO(state),
+    exposure: selectors.selectExposure(state),
+    format: selectors.selectFormat(state),
+    hasCameraPermissions: selectors.selectHasCameraPermissions(state),
   };
 }
 
@@ -73,6 +68,8 @@ function mapCameraDispatchToProps(
     updateISO: (iso: number) => dispatch(actionCreators.updateISO(iso)),
     updateExposure: (exposure: number) =>
       dispatch(actionCreators.updateExposure(exposure)),
+    updateFormat: (format: CameraFormat) =>
+      dispatch(actionCreators.updateFormat(format)),
     loadCameraPermissions: () =>
       dispatch(actionCreators.loadCameraPermissions()),
     requestCameraPermissions: () =>

@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { TouchableOpacity, Text } from 'react-native';
+import { TouchableOpacity, Text, View } from 'react-native';
 
 import { Units } from '../../constants';
 
@@ -9,6 +9,7 @@ import type { CameraFormat } from '../../state';
 
 export type CameraFormatListItemProps = {
   style?: ?Style,
+  isActive?: boolean,
   format: CameraFormat,
   depthFormat: CameraFormat,
   onPress: () => void,
@@ -18,26 +19,26 @@ const styles = {
   container: {
     paddingVertical: Units.small,
   },
-  formatText: {
-    color: '#fff',
+  formatText: (isActive: boolean) => ({
+    color: isActive ? '#fff' : '#999',
     fontSize: 17,
     fontWeight: 'bold',
     textAlign: 'left',
-  },
+  }),
 };
 
 export const CameraFormatListItem: SFC<CameraFormatListItemProps> = ({
   style,
+  isActive = false,
   format,
-  depthFormat,
   onPress,
 }: CameraFormatListItemProps) => (
-  <TouchableOpacity style={[styles.container, style]} onPress={onPress}>
-    <Text style={styles.formatText}>
-      {`Video: ${formatDimensions(
-        format.dimensions
-      )} - Depth: ${formatDimensions(depthFormat.dimensions)}`}
-    </Text>
+  <TouchableOpacity onPress={onPress}>
+    <View style={[styles.container, style]}>
+      <Text style={styles.formatText(isActive)}>
+        {`Video: ${formatDimensions(format.dimensions)}`}
+      </Text>
+    </View>
   </TouchableOpacity>
 );
 

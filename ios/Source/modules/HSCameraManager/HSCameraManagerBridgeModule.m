@@ -72,6 +72,17 @@ RCT_EXPORT_METHOD(getSupportedFormats : (RCTResponseSenderBlock)callback) {
   callback(@[ [NSNull null], formats ]);
 }
 
+RCT_EXPORT_METHOD(getFormat : (RCTResponseSenderBlock)callback) {
+  HSCameraFormat *format = HSCameraManager.sharedInstance.format;
+  if (!format) {
+    NSString *description = @"Failed to get camera format";
+    NSDictionary<NSString *, id> *error = RCTMakeError(description, @{}, nil);
+    callback(@[ error, [NSNull null] ]);
+    return;
+  }
+  callback(@[ [NSNull null], [format toNSDictionary] ]);
+}
+
 RCT_EXPORT_METHOD(setFormat
                   : (NSDictionary *)json callback
                   : (RCTResponseSenderBlock)callback) {

@@ -14,6 +14,7 @@
 		FC20ADFD22E9130000181579 /* HSExportTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC20ADFC22E9130000181579 /* HSExportTask.swift */; };
 		FC2FB8F022CBCEA5007CE0AF /* HSSegmentationModelLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC2FB8EF22CBCEA5007CE0AF /* HSSegmentationModelLoader.swift */; };
 		FC31DAB422E6279700D1FADD /* HSDepthBlurEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC31DAB322E6279700D1FADD /* HSDepthBlurEffect.swift */; };
+		FC526E7C22F0B9B700582BB5 /* ToDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC526E7B22F0B9B700582BB5 /* ToDictionary.swift */; };
 		FC552C9922E9320C00775729 /* fileUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC552C9822E9320C00775729 /* fileUtils.swift */; };
 		FC552C9B22E937A000775729 /* HSVideoCompositionExportManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC552C9A22E937A000775729 /* HSVideoCompositionExportManager.swift */; };
 		FC552CA022E9390900775729 /* HSVideoCompositionExportManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC552C9F22E9390900775729 /* HSVideoCompositionExportManagerDelegate.swift */; };
@@ -96,6 +97,7 @@
 		FC20ADFC22E9130000181579 /* HSExportTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSExportTask.swift; sourceTree = "<group>"; };
 		FC2FB8EF22CBCEA5007CE0AF /* HSSegmentationModelLoader.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSSegmentationModelLoader.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC31DAB322E6279700D1FADD /* HSDepthBlurEffect.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSDepthBlurEffect.swift; sourceTree = "<group>"; tabWidth = 2; };
+		FC526E7B22F0B9B700582BB5 /* ToDictionary.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = ToDictionary.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC552C9822E9320C00775729 /* fileUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = fileUtils.swift; sourceTree = "<group>"; };
 		FC552C9A22E937A000775729 /* HSVideoCompositionExportManager.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSVideoCompositionExportManager.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC552C9F22E9390900775729 /* HSVideoCompositionExportManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSVideoCompositionExportManagerDelegate.swift; sourceTree = "<group>"; };
@@ -324,6 +326,7 @@
 				FCDF906522E6899000AD5F4D /* NSDictionaryConvertible.swift */,
 				FC552C9822E9320C00775729 /* fileUtils.swift */,
 				FCDE2BD022EB604D0025177E /* HSCameraFormat.swift */,
+				FC526E7B22F0B9B700582BB5 /* ToDictionary.swift */,
 				FC904B8C22EFDB0F0010AD4F /* FromDictionary.swift */,
 				FC904B8F22EFDB280010AD4F /* Size+FromDictionary.swift */,
 				FCDF906322E6885900AD5F4D /* HSMinMaxInterval.swift */,
@@ -497,6 +500,7 @@
 				FC664EE822CAD98D00FD8AE7 /* HSCameraSetupResult.swift in Sources */,
 				FC664EE322CAD98000FD8AE7 /* HSEffectManager.swift in Sources */,
 				FC31DAB422E6279700D1FADD /* HSDepthBlurEffect.swift in Sources */,
+				FC526E7C22F0B9B700582BB5 /* ToDictionary.swift in Sources */,
 				FCF822AA22E9137500474CF8 /* HSVideoCompositionExportTask.swift in Sources */,
 				FCADFE2922E1521B00E3C76A /* HSVideoCompositor.swift in Sources */,
 				FC914B8822E8F3A9001691F7 /* HSExportManager.swift in Sources */,

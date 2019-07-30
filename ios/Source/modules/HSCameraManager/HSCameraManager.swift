@@ -403,6 +403,14 @@ class HSCameraManager: NSObject {
   }
 
   @objc
+  public var format: HSCameraFormat? {
+    guard let activeFormat = videoCaptureDevice?.activeFormat else {
+      return nil
+    }
+    return HSCameraFormat(format: activeFormat)
+  }
+
+  @objc
   public var supportedFormats: [HSCameraFormat]? {
     guard let videoCaptureDevice = videoCaptureDevice else {
       return nil

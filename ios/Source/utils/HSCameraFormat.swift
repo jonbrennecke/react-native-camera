@@ -77,6 +77,25 @@ extension HSCameraFormat: FromNSDictionary {
   }
 }
 
+extension HSCameraFormat: ToDictionary, ToNSDictionary {
+  public func toDictionary() -> Dictionary<String, Any> {
+    return [
+      "dimensions": [
+        "height": dimensions.height,
+        "width": dimensions.width,
+      ],
+      "mediaType": string(fromFourCharCode: mediaType),
+      "mediaSubType": string(fromFourCharCode: mediaSubType),
+      "supportedFrameRates": supportedFrameRates.map { $0.asDictionary() },
+      "supportedDepthFormats": supportedDepthFormats.map { $0.asDictionary() },
+    ]
+  }
+
+  public func toNSDictionary() -> NSDictionary {
+    return toDictionary() as NSDictionary
+  }
+}
+
 extension HSCameraFormat: NSDictionaryConvertible {
   @objc
   public func asDictionary() -> NSDictionary {

@@ -14,7 +14,7 @@ import {
   CameraFormatListItem,
   filterBestAvailableFormats,
   uniqueKeyForFormat,
-  setFormat
+  areFormatsEqual
 } from '@jonbrennecke/react-native-camera';
 
 import { createReduxStore } from './cameraStore';
@@ -50,12 +50,14 @@ const Component = CameraStateContainer(
     stopCapture,
     iso,
     exposure,
+    format: activeFormat,
     supportedISORange,
     supportedExposureRange,
     supportedFormats,
     loadSupportedFeatures,
     updateISO,
     updateExposure,
+    updateFormat
   }) => {
     const setup = async (): Promise<void> => {
       try {
@@ -69,7 +71,7 @@ const Component = CameraStateContainer(
     };
 
     const bestAvailableFormats = filterBestAvailableFormats(supportedFormats);
-    
+
     return (
       <StorybookStateWrapper
         initialState={{
@@ -92,9 +94,10 @@ const Component = CameraStateContainer(
                     keyForItem={({ format, depthFormat }) => uniqueKeyForFormat(format, depthFormat)}
                     renderItem={({ format, depthFormat }) => (
                       <CameraFormatListItem
+                        isActive={areFormatsEqual(format, activeFormat)}
                         format={format}
                         depthFormat={depthFormat}
-                        onPress={() => setFormat(format)}
+                        onPress={() => updateFormat(format)}
                       />
                     )}
                   />
