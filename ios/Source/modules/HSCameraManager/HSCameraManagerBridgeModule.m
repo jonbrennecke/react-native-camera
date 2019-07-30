@@ -83,14 +83,37 @@ RCT_EXPORT_METHOD(getFormat : (RCTResponseSenderBlock)callback) {
   callback(@[ [NSNull null], [format toNSDictionary] ]);
 }
 
+RCT_EXPORT_METHOD(getDepthFormat : (RCTResponseSenderBlock)callback) {
+  HSCameraFormat *depthFormat = HSCameraManager.sharedInstance.depthFormat;
+  if (!depthFormat) {
+    NSString *description = @"Failed to get camera depth format";
+    NSDictionary<NSString *, id> *error = RCTMakeError(description, @{}, nil);
+    callback(@[ error, [NSNull null] ]);
+    return;
+  }
+  callback(@[ [NSNull null], [depthFormat toNSDictionary] ]);
+}
+
 RCT_EXPORT_METHOD(setFormat
-                  : (NSDictionary *)json callback
+                  : (NSDictionary *)formatJson depthFormat
+                  : (NSDictionary *)depthFormatJson callback
                   : (RCTResponseSenderBlock)callback) {
   HSCameraFormat *format =
-      (HSCameraFormat *)[HSCameraFormat fromDictionary:json];
-  [HSCameraManager.sharedInstance setFormat:format:^{
-    callback(@[ [NSNull null], [NSNull null] ]);
-  }];
+      (HSCameraFormat *)[HSCameraFormat fromDictionary:formatJson];
+  HSCameraFormat *depthFormat =
+      (HSCameraFormat *)[HSCameraFormat fromDictionary:depthFormatJson];
+  if (!format || !depthFormat) {
+    NSString *description = @"Failed to get parse input format values";
+    NSDictionary<NSString *, id> *error = RCTMakeError(description, @{}, nil);
+    callback(@[ error, [NSNull null] ]);
+    return;
+  }
+  [HSCameraManager.sharedInstance
+      setFormat:format
+             withDepthFormat:depthFormat
+       completionHandler:^{
+         callback(@[ [NSNull null], [NSNull null] ]);
+       }];
 }
 
 RCT_EXPORT_METHOD(startCameraPreview) {

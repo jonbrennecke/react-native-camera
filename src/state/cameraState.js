@@ -27,6 +27,7 @@ export type CameraStateObject = {
   iso: number,
   exposure: number,
   format: ?CameraFormat,
+  depthFormat: ?CameraFormat,
   hasCameraPermissions: boolean,
 };
 
@@ -56,6 +57,9 @@ export interface ICameraState {
 
   getFormat(): ?CameraFormat;
   setFormat(format: CameraFormat): ICameraState;
+
+  getDepthFormat(): ?CameraFormat;
+  setDepthFormat(depthFormat: CameraFormat): ICameraState;
 }
 
 // eslint-disable-next-line flowtype/generic-spacing
@@ -125,5 +129,13 @@ export const createCameraState: CameraStateObject => Class<
 
     setFormat(format: CameraFormat): ICameraState {
       return this.set('format', format);
+    }
+
+    getDepthFormat(): ?CameraFormat {
+      return this.get('depthFormat');
+    }
+
+    setDepthFormat(depthFormat: CameraFormat): ICameraState {
+      return this.set('depthFormat', depthFormat);
     }
   };

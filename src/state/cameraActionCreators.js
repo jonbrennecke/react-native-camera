@@ -59,9 +59,12 @@ export const actionCreators = {
     dispatch(actionCreators.setFormat({ format }));
   },
 
-  updateFormat: (format: CameraFormat) => async (dispatch: Dispatch<*>) => {
+  updateFormat: (format: CameraFormat, depthFormat: CameraFormat) => async (
+    dispatch: Dispatch<any>
+  ) => {
     dispatch(actionCreators.setFormat({ format }));
-    await cameraUtils.setFormat(format);
+    dispatch(actionCreators.setDepthFormat({ depthFormat }));
+    await cameraUtils.setFormatWithDepth(format, depthFormat);
   },
 
   loadCameraPermissions: () => async (dispatch: Dispatch<*>) => {

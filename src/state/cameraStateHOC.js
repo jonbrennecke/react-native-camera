@@ -27,6 +27,7 @@ type StateProps = {
   iso: number,
   exposure: number,
   format: ?CameraFormat,
+  depthFormat: ?CameraFormat,
   hasCameraPermissions: boolean,
 };
 
@@ -36,7 +37,7 @@ type DispatchProps = {
   loadSupportedFeatures: () => any,
   updateISO: (iso: number) => any,
   updateExposure: (exposure: number) => any,
-  updateFormat: (format: CameraFormat) => any,
+  updateFormat: (format: CameraFormat, depthFormat: CameraFormat) => any,
   loadCameraPermissions: () => any,
   requestCameraPermissions: () => any,
 };
@@ -52,6 +53,7 @@ function mapCameraStateToProps(state: ICameraState): $Exact<StateProps> {
     iso: selectors.selectISO(state),
     exposure: selectors.selectExposure(state),
     format: selectors.selectFormat(state),
+    depthFormat: selectors.selectDepthFormat(state),
     hasCameraPermissions: selectors.selectHasCameraPermissions(state),
   };
 }
@@ -68,8 +70,8 @@ function mapCameraDispatchToProps(
     updateISO: (iso: number) => dispatch(actionCreators.updateISO(iso)),
     updateExposure: (exposure: number) =>
       dispatch(actionCreators.updateExposure(exposure)),
-    updateFormat: (format: CameraFormat) =>
-      dispatch(actionCreators.updateFormat(format)),
+    updateFormat: (format: CameraFormat, depthFormat: CameraFormat) =>
+      dispatch(actionCreators.updateFormat(format, depthFormat)),
     loadCameraPermissions: () =>
       dispatch(actionCreators.loadCameraPermissions()),
     requestCameraPermissions: () =>

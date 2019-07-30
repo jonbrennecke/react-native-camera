@@ -41,8 +41,13 @@ class HSDepthBlurEffect {
       }
     }
 
+    let scaledDepthImage = videoImage.applyingFilter("CIEdgePreserveUpsampleFilter", parameters: [
+      "inputSmallImage": depthImage,
+    ])
+
     depthBlurFilter.setValue(videoImage, forKey: kCIInputImageKey)
-    depthBlurFilter.setValue(depthImage, forKey: kCIInputDisparityImageKey)
+    depthBlurFilter.setValue(scaledDepthImage, forKey: kCIInputDisparityImageKey)
+
     return depthBlurFilter.outputImage
   }
 }

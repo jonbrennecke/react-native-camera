@@ -54,9 +54,12 @@ class HSCameraManager: NSObject {
     }
   }
 
-  public var depthPixelFormat: OSType = kCVPixelFormatType_DisparityFloat32 {
-    didSet {
-      // TODO: update depth output configuration
+  public var depthPixelFormat: OSType {
+    get {
+      guard let activeDepthFormat = videoCaptureDevice?.activeDepthDataFormat else {
+        return kCVPixelFormatType_DisparityFloat32
+      }
+      return CMFormatDescriptionGetMediaSubType(activeDepthFormat.formatDescription)
     }
   }
 
@@ -251,7 +254,9 @@ class HSCameraManager: NSObject {
       let supportedDepthFormats = videoCaptureDevice.activeFormat.supportedDepthDataFormats
 
       let depthFormats = supportedDepthFormats.filter { format in
-        return CMFormatDescriptionGetMediaSubType(format.formatDescription) == depthPixelFormat
+        return
+          CMFormatDescriptionGetMediaSubType(format.formatDescription) == kCVPixelFormatType_DisparityFloat32
+          || CMFormatDescriptionGetMediaSubType(format.formatDescription) == kCVPixelFormatType_DisparityFloat16
       }
 
       let highestResolutionDepthFormat = depthFormats.max { a, b in
@@ -411,6 +416,14 @@ class HSCameraManager: NSObject {
   }
 
   @objc
+  public var depthFormat: HSCameraFormat? {
+    guard let activeDepthFormat = videoCaptureDevice?.activeDepthDataFormat else {
+      return nil
+    }
+    return HSCameraFormat(format: activeDepthFormat)
+  }
+
+  @objc
   public var supportedFormats: [HSCameraFormat]? {
     guard let videoCaptureDevice = videoCaptureDevice else {
       return nil
@@ -421,18 +434,16 @@ class HSCameraManager: NSObject {
   }
 
   @objc
-  public func setFormat(_ format: HSCameraFormat, _ completionHandler: @escaping () -> Void) {
+  public func setFormat(_ format: HSCameraFormat, withDepthFormat depthFormat: HSCameraFormat, completionHandler: @escaping () -> Void) {
     guard let videoCaptureDevice = videoCaptureDevice else {
       return completionHandler()
     }
-    if let activeFormat = videoCaptureDevice.formats.first(where: { fmt in
-      let formatDescription = fmt.formatDescription
-      return CMFormatDescriptionGetMediaType(formatDescription) == format.mediaType
-        && CMFormatDescriptionGetMediaSubType(formatDescription) == format.mediaSubType
-        && Int(CMVideoFormatDescriptionGetDimensions(formatDescription).width) == format.dimensions.width
-    }) {
+    if
+      let activeFormat = videoCaptureDevice.formats.first(where: { format.isEqual($0) }),
+      let activeDepthFormat = activeFormat.supportedDepthDataFormats.first(where: { depthFormat.isEqual($0) }) {
       if case .some = try? videoCaptureDevice.lockForConfiguration() {
         videoCaptureDevice.activeFormat = activeFormat
+        videoCaptureDevice.activeDepthDataFormat = activeDepthFormat
         videoCaptureDevice.unlockForConfiguration()
       }
     }

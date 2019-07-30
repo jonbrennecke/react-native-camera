@@ -103,7 +103,7 @@ struct HSPortraitMaskFactory {
     let buffer = HSPixelBuffer(depthData: depthData)
     let iterator: HSPixelBufferIterator<Float> = buffer.makeIterator()
     let bounds = iterator.bounds()
-    guard let depthPixelBuffer = convertDisparityFloat32PixelBufferToUInt8(
+    guard let depthPixelBuffer = convertDisparityOrDepthPixelBufferToUInt8(
       pixelBuffer: buffer, pixelBufferPool: rawDepthCVPixelBufferPool, bounds: bounds
     ) else {
       return nil

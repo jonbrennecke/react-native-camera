@@ -79,10 +79,17 @@ export const getSupportedFormats = async (): Promise<
   return await CameraManager.getSupportedFormatsAsync();
 };
 
-export const setFormat = async (format: CameraFormat): Promise<void> => {
-  return await CameraManager.setFormatAsync(format);
+export const setFormatWithDepth = async (
+  format: CameraFormat,
+  depthFormat: CameraFormat
+): Promise<void> => {
+  return await CameraManager.setFormatAsync(format, depthFormat);
 };
 
 export const getFormat = async (): Promise<CameraFormat> => {
   return await CameraManager.getFormatAsync();
+};
+
+export const getDepthFormat = async (): Promise<CameraFormat> => {
+  return await CameraManager.getDepthFormatAsync();
 };

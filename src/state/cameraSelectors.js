@@ -24,3 +24,6 @@ export const selectHasCameraPermissions = (state: ICameraState) =>
   state.hasCameraPermissions();
 
 export const selectFormat = (state: ICameraState) => state.getFormat();
+
+export const selectDepthFormat = (state: ICameraState) =>
+  state.getDepthFormat();

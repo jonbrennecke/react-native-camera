@@ -40,6 +40,17 @@ public final class HSCameraFormat: NSObject {
       supportedDepthFormats: depthFormats
     )
   }
+
+  public func isEqual(_ format: AVCaptureDevice.Format) -> Bool {
+    let formatDescription = format.formatDescription
+    let formatMediaType = CMFormatDescriptionGetMediaType(formatDescription)
+    let formatMediaSubType = CMFormatDescriptionGetMediaSubType(formatDescription)
+    let formatDimensions = CMVideoFormatDescriptionGetDimensions(formatDescription)
+    return formatMediaType == mediaType
+      && formatMediaSubType == mediaSubType
+      && Int(formatDimensions.height) == dimensions.height
+      && Int(formatDimensions.width) == dimensions.width
+  }
 }
 
 extension HSCameraFormat: FromDictionary {

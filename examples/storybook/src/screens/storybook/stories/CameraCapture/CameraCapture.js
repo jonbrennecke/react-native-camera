@@ -72,6 +72,8 @@ const Component = CameraStateContainer(
 
     const bestAvailableFormats = filterBestAvailableFormats(supportedFormats);
 
+    console.log({bestAvailableFormats})
+
     return (
       <StorybookStateWrapper
         initialState={{
@@ -97,7 +99,10 @@ const Component = CameraStateContainer(
                         isActive={areFormatsEqual(format, activeFormat)}
                         format={format}
                         depthFormat={depthFormat}
-                        onPress={() => updateFormat(format)}
+                        onPress={() => {
+                          updateFormat(format, depthFormat);
+                          setState({ showFormatModal: false })
+                        }}
                       />
                     )}
                   />

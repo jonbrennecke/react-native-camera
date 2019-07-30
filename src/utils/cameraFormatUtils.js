@@ -9,11 +9,13 @@ import type { CameraFormat } from '../state';
 export const filterBestAvailableFormats = (
   allSupportedFormats: CameraFormat[]
 ): { depthFormat: CameraFormat, format: CameraFormat }[] => {
-  const formatsWithDepth = allSupportedFormats.filter(
-    fmt => !!fmt.supportedDepthFormats.length
-  );
+  const filteredFormats = allSupportedFormats
+    .filter(fmt => !!fmt.supportedDepthFormats.length)
+    .filter(
+      fmt => fmt.mediaSubType.endsWith('f') // Choose 420f over 420v
+    );
   const groupedFormats = groupBy(
-    formatsWithDepth,
+    filteredFormats,
     fmt => `${fmt.dimensions.width},${fmt.dimensions.height}`
   );
   return map(groupedFormats, formats => ({

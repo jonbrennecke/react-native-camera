@@ -19,6 +19,7 @@ const CameraState = createCameraState({
   iso: 0,
   exposure: 0,
   format: null,
+  depthFormat: null,
   hasCameraPermissions: false,
 });
 
@@ -100,6 +101,16 @@ const reducers = {
       return state;
     }
     return state.setFormat(payload.format);
+  },
+
+  setDepthFormat: (
+    state,
+    { payload }: Action<{ depthFormat: CameraFormat }>
+  ): ICameraState => {
+    if (!payload) {
+      return state;
+    }
+    return state.setDepthFormat(payload.depthFormat);
   },
 };
 
