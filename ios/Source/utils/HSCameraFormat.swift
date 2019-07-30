@@ -2,7 +2,7 @@ import AVFoundation
 import HSCameraUtils
 
 @objc
-public class HSCameraFormat: NSObject {
+public final class HSCameraFormat: NSObject {
   let dimensions: Size<Int>
   let mediaType: CMMediaType
   let mediaSubType: FourCharCode
@@ -42,6 +42,41 @@ public class HSCameraFormat: NSObject {
   }
 }
 
+extension HSCameraFormat: FromDictionary {
+  public static func from(dictionary: Dictionary<String, Any>) -> HSCameraFormat? {
+    guard
+      let dimensionsDict = dictionary["dimensions"] as? Dictionary<String, Any>,
+      let dimensions = Size<Int>.from(dictionary: dimensionsDict),
+      let mediaTypeString = dictionary["mediaType"] as? String,
+      let mediaType = fourCharCode(fromString: mediaTypeString),
+      let mediaSubTypeString = dictionary["mediaSubType"] as? String,
+      let mediaSubType = fourCharCode(fromString: mediaSubTypeString),
+      let supportedFrameRatesArray = dictionary["supportedFrameRates"] as? Array<Dictionary<String, Any>>,
+      let supportedFrameRates = Array<HSMinMaxInterval>.from(arrayOfDictionaries: supportedFrameRatesArray),
+      let supportedDepthFormatsArray = dictionary["supportedDepthFormats"] as? Array<Dictionary<String, Any>>,
+      let supportedDepthFormats = Array<HSCameraFormat>.from(arrayOfDictionaries: supportedDepthFormatsArray)
+    else {
+      return nil
+    }
+    return HSCameraFormat(
+      dimensions: dimensions,
+      mediaType: mediaType,
+      mediaSubType: mediaSubType,
+      supportedFrameRates: supportedFrameRates,
+      supportedDepthFormats: supportedDepthFormats
+    )
+  }
+}
+
+extension HSCameraFormat: FromNSDictionary {
+  public static func from(dictionary: NSDictionary) -> FromNSDictionary? {
+    guard let swiftDict = dictionary as? Dictionary<String, Any> else {
+      return nil
+    }
+    return from(dictionary: swiftDict)
+  }
+}
+
 extension HSCameraFormat: NSDictionaryConvertible {
   @objc
   public func asDictionary() -> NSDictionary {
@@ -67,4 +102,16 @@ fileprivate func string(fromFourCharCode code: FourCharCode) -> String {
     0,
   ]
   return String(cString: cString)
+}
+
+// See: https://gist.github.com/patrickjuchli/d1b07f97e0ea1da5db09
+fileprivate func fourCharCode(fromString string: String) -> FourCharCode? {
+  var code: FourCharCode = 0
+  if string.count == 4, string.utf8.count == 4 {
+    for byte in string.utf8 {
+      code = code << 8 + FourCharCode(byte)
+    }
+    return code
+  }
+  return nil
 }

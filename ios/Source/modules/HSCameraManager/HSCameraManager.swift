@@ -423,7 +423,10 @@ class HSCameraManager: NSObject {
         && CMFormatDescriptionGetMediaSubType(formatDescription) == format.mediaSubType
         && Int(CMVideoFormatDescriptionGetDimensions(formatDescription).width) == format.dimensions.width
     }) {
-      videoCaptureDevice.activeFormat = activeFormat
+      if case .some = try? videoCaptureDevice.lockForConfiguration() {
+        videoCaptureDevice.activeFormat = activeFormat
+        videoCaptureDevice.unlockForConfiguration()
+      }
     }
   }
 

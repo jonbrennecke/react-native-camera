@@ -2,6 +2,8 @@
 import Bluebird from 'bluebird';
 import { NativeModules } from 'react-native';
 
+import type { CameraFormat } from '../state';
+
 const {
   HSCameraManager: NativeCameraManager,
   HSEffectManager: NativeEffectManager,
@@ -75,4 +77,8 @@ export const getSupportedFormats = async (): Promise<
   { [key: string]: any }[]
 > => {
   return await CameraManager.getSupportedFormatsAsync();
+};
+
+export const setFormat = async (format: CameraFormat): Promise<void> => {
+  return await CameraManager.setFormatAsync(format);
 };

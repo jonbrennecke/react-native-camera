@@ -7,6 +7,7 @@ import { CaptureButton } from '../CaptureButton';
 import { CameraFocusArea } from '../CameraFocusArea';
 import { RangeInputDial } from '../RangeInputDial';
 import { CameraSettingsSelect } from '../CameraSettingsSelect';
+import { TopCameraControlsToolbar } from '../cameraControls';
 import { Units, CameraSettingIdentifiers } from '../../constants';
 import {
   shouldDisplayIntegerValues,
@@ -63,6 +64,7 @@ export type CameraCaptureProps = {
   ) => void,
   onRequestBeginCapture: () => void,
   onRequestEndCapture: () => void,
+  onRequestShowFormatDialog: () => void,
 };
 
 export const CameraCapture: SFC<CameraCaptureProps> = ({
@@ -76,6 +78,7 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
   onRequestSelectActiveCameraSetting,
   onRequestBeginCapture,
   onRequestEndCapture,
+  onRequestShowFormatDialog,
 }: CameraCaptureProps) => {
   const updateSelectedCameraSettingValue = (value: number) => {
     switch (activeCameraSetting) {
@@ -89,6 +92,10 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
   };
   return (
     <View style={[styles.container, style]}>
+      <TopCameraControlsToolbar
+        style={styles.cameraControlsRow}
+        onRequestShowFormatDialog={onRequestShowFormatDialog}
+      />
       <View style={styles.cameraWrap}>
         <Camera ref={cameraRef} style={styles.flex} />
         <CameraFocusArea

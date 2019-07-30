@@ -72,6 +72,16 @@ RCT_EXPORT_METHOD(getSupportedFormats : (RCTResponseSenderBlock)callback) {
   callback(@[ [NSNull null], formats ]);
 }
 
+RCT_EXPORT_METHOD(setFormat
+                  : (NSDictionary *)json callback
+                  : (RCTResponseSenderBlock)callback) {
+  HSCameraFormat *format =
+      (HSCameraFormat *)[HSCameraFormat fromDictionary:json];
+  [HSCameraManager.sharedInstance setFormat:format:^{
+    callback(@[ [NSNull null], [NSNull null] ]);
+  }];
+}
+
 RCT_EXPORT_METHOD(startCameraPreview) {
   HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
   [cameraManager setupCameraCaptureSession];
