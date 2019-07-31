@@ -26,7 +26,7 @@ class HSEffectManager: NSObject {
 
   private lazy var displayLink: CADisplayLink = {
     let displayLink = CADisplayLink(target: self, selector: #selector(handleDisplayLinkUpdate))
-    displayLink.preferredFramesPerSecond = 24
+    displayLink.preferredFramesPerSecond = 30
     return displayLink
   }()
 
@@ -66,16 +66,18 @@ class HSEffectManager: NSObject {
       return
     }
     let depthPixelBuffer = HSPixelBuffer(depthData: depthData)
-    guard let ciImage = depthBlurEffect.makeEffectImage(
-      depthPixelBuffer: depthPixelBuffer,
-      videoPixelBuffer: videoPixelBuffer,
-      aperture: HSCameraManager.shared.aperture
-    ) else {
+    guard
+      let ciImage = depthBlurEffect.makeEffectImage(
+        depthPixelBuffer: depthPixelBuffer,
+        videoPixelBuffer: videoPixelBuffer,
+        aperture: HSCameraManager.shared.aperture
+      ),
+      let pixelBuffer = createOutputPixelBuffer()
+    else {
       return
     }
-    guard let pixelBuffer = createOutputPixelBuffer() else {
-      return
-    }
+    ciImage.transformed(by: CGAffineTransform(scaleX: -1, y: 1))
+    ciImage.transformed(by: CGAffineTransform(translationX: 0, y: ciImage.extent.size.height))
     context.render(ciImage, to: pixelBuffer)
     let imageBuffer = HSImageBuffer(cvPixelBuffer: pixelBuffer)
     guard let outputImage = imageBuffer.makeCGImage() else {

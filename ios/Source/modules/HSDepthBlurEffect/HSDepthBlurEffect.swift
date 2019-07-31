@@ -34,14 +34,12 @@ class HSDepthBlurEffect {
 
     let isDisparity = depthPixelBuffer.pixelFormatType == kCVPixelFormatType_DisparityFloat32
       || depthPixelBuffer.pixelFormatType == kCVPixelFormatType_DisparityFloat16
-    let depthImage = isDisparity ? depthOrDisparityImage : depthOrDisparityImage.applyingFilter("CIDepthToDisparity")
-    let scaledDepthImage = videoImage.applyingFilter("CIEdgePreserveUpsampleFilter", parameters: [
-      "inputSmallImage": depthImage,
+    let disparityImage = isDisparity ? depthOrDisparityImage : depthOrDisparityImage.applyingFilter("CIDepthToDisparity")
+    let scaledDisparityImage = videoImage.applyingFilter("CIEdgePreserveUpsampleFilter", parameters: [
+      "inputSmallImage": disparityImage,
     ])
-
     depthBlurFilter.setValue(videoImage, forKey: kCIInputImageKey)
-    depthBlurFilter.setValue(scaledDepthImage, forKey: kCIInputDisparityImageKey)
-
+    depthBlurFilter.setValue(scaledDisparityImage, forKey: kCIInputDisparityImageKey)
     return depthBlurFilter.outputImage
   }
 }
