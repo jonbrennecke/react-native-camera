@@ -42,21 +42,35 @@ class HSDepthBlurEffect {
       }
     }
 
-//    let isDisparity = depthPixelBuffer.pixelFormatType == kCVPixelFormatType_DisparityFloat32
-//      || depthPixelBuffer.pixelFormatType == kCVPixelFormatType_DisparityFloat16
-//    let disparityImage = isDisparity ? depthOrDisparityImage : depthOrDisparityImage.applyingFilter("CIDepthToDisparity")
-//    let scaledDisparityImage = videoImage.applyingFilter("CIEdgePreserveUpsampleFilter", parameters: [
-//      "inputSmallImage": disparityImage,
-//    ])
-    return normalize(image: depthOrDisparityImage, context: context)
+    guard let normalizedDisparityImage = normalize(image: depthOrDisparityImage, context: context) else {
+      return nil
+    }
+    let scaledDisparityImage = videoImage
+      .applyingFilter("CIEdgePreserveUpsampleFilter", parameters: [
+        "inputSmallImage": normalizedDisparityImage,
+      ])
 
-//    depthBlurFilter.setValue(videoImage, forKey: kCIInputImageKey)
-//    depthBlurFilter.setValue(scaledDisparityImage, forKey: kCIInputDisparityImageKey)
-//    return depthBlurFilter.outputImage
+    // TODO: if showDepthPreview = true
+    // return scaledDisparityImage
+
+    depthBlurFilter.setValue(videoImage, forKey: kCIInputImageKey)
+    depthBlurFilter.setValue(scaledDisparityImage, forKey: kCIInputDisparityImageKey)
+    return depthBlurFilter.outputImage
   }
 }
 
 fileprivate func normalize(image inputImage: CIImage, context: CIContext) -> CIImage? {
+  guard
+    let (min, max) = minMax(image: inputImage, context: context),
+    let normalizeFilter = normalizeFilter(inputImage: inputImage, min: min, max: max),
+    let normalizedImage = normalizeFilter.outputImage
+  else {
+    return nil
+  }
+  return normalizedImage
+}
+
+fileprivate func minMax(image inputImage: CIImage, context: CIContext) -> (min: Float, max: Float)? {
   guard
     let minMaxFilter = areaMinMaxRedFilter(inputImage: inputImage),
     let areaMinMaxImage = minMaxFilter.outputImage
@@ -77,15 +91,7 @@ fileprivate func normalize(image inputImage: CIImage, context: CIContext) -> CII
   if error != kvImageNoError {
     return nil
   }
-  let min = output[0]
-  let max = output[1]
-  guard
-    let normalizeFilter = normalizeFilter(inputImage: inputImage, min: min, max: max),
-    let normalizedImage = normalizeFilter.outputImage
-  else {
-    return nil
-  }
-  return normalizedImage
+  return (min: output[0], max: output[1])
 }
 
 fileprivate func normalizeFilter(inputImage: CIImage, min: Float, max: Float) -> CIFilter? {
@@ -98,7 +104,6 @@ fileprivate func normalizeFilter(inputImage: CIImage, min: Float, max: Float) ->
   filter.setValue(CIVector(x: slope, y: 0, z: 0, w: 0), forKey: "inputRVector")
   filter.setValue(CIVector(x: 0, y: slope, z: 0, w: 0), forKey: "inputGVector")
   filter.setValue(CIVector(x: 0, y: 0, z: slope, w: 0), forKey: "inputBVector")
-//  filter.setValue(CIVector(x: 0, y: 0, z: 0, w: slope), forKey: "inputAVector")
   filter.setValue(CIVector(x: bias, y: bias, z: bias, w: 0), forKey: "inputBiasVector")
   filter.setValue(inputImage, forKey: kCIInputImageKey)
   return filter
