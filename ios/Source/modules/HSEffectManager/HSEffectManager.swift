@@ -6,13 +6,8 @@ import UIKit
 @available(iOS 11.0, *)
 @objc
 class HSEffectManager: NSObject {
-  private let outputPixelBufferSize = Size<Int>(width: 480, height: 640)
-  private lazy var outputPixelBufferPool: CVPixelBufferPool? = {
-    createCVPixelBufferPool(
-      size: outputPixelBufferSize,
-      pixelFormatType: kCVPixelFormatType_32BGRA
-    )
-  }()
+  private var videoResolution: Size<Int> = Size<Int>(width: 480, height: 640)
+  private var depthResolution: Size<Int> = Size<Int>(width: 480, height: 640)
 
   private lazy var mtlDevice: MTLDevice! = {
     guard let mtlDevice = MTLCreateSystemDefaultDevice() else {
@@ -23,6 +18,12 @@ class HSEffectManager: NSObject {
 
   private lazy var context = CIContext(mtlDevice: mtlDevice)
   private lazy var depthBlurEffect = HSDepthBlurEffect()
+  private lazy var outputPixelBufferPool: CVPixelBufferPool? = {
+    createCVPixelBufferPool(
+      size: HSCameraManager.shared.videoResolution ?? videoResolution,
+      pixelFormatType: HSCameraManager.shared.videoPixelFormat
+    )
+  }()
 
   private lazy var displayLink: CADisplayLink = {
     let displayLink = CADisplayLink(target: self, selector: #selector(handleDisplayLinkUpdate))
@@ -45,6 +46,11 @@ class HSEffectManager: NSObject {
 
   @objc
   public var videoSampleBuffer: CMSampleBuffer?
+
+  private override init() {
+    super.init()
+    HSCameraManager.shared.resolutionDelegate = self
+  }
 
   @objc
   private func handleDisplayLinkUpdate(_: CADisplayLink) {
@@ -76,9 +82,7 @@ class HSEffectManager: NSObject {
     else {
       return
     }
-    ciImage.transformed(by: CGAffineTransform(scaleX: -1, y: 1))
-    ciImage.transformed(by: CGAffineTransform(translationX: 0, y: ciImage.extent.size.height))
-    context.render(ciImage, to: pixelBuffer)
+    context.render(flipImageHorizontally(image: ciImage), to: pixelBuffer)
     let imageBuffer = HSImageBuffer(cvPixelBuffer: pixelBuffer)
     guard let outputImage = imageBuffer.makeCGImage() else {
       return
@@ -93,4 +97,16 @@ class HSEffectManager: NSObject {
     displayLink.add(to: .main, forMode: .default)
     completionHandler()
   }
+}
+
+extension HSEffectManager: HSCameraManagerResolutionDelegate {
+  func cameraManagerDidUpdate(videoResolution: Size<Int>, depthResolution: Size<Int>) {
+    self.videoResolution = videoResolution
+    self.depthResolution = depthResolution
+  }
+}
+
+fileprivate func flipImageHorizontally(image: CIImage) -> CIImage {
+  let transform = image.orientationTransform(for: .upMirrored)
+  return image.transformed(by: transform)
 }

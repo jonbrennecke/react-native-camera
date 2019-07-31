@@ -14,7 +14,8 @@ import {
   CameraFormatListItem,
   filterBestAvailableFormats,
   uniqueKeyForFormat,
-  areFormatsEqual
+  areFormatsEqual,
+  startCameraEffects
 } from '@jonbrennecke/react-native-camera';
 
 import { createReduxStore } from './cameraStore';
@@ -63,16 +64,13 @@ const Component = CameraStateContainer(
       try {
         await requestCameraPermissions();
         startCameraPreview();
+        await startCameraEffects();
         await loadSupportedFeatures();
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error(error);
       }
     };
-
-    const bestAvailableFormats = filterBestAvailableFormats(supportedFormats);
-
-    console.log({bestAvailableFormats})
 
     return (
       <StorybookStateWrapper
@@ -92,7 +90,7 @@ const Component = CameraStateContainer(
                 <View style={styles.modal}>
                   <CameraFormatList
                     style={styles.flex}
-                    items={bestAvailableFormats}
+                    items={filterBestAvailableFormats(supportedFormats)}
                     keyForItem={({ format, depthFormat }) => uniqueKeyForFormat(format, depthFormat)}
                     renderItem={({ format, depthFormat }) => (
                       <CameraFormatListItem

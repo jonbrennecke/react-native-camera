@@ -56,7 +56,7 @@ class HSCameraManager: NSObject {
 
   public var depthPixelFormat: OSType {
     guard let activeDepthFormat = videoCaptureDevice?.activeDepthDataFormat else {
-      return kCVPixelFormatType_DisparityFloat32
+      return kCVPixelFormatType_DisparityFloat16
     }
     return CMFormatDescriptionGetMediaSubType(activeDepthFormat.formatDescription)
   }
@@ -95,6 +95,8 @@ class HSCameraManager: NSObject {
 
   @objc
   public var depthDelegate: HSCameraManagerDepthDataDelegate?
+
+  internal var resolutionDelegate: HSCameraManagerResolutionDelegate?
 
   private func setupAssetWriter(to outputURL: URL) -> HSCameraSetupResult {
     assetWriter = HSVideoWriter()
@@ -434,6 +436,11 @@ class HSCameraManager: NSObject {
   @objc
   public func setFormat(_ format: HSCameraFormat, withDepthFormat depthFormat: HSCameraFormat, completionHandler: @escaping () -> Void) {
     guard let videoCaptureDevice = videoCaptureDevice else {
+      if let videoResolution = videoResolution, let depthResolution = depthResolution {
+        resolutionDelegate?.cameraManagerDidUpdate(
+          videoResolution: videoResolution, depthResolution: depthResolution
+        )
+      }
       return completionHandler()
     }
     if

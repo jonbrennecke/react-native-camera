@@ -3,6 +3,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 
 import { Camera } from '../Camera';
+import { CameraEffect } from '../CameraEffect';
 import { CaptureButton } from '../CaptureButton';
 import { CameraFocusArea } from '../CameraFocusArea';
 import { RangeInputDial } from '../RangeInputDial';
@@ -97,7 +98,7 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
         onRequestShowFormatDialog={onRequestShowFormatDialog}
       />
       <View style={styles.cameraWrap}>
-        <Camera ref={cameraRef} style={styles.flex} />
+        <CameraEffect style={styles.flex} />
         <CameraFocusArea
           style={styles.absoluteFill}
           onRequestFocus={onRequestFocus}
