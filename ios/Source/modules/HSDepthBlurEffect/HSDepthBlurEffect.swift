@@ -3,15 +3,6 @@ import CoreImage
 import HSCameraUtils
 
 class HSDepthBlurEffect {
-  private let outputPixelBufferSize = Size<Int>(width: 480, height: 640)
-
-  private lazy var outputPixelBufferPool: CVPixelBufferPool? = {
-    createCVPixelBufferPool(
-      size: outputPixelBufferSize,
-      pixelFormatType: kCVPixelFormatType_32BGRA
-    )
-  }()
-
   public lazy var faceDetector: CIDetector? = {
     let options = [CIDetectorAccuracy: CIDetectorAccuracyHigh]
     return CIDetector(ofType: CIDetectorTypeFace, context: nil, options: options)

@@ -55,12 +55,10 @@ class HSCameraManager: NSObject {
   }
 
   public var depthPixelFormat: OSType {
-    get {
-      guard let activeDepthFormat = videoCaptureDevice?.activeDepthDataFormat else {
-        return kCVPixelFormatType_DisparityFloat32
-      }
-      return CMFormatDescriptionGetMediaSubType(activeDepthFormat.formatDescription)
+    guard let activeDepthFormat = videoCaptureDevice?.activeDepthDataFormat else {
+      return kCVPixelFormatType_DisparityFloat32
     }
+    return CMFormatDescriptionGetMediaSubType(activeDepthFormat.formatDescription)
   }
 
   public var videoResolution: Size<Int>? {
@@ -571,7 +569,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
     _: AVCaptureDataOutputSynchronizer, didOutput collection: AVCaptureSynchronizedDataCollection
   ) {
     if case let .recording(_, startTime) = state {
-      outputProcessingQueue.async {
+      outputProcessingQueue.async { // TODO: weak self
         if let synchronizedDepthData = collection.synchronizedData(for: self.depthOutput) as? AVCaptureSynchronizedDepthData {
           let presentationTime = synchronizedDepthData.timestamp - startTime
           self.record(depthData: synchronizedDepthData.depthData, at: presentationTime)
@@ -585,15 +583,19 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
 
     // MARK: - send data to delegates
 
-//    if let delegate = depthDelegate {
-//      if !synchronizedDepthData.depthDataWasDropped {
-//        delegate.cameraManagerDidOutput(depthData: synchronizedDepthData.depthData)
-//      }
-//
-//      if !synchronizedVideoData.sampleBufferWasDropped {
-//        delegate.cameraManagerDidOutput(videoSampleBuffer: synchronizedVideoData.sampleBuffer)
-//      }
-//    }
+    outputProcessingQueue.async { [weak self] in
+      guard let strongSelf = self, let depthDelegate = strongSelf.depthDelegate else { return }
+      if let synchronizedDepthData = collection.synchronizedData(for: strongSelf.depthOutput) as? AVCaptureSynchronizedDepthData {
+        if !synchronizedDepthData.depthDataWasDropped {
+          depthDelegate.cameraManagerDidOutput(depthData: synchronizedDepthData.depthData)
+        }
+      }
+      if let synchronizedVideoData = collection.synchronizedData(for: strongSelf.videoOutput) as? AVCaptureSynchronizedSampleBufferData {
+        if !synchronizedVideoData.sampleBufferWasDropped {
+          depthDelegate.cameraManagerDidOutput(videoSampleBuffer: synchronizedVideoData.sampleBuffer)
+        }
+      }
+    }
 
     // send detected faces to delegate method
 //    if let synchronizedMetadata = collection.synchronizedData(for: metadataOutput) as? AVCaptureSynchronizedMetadataObjectData {

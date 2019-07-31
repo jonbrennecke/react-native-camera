@@ -108,12 +108,11 @@ RCT_EXPORT_METHOD(setFormat
     callback(@[ error, [NSNull null] ]);
     return;
   }
-  [HSCameraManager.sharedInstance
-      setFormat:format
-             withDepthFormat:depthFormat
-       completionHandler:^{
-         callback(@[ [NSNull null], [NSNull null] ]);
-       }];
+  [HSCameraManager.sharedInstance setFormat:format
+                            withDepthFormat:depthFormat
+                          completionHandler:^{
+                            callback(@[ [NSNull null], [NSNull null] ]);
+                          }];
 }
 
 RCT_EXPORT_METHOD(startCameraPreview) {

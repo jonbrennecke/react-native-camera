@@ -6,24 +6,23 @@ import UIKit
 @available(iOS 11.0, *)
 @objc
 class HSEffectManager: NSObject {
-  @objc(HSEffectManagerResult)
-  public enum Result: Int {
-    case success
-    case failedToLoadModel
-  }
-
-  private var model: HSSegmentationModel? // TODO: remove model from HSEffectManager
-  private var portraitMaskFactory: HSPortraitMaskFactory?
-
-  // TODO: remove model from HSEffectManager
-  private lazy var backgroundImagePixelBufferPool: CVPixelBufferPool? = {
-    guard let size = model?.sizeOf(output: .segmentationImage) else {
-      return nil
-    }
-    return createCVPixelBufferPool(
-      size: size, pixelFormatType: kCVPixelFormatType_32BGRA
+  private let outputPixelBufferSize = Size<Int>(width: 480, height: 640)
+  private lazy var outputPixelBufferPool: CVPixelBufferPool? = {
+    createCVPixelBufferPool(
+      size: outputPixelBufferSize,
+      pixelFormatType: kCVPixelFormatType_32BGRA
     )
   }()
+
+  private lazy var mtlDevice: MTLDevice! = {
+    guard let mtlDevice = MTLCreateSystemDefaultDevice() else {
+      fatalError("Failed to create Metal device")
+    }
+    return mtlDevice
+  }()
+
+  private lazy var context = CIContext(mtlDevice: mtlDevice)
+  private lazy var depthBlurEffect = HSDepthBlurEffect()
 
   private lazy var displayLink: CADisplayLink = {
     let displayLink = CADisplayLink(target: self, selector: #selector(handleDisplayLinkUpdate))
@@ -31,33 +30,12 @@ class HSEffectManager: NSObject {
     return displayLink
   }()
 
-  private lazy var backgroundBuffer: HSPixelBuffer? = {
-    guard
-      let size = model?.sizeOf(output: .segmentationImage),
-      let pool = backgroundImagePixelBufferPool
-    else {
-      return nil
-    }
-    let bufferInfo = HSBufferInfo(pixelFormatType: kCVPixelFormatType_32BGRA)
-    var pixels = [HS32BGRAPixelValue](repeating: .red, count: size.width * size.height)
-    return createPixelBuffer(data: &pixels, size: size, pool: pool, bufferInfo: bufferInfo)
-  }()
-
-  private lazy var backgroundImage: CIImage? = {
-    guard let backgroundBuffer = backgroundBuffer else {
-      return nil
-    }
-    return HSImageBuffer(pixelBuffer: backgroundBuffer).makeCIImage()
-  }()
-
   internal lazy var effectLayer: CALayer = {
     let layer = CALayer()
-    layer.contentsGravity = .resizeAspect
+    layer.contentsGravity = .resizeAspectFill
     layer.backgroundColor = UIColor.black.cgColor
     return layer
   }()
-
-  internal lazy var context = CIContext()
 
   @objc(sharedInstance)
   public static let shared = HSEffectManager()
@@ -68,19 +46,6 @@ class HSEffectManager: NSObject {
   @objc
   public var videoSampleBuffer: CMSampleBuffer?
 
-  private func loadModel(_ completionHandler: @escaping (HSEffectManager.Result) -> Void) {
-    HSSegmentationModelLoader.loadModel { result in
-      switch result {
-      case let .ok(model):
-        self.model = model
-        self.portraitMaskFactory = HSPortraitMaskFactory(model: model)
-        completionHandler(.success)
-      case .err:
-        completionHandler(.failedToLoadModel)
-      }
-    }
-  }
-
   @objc
   private func handleDisplayLinkUpdate(_: CADisplayLink) {
     guard let depthData = depthData, let videoSampleBuffer = videoSampleBuffer else {
@@ -89,27 +54,41 @@ class HSEffectManager: NSObject {
     applyEffects(with: depthData, videoSampleBuffer: videoSampleBuffer)
   }
 
+  private func createOutputPixelBuffer() -> CVPixelBuffer? {
+    guard let pool = outputPixelBufferPool else {
+      return nil
+    }
+    return createPixelBuffer(with: pool)
+  }
+
   private func applyEffects(with depthData: AVDepthData, videoSampleBuffer: CMSampleBuffer) {
-    guard
-      let portraitMask = portraitMaskFactory?.makePortraitMask(
-        depthData: depthData, videoSampleBuffer: videoSampleBuffer
-      ),
-      let backgroundImage = backgroundImage,
-      let composedImage = portraitMask.imageByApplyingMask(toBackground: backgroundImage)
-    else {
+    guard let videoPixelBuffer = HSPixelBuffer(sampleBuffer: videoSampleBuffer) else {
       return
     }
-    let composedCGImage = context.createCGImage(composedImage, from: composedImage.extent)
+    let depthPixelBuffer = HSPixelBuffer(depthData: depthData)
+    guard let ciImage = depthBlurEffect.makeEffectImage(
+      depthPixelBuffer: depthPixelBuffer,
+      videoPixelBuffer: videoPixelBuffer,
+      aperture: HSCameraManager.shared.aperture
+    ) else {
+      return
+    }
+    guard let pixelBuffer = createOutputPixelBuffer() else {
+      return
+    }
+    context.render(ciImage, to: pixelBuffer)
+    let imageBuffer = HSImageBuffer(cvPixelBuffer: pixelBuffer)
+    guard let outputImage = imageBuffer.makeCGImage() else {
+      return
+    }
     DispatchQueue.main.async {
-      self.effectLayer.contents = composedCGImage
+      self.effectLayer.contents = outputImage
     }
   }
 
   @objc(start:)
-  public func start(_ completionHandler: @escaping (HSEffectManager.Result) -> Void) {
-    loadModel { result in
-      self.displayLink.add(to: .main, forMode: .default)
-      completionHandler(result)
-    }
+  public func start(_ completionHandler: @escaping () -> Void) {
+    displayLink.add(to: .main, forMode: .default)
+    completionHandler()
   }
 }
