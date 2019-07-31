@@ -4,19 +4,15 @@ import UIKit
 @available(iOS 11.1, *)
 @objc
 class HSCameraEffectView: UIView {
-  private lazy var effectLayer: CALayer = {
-    HSEffectManager.shared.effectLayer
-  }()
-
   override func didMoveToSuperview() {
     super.didMoveToSuperview()
-    layer.sublayers = nil
-    layer.addSublayer(effectLayer)
+    addSubview(HSEffectManager.shared.effectView)
     layoutSubviews()
   }
 
   override func layoutSubviews() {
     super.layoutSubviews()
-    effectLayer.frame = bounds
+    HSEffectManager.shared.effectView.frame = bounds
+    HSEffectManager.shared.effectView.drawableSize = bounds.size
   }
 }

@@ -2,12 +2,15 @@ import AVFoundation
 import CoreGraphics
 import HSCameraUtils
 import UIKit
+import MetalKit
 
 @available(iOS 11.0, *)
 @objc
 class HSEffectManager: NSObject {
+  private var queue = DispatchQueue(label: "com.jonbrennecke.HSEffectManager.queue")
   private var videoResolution: Size<Int> = Size<Int>(width: 480, height: 640)
   private var depthResolution: Size<Int> = Size<Int>(width: 480, height: 640)
+  private let preferredFramesPerSecond = 15
 
   private lazy var mtlDevice: MTLDevice! = {
     guard let mtlDevice = MTLCreateSystemDefaultDevice() else {
@@ -15,8 +18,28 @@ class HSEffectManager: NSObject {
     }
     return mtlDevice
   }()
+  
+  internal lazy var effectView: MTKView = {
+    let view = MTKView(frame: .zero, device: mtlDevice)
+    view.device = mtlDevice
+    view.framebufferOnly = false
+    view.preferredFramesPerSecond = preferredFramesPerSecond
+    view.autoResizeDrawable = true
+    view.enableSetNeedsDisplay = false
+    return view
+  }()
+  
+  private lazy var commandQueue: MTLCommandQueue! = {
+    guard let commandQueue = mtlDevice.makeCommandQueue() else {
+      fatalError("Failed to create Metal command queue")
+    }
+    return commandQueue
+  }()
 
-  private lazy var context = CIContext(mtlDevice: mtlDevice)
+  private lazy var context = CIContext(mtlDevice: mtlDevice, options: [CIContextOption.workingColorSpace: NSNull()])
+  private let grayscaleColorSpace = CGColorSpaceCreateDeviceGray()
+  private let colorSpace = CGColorSpaceCreateDeviceRGB()
+
   private lazy var depthBlurEffect = HSDepthBlurEffect()
   private lazy var outputPixelBufferPool: CVPixelBufferPool? = {
     createCVPixelBufferPool(
@@ -27,15 +50,8 @@ class HSEffectManager: NSObject {
 
   private lazy var displayLink: CADisplayLink = {
     let displayLink = CADisplayLink(target: self, selector: #selector(handleDisplayLinkUpdate))
-    displayLink.preferredFramesPerSecond = 30
+    displayLink.preferredFramesPerSecond = preferredFramesPerSecond
     return displayLink
-  }()
-
-  internal lazy var effectLayer: CALayer = {
-    let layer = CALayer()
-    layer.contentsGravity = .resizeAspectFill
-    layer.backgroundColor = UIColor.black.cgColor
-    return layer
   }()
 
   @objc(sharedInstance)
@@ -53,11 +69,15 @@ class HSEffectManager: NSObject {
   }
 
   @objc
-  private func handleDisplayLinkUpdate(_: CADisplayLink) {
+  private func handleDisplayLinkUpdate(displayLink: CADisplayLink) {
     guard let depthData = depthData, let videoSampleBuffer = videoSampleBuffer else {
       return
     }
-    applyEffects(with: depthData, videoSampleBuffer: videoSampleBuffer)
+    let actualFramesPerSecond = 1 / (displayLink.targetTimestamp - displayLink.timestamp)
+    print("Frames per second: \(actualFramesPerSecond)")
+    queue.async { [weak self] in
+      self?.applyEffects(with: depthData, videoSampleBuffer: videoSampleBuffer)
+    }
   }
 
   private func createOutputPixelBuffer() -> CVPixelBuffer? {
@@ -68,29 +88,35 @@ class HSEffectManager: NSObject {
   }
 
   private func applyEffects(with depthData: AVDepthData, videoSampleBuffer: CMSampleBuffer) {
+    let startTime = CFAbsoluteTimeGetCurrent()
     guard let videoPixelBuffer = HSPixelBuffer(sampleBuffer: videoSampleBuffer) else {
       return
     }
     let depthPixelBuffer = HSPixelBuffer(depthData: depthData)
     guard
-      let ciImage = depthBlurEffect.makeEffectImage(
+      let image = depthBlurEffect.makeEffectImage(
         previewMode: .depth,
         depthPixelBuffer: depthPixelBuffer,
         videoPixelBuffer: videoPixelBuffer,
         aperture: HSCameraManager.shared.aperture
-      ),
-      let pixelBuffer = createOutputPixelBuffer()
+      )
     else {
       return
     }
-    context.render(flipImageHorizontally(image: ciImage), to: pixelBuffer)
-    let imageBuffer = HSImageBuffer(cvPixelBuffer: pixelBuffer)
-    guard let outputImage = imageBuffer.makeCGImage() else {
-      return
+    if let commandBuffer = commandQueue.makeCommandBuffer(), let drawable = effectView.currentDrawable {
+      let outputImage = flipImageHorizontally(image: image)
+      context.render(
+        outputImage,
+        to: drawable.texture,
+        commandBuffer: commandBuffer,
+        bounds: outputImage.extent,
+        colorSpace: colorSpace
+      )
+      commandBuffer.present(drawable)
+      commandBuffer.commit()
     }
-    DispatchQueue.main.async {
-      self.effectLayer.contents = outputImage
-    }
+    let totalTime = CFAbsoluteTimeGetCurrent() - startTime
+    print("Render time: \(totalTime)")
   }
 
   @objc(start:)
