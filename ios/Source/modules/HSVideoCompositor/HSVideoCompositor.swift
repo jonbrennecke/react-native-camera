@@ -27,9 +27,6 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
   public var aperture: Float = 0
 
   private func composePixelBuffer(with request: AVAsynchronousVideoCompositionRequest) -> CVPixelBuffer? {
-    if isDepthPreviewEnabled {
-      return request.sourceFrame(byTrackID: depthTrackID)
-    }
     if !isPortraitModeEnabled {
       return request.sourceFrame(byTrackID: videoTrackID)
     }
@@ -41,6 +38,7 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
     }
     guard
       let depthBlurImage = depthBlurEffect.makeEffectImage(
+        previewMode: isDepthPreviewEnabled ? .depth : .portraitBlur,
         depthPixelBuffer: HSPixelBuffer(pixelBuffer: depthPixelBuffer),
         videoPixelBuffer: HSPixelBuffer(pixelBuffer: videoPixelBuffer),
         aperture: aperture

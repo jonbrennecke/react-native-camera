@@ -17,21 +17,41 @@ class HSDepthBlurEffect {
     let options = [CIDetectorAccuracy: CIDetectorAccuracyHigh]
     return CIDetector(ofType: CIDetectorTypeFace, context: nil, options: options)
   }()
+  
+  public enum PreviewMode {
+    case depth
+    case portraitBlur
+  }
 
   public func makeEffectImage(
+    previewMode: PreviewMode,
     depthPixelBuffer: HSPixelBuffer, // Depth or disparity
     videoPixelBuffer: HSPixelBuffer,
     aperture: Float
   ) -> CIImage? {
     guard
+      let depthOrDisparityImage = HSImageBuffer(pixelBuffer: depthPixelBuffer).makeCIImage(),
+      let normalizedDisparityImage = normalize(image: depthOrDisparityImage, context: context) else {
+      return nil
+    }
+    if case .depth = previewMode {
+      return normalizedDisparityImage
+    }
+    guard
       let faceDetector = faceDetector,
       let depthBlurFilter = buildDepthBlurCIFilter(aperture: aperture),
-      let videoImage = HSImageBuffer(pixelBuffer: videoPixelBuffer).makeCIImage(),
-      let depthOrDisparityImage = HSImageBuffer(pixelBuffer: depthPixelBuffer).makeCIImage()
+      let videoImage = HSImageBuffer(pixelBuffer: videoPixelBuffer).makeCIImage()
     else {
       return nil
     }
-
+    
+    // scale disparity image
+    let scaledDisparityImage = videoImage
+      .applyingFilter("CIEdgePreserveUpsampleFilter", parameters: [
+        "inputSmallImage": normalizedDisparityImage,
+      ])
+    
+    // find face features
     let faces = faceDetector.features(in: videoImage)
     if let face = faces.first as? CIFaceFeature {
       if face.hasRightEyePosition {
@@ -41,17 +61,6 @@ class HSDepthBlurEffect {
         depthBlurFilter.setValue(CIVector(cgPoint: face.leftEyePosition), forKey: "inputLeftEyePositions")
       }
     }
-
-    guard let normalizedDisparityImage = normalize(image: depthOrDisparityImage, context: context) else {
-      return nil
-    }
-    let scaledDisparityImage = videoImage
-      .applyingFilter("CIEdgePreserveUpsampleFilter", parameters: [
-        "inputSmallImage": normalizedDisparityImage,
-      ])
-
-    // TODO: if showDepthPreview = true
-    // return scaledDisparityImage
 
     depthBlurFilter.setValue(videoImage, forKey: kCIInputImageKey)
     depthBlurFilter.setValue(scaledDisparityImage, forKey: kCIInputDisparityImageKey)

@@ -74,6 +74,7 @@ class HSEffectManager: NSObject {
     let depthPixelBuffer = HSPixelBuffer(depthData: depthData)
     guard
       let ciImage = depthBlurEffect.makeEffectImage(
+        previewMode: .depth,
         depthPixelBuffer: depthPixelBuffer,
         videoPixelBuffer: videoPixelBuffer,
         aperture: HSCameraManager.shared.aperture
