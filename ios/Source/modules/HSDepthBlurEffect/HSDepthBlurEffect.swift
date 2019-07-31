@@ -9,7 +9,7 @@ class HSDepthBlurEffect {
   }()
 
   public func makeEffectImage(
-    depthPixelBuffer: HSPixelBuffer,
+    depthPixelBuffer: HSPixelBuffer, // Depth or disparity
     videoPixelBuffer: HSPixelBuffer,
     aperture: Float
   ) -> CIImage? {
@@ -17,7 +17,7 @@ class HSDepthBlurEffect {
       let faceDetector = faceDetector,
       let depthBlurFilter = buildDepthBlurCIFilter(aperture: aperture),
       let videoImage = HSImageBuffer(pixelBuffer: videoPixelBuffer).makeCIImage(),
-      let depthImage = HSImageBuffer(pixelBuffer: depthPixelBuffer).makeCIImage()
+      let depthOrDisparityImage = HSImageBuffer(pixelBuffer: depthPixelBuffer).makeCIImage()
     else {
       return nil
     }
@@ -32,6 +32,9 @@ class HSDepthBlurEffect {
       }
     }
 
+    let isDisparity = depthPixelBuffer.pixelFormatType == kCVPixelFormatType_DisparityFloat32
+      || depthPixelBuffer.pixelFormatType == kCVPixelFormatType_DisparityFloat16
+    let depthImage = isDisparity ? depthOrDisparityImage : depthOrDisparityImage.applyingFilter("CIDepthToDisparity")
     let scaledDepthImage = videoImage.applyingFilter("CIEdgePreserveUpsampleFilter", parameters: [
       "inputSmallImage": depthImage,
     ])
