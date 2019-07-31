@@ -70,7 +70,7 @@ fileprivate func normalize(image inputImage: CIImage, context: CIContext) -> CII
   return normalizedImage
 }
 
-fileprivate func minMax(image inputImage: CIImage, context: CIContext) -> (min: Float, max: Float)? {
+fileprivate func minMax(image inputImage: CIImage, context: CIContext = CIContext()) -> (min: Float, max: Float)? {
   guard
     let minMaxFilter = areaMinMaxRedFilter(inputImage: inputImage),
     let areaMinMaxImage = minMaxFilter.outputImage
