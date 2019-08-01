@@ -7,7 +7,6 @@ import UIKit
 @available(iOS 11.0, *)
 @objc
 class HSEffectManager: NSObject {
-  private var queue = DispatchQueue(label: "com.jonbrennecke.HSEffectManager.queue")
   private var videoResolution: Size<Int> = Size<Int>(width: 480, height: 640)
   private var depthResolution: Size<Int> = Size<Int>(width: 480, height: 640)
   private let preferredFramesPerSecond = 15
@@ -75,9 +74,7 @@ class HSEffectManager: NSObject {
     }
     let actualFramesPerSecond = 1 / (displayLink.targetTimestamp - displayLink.timestamp)
     print("Frames per second: \(actualFramesPerSecond)")
-    queue.async { [weak self] in
-      self?.applyEffects(with: depthData, videoSampleBuffer: videoSampleBuffer)
-    }
+    applyEffects(with: depthData, videoSampleBuffer: videoSampleBuffer)
   }
 
   private func createOutputPixelBuffer() -> CVPixelBuffer? {
