@@ -26,6 +26,11 @@ class HSDepthBlurEffect {
     let options = [CIDetectorAccuracy: CIDetectorAccuracyHigh]
     return CIDetector(ofType: CIDetectorTypeFace, context: nil, options: options)
   }()
+  
+  public enum QualityMode {
+    case previewQuality
+    case exportQuality
+  }
 
   public enum PreviewMode {
     case depth
@@ -34,6 +39,7 @@ class HSDepthBlurEffect {
 
   public func makeEffectImage(
     previewMode: PreviewMode,
+    qualityMode: QualityMode,
     disparityPixelBuffer: HSPixelBuffer,
     videoPixelBuffer: HSPixelBuffer,
     aperture: Float,
@@ -49,7 +55,10 @@ class HSDepthBlurEffect {
     if case .depth = previewMode {
       return disparityImage
     }
-    guard let depthBlurFilter = buildDepthBlurCIFilter(aperture: aperture) else {
+    guard let depthBlurFilter = depthBlurEffectFilter(
+      scale: qualityMode == .exportQuality ? 1 : 0.1,
+      aperture: aperture
+    ) else {
       return nil
     }
     let videoImage = HSImageBuffer(pixelBuffer: videoPixelBuffer).makeCIImage()!
@@ -171,12 +180,12 @@ fileprivate func areaMinMaxRedFilter(
   return filter
 }
 
-fileprivate func buildDepthBlurCIFilter(aperture: Float) -> CIFilter? {
+fileprivate func depthBlurEffectFilter(scale: Float, aperture: Float) -> CIFilter? {
   guard let filter = CIFilter(name: "CIDepthBlurEffect") else {
     return nil
   }
   filter.setDefaults()
-  filter.setValue(0.1, forKey: "inputScaleFactor") // TODO: could use this instead of scaling later
+  filter.setValue(scale, forKey: "inputScaleFactor")
   filter.setValue(aperture, forKey: "inputAperture")
   //    filter.setValue(inputCalibrationData, forKey: "inputCalibrationData")
   //    filter.setValue(inputAuxDataMetadata, forKey: "inputAuxDataMetadata")

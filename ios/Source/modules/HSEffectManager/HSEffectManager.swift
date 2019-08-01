@@ -67,6 +67,7 @@ class HSEffectManager: NSObject {
     guard
       let image = depthBlurEffect.makeEffectImage(
         previewMode: isDepthPreviewEnabled ? .depth : .portraitBlur,
+        qualityMode: .previewQuality,
         disparityPixelBuffer: disparityPixelBuffer,
         videoPixelBuffer: videoPixelBuffer,
         aperture: HSCameraManager.shared.aperture
