@@ -51,8 +51,8 @@ class HSDepthBlurEffect {
       return nil
     }
     let videoImage = CIImage(cvPixelBuffer: videoPixelBuffer.buffer)
-    
-    // TODO check if videoPixelBuffer.buffer or depthPixelBuffer.buffer are null
+
+    // TODO: check if videoPixelBuffer.buffer or depthPixelBuffer.buffer are null
 
     // scale disparity image
 //    let scaledDisparityImage = videoImage

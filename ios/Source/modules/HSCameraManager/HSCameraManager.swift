@@ -156,8 +156,8 @@ class HSCameraManager: NSObject {
     if case .failure = setupDepthOutput() {
       return .failure
     }
-    
-// TODO
+
+    // TODO:
 //    if let videoCaptureDevice = videoCaptureDevice {
 //       if case .some = try? videoCaptureDevice.lockForConfiguration() {
 //        if videoCaptureDevice.isFocusModeSupported(.locked) {
@@ -266,7 +266,7 @@ class HSCameraManager: NSObject {
 
       let depthFormats = supportedDepthFormats.filter { format in
         return
-          CMFormatDescriptionGetMediaSubType(format.formatDescription) == kCVPixelFormatType_DepthFloat16 // TODO
+          CMFormatDescriptionGetMediaSubType(format.formatDescription) == kCVPixelFormatType_DepthFloat16 // TODO:
       }
 
       let highestResolutionDepthFormat = depthFormats.max { a, b in
