@@ -17,6 +17,7 @@ class HSDepthBlurEffect {
       CIContextOption.useSoftwareRenderer: false,
       CIContextOption.workingColorSpace: NSNull(),
       CIContextOption.workingFormat: kCVPixelFormatType_16Gray,
+      //      CIContextOption.workingFormat: CIFormat.RGBAh,
       CIContextOption.outputColorSpace: NSNull(),
     ]
   )
@@ -35,14 +36,18 @@ class HSDepthBlurEffect {
     previewMode: PreviewMode,
     disparityPixelBuffer: HSPixelBuffer,
     videoPixelBuffer: HSPixelBuffer,
-    aperture: Float
+    aperture: Float,
+    shouldNormalize: Bool = true
   ) -> CIImage? {
-    let disparityImage = HSImageBuffer(pixelBuffer: disparityPixelBuffer).makeCIImage()!
-    guard let normalizedDisparityImage = normalize(image: disparityImage, context: context) else {
+    guard let disparityImage = composeDisparityImage(
+      pixelBuffer: disparityPixelBuffer,
+      context: context,
+      shouldNormalize: previewMode == .depth || shouldNormalize
+    ) else {
       return nil
     }
     if case .depth = previewMode {
-      return normalizedDisparityImage.cropped(to: normalizedDisparityImage.extent)
+      return disparityImage
     }
     guard let depthBlurFilter = buildDepthBlurCIFilter(aperture: aperture) else {
       return nil
@@ -70,9 +75,21 @@ class HSDepthBlurEffect {
 //    }
 
     depthBlurFilter.setValue(videoImage, forKey: kCIInputImageKey)
-    depthBlurFilter.setValue(normalizedDisparityImage, forKey: kCIInputDisparityImageKey)
+    depthBlurFilter.setValue(disparityImage, forKey: kCIInputDisparityImageKey)
     return depthBlurFilter.outputImage
   }
+}
+
+fileprivate func composeDisparityImage(pixelBuffer: HSPixelBuffer, context: CIContext, shouldNormalize: Bool) -> CIImage? {
+  guard let disparityImage = HSImageBuffer(pixelBuffer: pixelBuffer).makeCIImage() else {
+    return nil
+  }
+  let orientationFixedDisparityImage = disparityImage.oriented(CGImagePropertyOrientation.right)
+  if shouldNormalize {
+    return normalize(image: orientationFixedDisparityImage, context: context)?
+      .applyingFilter("CIGaussianBlur", parameters: ["inputRadius": 0.5])
+  }
+  return orientationFixedDisparityImage
 }
 
 fileprivate func normalize(image inputImage: CIImage, context: CIContext) -> CIImage? {
@@ -159,7 +176,7 @@ fileprivate func buildDepthBlurCIFilter(aperture: Float) -> CIFilter? {
     return nil
   }
   filter.setDefaults()
-  filter.setValue(1, forKey: "inputScaleFactor")
+  filter.setValue(0.1, forKey: "inputScaleFactor") // TODO: could use this instead of scaling later
   filter.setValue(aperture, forKey: "inputAperture")
   //    filter.setValue(inputCalibrationData, forKey: "inputCalibrationData")
   //    filter.setValue(inputAuxDataMetadata, forKey: "inputAuxDataMetadata")

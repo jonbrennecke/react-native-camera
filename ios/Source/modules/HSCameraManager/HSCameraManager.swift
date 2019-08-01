@@ -233,6 +233,9 @@ class HSCameraManager: NSObject {
         if connection.isVideoStabilizationSupported {
           connection.preferredVideoStabilizationMode = .auto
         }
+//        if connection.isVideoOrientationSupported {
+//          connection.videoOrientation = .portrait
+//        }
       }
     } else {
       return .failure
@@ -565,11 +568,16 @@ class HSCameraManager: NSObject {
 @available(iOS 11.1, *)
 extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
   private func record(depthData: AVDepthData, at presentationTime: CMTime) {
-    if let depthBuffer = depthDataConverter?.convert(depthData: depthData) {
+    let isDepth = [kCVPixelFormatType_DepthFloat16, kCVPixelFormatType_DepthFloat32].contains(depthData.depthDataType)
+    let disparityData = isDepth ? depthData.converting(toDepthDataType: kCVPixelFormatType_DisparityFloat16) : depthData
+//    let rotatedDisparityData = disparityData.applyingExifOrientation(.right)
+    if let depthBuffer = depthDataConverter?.convert(depthData: disparityData) {
       let frameBuffer = HSVideoFrameBuffer(
         pixelBuffer: depthBuffer, presentationTime: presentationTime
       )
       assetWriterDepthInput?.append(frameBuffer)
+    } else {
+      print("[HSCameraManager]: Dropped depth frame")
     }
   }
 

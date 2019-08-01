@@ -63,8 +63,7 @@ class HSEffectManager: NSObject {
     }
     let isDepth = [kCVPixelFormatType_DepthFloat16, kCVPixelFormatType_DepthFloat32].contains(depthData.depthDataType)
     let disparityData = isDepth ? depthData.converting(toDepthDataType: kCVPixelFormatType_DisparityFloat16) : depthData
-    let rotatedDisparityData = disparityData.applyingExifOrientation(.right)
-    let disparityPixelBuffer = HSPixelBuffer(depthData: rotatedDisparityData)
+    let disparityPixelBuffer = HSPixelBuffer(depthData: disparityData)
     guard
       let image = depthBlurEffect.makeEffectImage(
         previewMode: isDepthPreviewEnabled ? .depth : .portraitBlur,
