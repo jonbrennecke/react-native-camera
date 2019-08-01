@@ -16,7 +16,9 @@ class HSDepthBlurEffect {
     mtlDevice: mtlDevice,
     options: [
       CIContextOption.useSoftwareRenderer: false,
+      CIContextOption.workingColorSpace: NSNull(),
       CIContextOption.workingFormat: kCVPixelFormatType_16Gray,
+      CIContextOption.outputColorSpace: NSNull(),
     ]
   )
 
@@ -36,7 +38,7 @@ class HSDepthBlurEffect {
     videoPixelBuffer: HSPixelBuffer,
     aperture: Float
   ) -> CIImage? {
-    let disparityImage = CIImage(cvPixelBuffer: disparityPixelBuffer.buffer)
+    let disparityImage = HSImageBuffer(pixelBuffer: disparityPixelBuffer).makeCIImage()!
     guard let normalizedDisparityImage = normalize(image: disparityImage, context: context) else {
       return nil
     }
@@ -46,9 +48,7 @@ class HSDepthBlurEffect {
     guard let depthBlurFilter = buildDepthBlurCIFilter(aperture: aperture) else {
       return nil
     }
-    let videoImage = CIImage(cvPixelBuffer: videoPixelBuffer.buffer)
-
-//    videoPixelBuffer.withDataPointer(<#T##fn: (UnsafeRawPointer) -> R##(UnsafeRawPointer) -> R#>)
+    let videoImage = HSImageBuffer(pixelBuffer: videoPixelBuffer).makeCIImage()!
 
     // TODO: check if videoPixelBuffer.buffer or depthPixelBuffer.buffer are null
 
