@@ -4,6 +4,7 @@ import UIKit
 @available(iOS 11.1, *)
 @objc
 class HSCameraEffectView: UIView {
+  
   override func didMoveToSuperview() {
     super.didMoveToSuperview()
     addSubview(HSEffectManager.shared.effectView)
@@ -13,6 +14,5 @@ class HSCameraEffectView: UIView {
   override func layoutSubviews() {
     super.layoutSubviews()
     HSEffectManager.shared.effectView.frame = bounds
-    HSEffectManager.shared.effectView.drawableSize = bounds.size
   }
 }

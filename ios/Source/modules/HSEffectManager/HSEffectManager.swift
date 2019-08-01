@@ -7,8 +7,6 @@ import UIKit
 @available(iOS 11.0, *)
 @objc
 class HSEffectManager: NSObject {
-  private var videoResolution: Size<Int> = Size<Int>(width: 480, height: 640)
-  private var depthResolution: Size<Int> = Size<Int>(width: 480, height: 640)
   private let preferredFramesPerSecond = 15
 
   private lazy var mtlDevice: MTLDevice! = {
@@ -39,15 +37,7 @@ class HSEffectManager: NSObject {
   private let grayscaleColorSpace = CGColorSpaceCreateDeviceGray()
   private let colorSpace = CGColorSpaceCreateDeviceRGB()
   private let printDebugLog = false
-
   private lazy var depthBlurEffect = HSDepthBlurEffect()
-  private lazy var outputPixelBufferPool: CVPixelBufferPool? = {
-    createCVPixelBufferPool(
-      size: HSCameraManager.shared.videoResolution ?? videoResolution,
-      pixelFormatType: HSCameraManager.shared.videoPixelFormat
-    )
-  }()
-
   private lazy var displayLink: CADisplayLink = {
     let displayLink = CADisplayLink(target: self, selector: #selector(handleDisplayLinkUpdate))
     displayLink.preferredFramesPerSecond = preferredFramesPerSecond
@@ -62,11 +52,6 @@ class HSEffectManager: NSObject {
 
   @objc
   public var videoSampleBuffer: CMSampleBuffer?
-
-  private override init() {
-    super.init()
-    HSCameraManager.shared.resolutionDelegate = self
-  }
 
   @objc
   private func handleDisplayLinkUpdate(displayLink: CADisplayLink) {
@@ -108,6 +93,7 @@ class HSEffectManager: NSObject {
         bounds: outputImage.extent,
         colorSpace: colorSpace
       )
+      effectView.drawableSize = outputImage.extent.size
       commandBuffer.present(drawable)
       commandBuffer.commit()
     }
@@ -121,13 +107,6 @@ class HSEffectManager: NSObject {
   public func start(_ completionHandler: @escaping () -> Void) {
     displayLink.add(to: .main, forMode: .default)
     completionHandler()
-  }
-}
-
-extension HSEffectManager: HSCameraManagerResolutionDelegate {
-  func cameraManagerDidUpdate(videoResolution: Size<Int>, depthResolution: Size<Int>) {
-    self.videoResolution = videoResolution
-    self.depthResolution = depthResolution
   }
 }
 
