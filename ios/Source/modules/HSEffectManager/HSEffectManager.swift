@@ -80,13 +80,6 @@ class HSEffectManager: NSObject {
     applyEffects(with: depthData, videoSampleBuffer: videoSampleBuffer)
   }
 
-  private func createOutputPixelBuffer() -> CVPixelBuffer? {
-    guard let pool = outputPixelBufferPool else {
-      return nil
-    }
-    return createPixelBuffer(with: pool)
-  }
-
   private func applyEffects(with depthData: AVDepthData, videoSampleBuffer: CMSampleBuffer) {
     let startTime = CFAbsoluteTimeGetCurrent()
     guard let videoPixelBuffer = HSPixelBuffer(sampleBuffer: videoSampleBuffer) else {
