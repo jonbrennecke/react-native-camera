@@ -132,6 +132,7 @@ const Component = CameraStateContainer(
                     supportedRange: supportedExposureRange,
                   }, // TODO
                 }}
+                cameraLayoutStyle="fullscreen"
                 supportedISORange={supportedISORange}
                 activeCameraSetting={getState().activeCameraSetting}
                 enableDepthPreview={getState().enableDepthPreview}

@@ -4,7 +4,6 @@ import CoreImage
 import HSCameraUtils
 
 class HSDepthBlurEffect {
-
   private lazy var mtlDevice: MTLDevice! = {
     guard let mtlDevice = MTLCreateSystemDefaultDevice() else {
       fatalError("Failed to create Metal device")

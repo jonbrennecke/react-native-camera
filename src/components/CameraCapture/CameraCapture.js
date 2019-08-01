@@ -22,19 +22,12 @@ const styles = {
   flex: {
     flex: 1,
   },
-  absoluteFill: {
-    ...StyleSheet.absoluteFillObject,
-  },
+  absoluteFill: StyleSheet.absoluteFillObject,
   container: {
     backgroundColor: '#000',
   },
   bottomControls: {
     flexDirection: 'column',
-  },
-  cameraWrap: {
-    flex: 1,
-    borderRadius: Units.small,
-    overflow: 'hidden',
   },
   cameraControlsRow: {
     paddingVertical: Units.small,
@@ -42,6 +35,37 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
   },
+  cameraWrap: (cameraLayoutStyle: 'boxed' | 'fullscreen') =>
+    cameraLayoutStyle === 'boxed'
+      ? {
+          flex: 1,
+          borderRadius: Units.small,
+          overflow: 'hidden',
+        }
+      : {
+          ...styles.absoluteFill,
+          borderRadius: Units.small,
+          overflow: 'hidden',
+        },
+  cameraWrapSpacer: (cameraLayoutStyle: 'boxed' | 'fullscreen') =>
+    cameraLayoutStyle === 'boxed'
+      ? styles.absoluteFill
+      : {
+          flex: 1,
+        },
+  topToolbar: (cameraLayoutStyle: 'boxed' | 'fullscreen') =>
+    cameraLayoutStyle === 'boxed'
+      ? styles.cameraControlsRow
+      : {
+          paddingVertical: Units.small,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          position: 'absolute',
+          top: 0,
+          width: '100%',
+          zIndex: 2
+        },
 };
 
 export type CameraSettings = {
@@ -53,6 +77,7 @@ export type CameraSettings = {
 
 export type CameraCaptureProps = {
   style?: ?Style,
+  cameraLayoutStyle?: 'boxed' | 'fullscreen',
   cameraRef: ((?Camera) => void) | ReturnType<typeof React.createRef>,
   activeCameraSetting: $Keys<typeof CameraSettingIdentifiers>,
   cameraSettings: CameraSettings,
@@ -75,6 +100,7 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
   style,
   cameraRef,
   cameraSettings,
+  cameraLayoutStyle = 'boxed',
   activeCameraSetting,
   showManualCameraControls = false,
   enableDepthPreview = false,
@@ -100,11 +126,12 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
   return (
     <View style={[styles.container, style]}>
       <TopCameraControlsToolbar
-        style={styles.cameraControlsRow}
+        style={styles.topToolbar(cameraLayoutStyle)}
         onRequestShowFormatDialog={onRequestShowFormatDialog}
         onRequestToggleDepthPreview={onRequestToggleDepthPreview}
       />
-      <View style={styles.cameraWrap}>
+      <View style={styles.cameraWrapSpacer(cameraLayoutStyle)} />
+      <View style={styles.cameraWrap(cameraLayoutStyle)}>
         <CameraEffect
           style={styles.flex}
           isDepthPreviewEnabled={enableDepthPreview}
