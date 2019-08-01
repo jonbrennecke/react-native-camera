@@ -38,6 +38,7 @@ class HSEffectManager: NSObject {
   private lazy var context = CIContext(mtlDevice: mtlDevice, options: [CIContextOption.workingColorSpace: NSNull()])
   private let grayscaleColorSpace = CGColorSpaceCreateDeviceGray()
   private let colorSpace = CGColorSpaceCreateDeviceRGB()
+  private let printDebugLog = false
 
   private lazy var depthBlurEffect = HSDepthBlurEffect()
   private lazy var outputPixelBufferPool: CVPixelBufferPool? = {
@@ -72,8 +73,10 @@ class HSEffectManager: NSObject {
     guard let depthData = depthData, let videoSampleBuffer = videoSampleBuffer else {
       return
     }
-    let actualFramesPerSecond = 1 / (displayLink.targetTimestamp - displayLink.timestamp)
-    print("Frames per second: \(actualFramesPerSecond)")
+    if printDebugLog {
+      let actualFramesPerSecond = 1 / (displayLink.targetTimestamp - displayLink.timestamp)
+      print("[HSEffectManager]: Frames per second: \(actualFramesPerSecond)")
+    }
     applyEffects(with: depthData, videoSampleBuffer: videoSampleBuffer)
   }
 
@@ -115,8 +118,10 @@ class HSEffectManager: NSObject {
       commandBuffer.present(drawable)
       commandBuffer.commit()
     }
-    let totalTime = CFAbsoluteTimeGetCurrent() - startTime
-    print("Render time: \(totalTime)")
+    if printDebugLog {
+      let totalTime = CFAbsoluteTimeGetCurrent() - startTime
+      print("[HSEffectManager]: Render time: \(totalTime)")
+    }
   }
 
   @objc(start:)
