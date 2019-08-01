@@ -1,8 +1,8 @@
 import AVFoundation
 import CoreGraphics
 import HSCameraUtils
-import UIKit
 import MetalKit
+import UIKit
 
 @available(iOS 11.0, *)
 @objc
@@ -18,7 +18,7 @@ class HSEffectManager: NSObject {
     }
     return mtlDevice
   }()
-  
+
   internal lazy var effectView: MTKView = {
     let view = MTKView(frame: .zero, device: mtlDevice)
     view.device = mtlDevice
@@ -28,7 +28,7 @@ class HSEffectManager: NSObject {
     view.enableSetNeedsDisplay = false
     return view
   }()
-  
+
   private lazy var commandQueue: MTLCommandQueue! = {
     guard let commandQueue = mtlDevice.makeCommandQueue() else {
       fatalError("Failed to create Metal command queue")
@@ -92,10 +92,13 @@ class HSEffectManager: NSObject {
     guard let videoPixelBuffer = HSPixelBuffer(sampleBuffer: videoSampleBuffer) else {
       return
     }
-    let depthPixelBuffer = HSPixelBuffer(depthData: depthData)
+    let isDepth = [kCVPixelFormatType_DepthFloat16, kCVPixelFormatType_DepthFloat32].contains(depthData.depthDataType)
+    let disparityData = isDepth ? depthData.converting(toDepthDataType: kCVPixelFormatType_DisparityFloat16) : depthData
+    let portraitDisparityData = disparityData.applyingExifOrientation(.right)
+    let depthPixelBuffer = HSPixelBuffer(depthData: portraitDisparityData)
     guard
       let image = depthBlurEffect.makeEffectImage(
-        previewMode: .depth,
+        previewMode: .portraitBlur,
         depthPixelBuffer: depthPixelBuffer,
         videoPixelBuffer: videoPixelBuffer,
         aperture: HSCameraManager.shared.aperture

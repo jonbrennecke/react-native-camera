@@ -14,19 +14,19 @@ class HSDepthBlurEffect {
 //  private lazy var context = CIContext(mtlDevice: mtlDevice)
   private lazy var context = CIContext()
 //  private lazy var context = CIContext(options: [
-////    CIContextOption.useSoftwareRenderer: true,
-////    CIContextOption.workingColorSpace: CGColorSpaceCreateDeviceGray(),
-////    CIContextOption.outputColorSpace: CGColorSpaceCreateDeviceGray(),
+  ////    CIContextOption.useSoftwareRenderer: true,
+  ////    CIContextOption.workingColorSpace: CGColorSpaceCreateDeviceGray(),
+  ////    CIContextOption.outputColorSpace: CGColorSpaceCreateDeviceGray(),
 //    CIContextOption.workingColorSpace: CGColorSpaceCreateDeviceGray(),
-////    CIContextOption.workingFormat: kCVPixelFormatType_OneComponent8
-////    kCIImageColorSpace: null
+  ////    CIContextOption.workingFormat: kCVPixelFormatType_OneComponent8
+  ////    kCIImageColorSpace: null
 //  ])
 
   public lazy var faceDetector: CIDetector? = {
     let options = [CIDetectorAccuracy: CIDetectorAccuracyHigh]
     return CIDetector(ofType: CIDetectorTypeFace, context: nil, options: options)
   }()
-  
+
   public enum PreviewMode {
     case depth
     case portraitBlur
@@ -38,8 +38,10 @@ class HSDepthBlurEffect {
     videoPixelBuffer: HSPixelBuffer,
     aperture: Float
   ) -> CIImage? {
-    let depthOrDisparityImage = CIImage(cvPixelBuffer: depthPixelBuffer.buffer)
-    guard let normalizedDisparityImage = normalize(image: depthOrDisparityImage, context: context) else {
+    let disparityImage = CIImage(cvPixelBuffer: depthPixelBuffer.buffer)
+//    let isDepth = [kCVPixelFormatType_DepthFloat16, kCVPixelFormatType_DepthFloat32].contains(depthPixelBuffer.pixelFormatType)
+//    let disparityImage = isDepth ? depthOrDisparityImage.applyingFilter("CIDepthToDisparity") : depthOrDisparityImage
+    guard let normalizedDisparityImage = normalize(image: disparityImage, context: context) else {
       return nil
     }
     if case .depth = previewMode {
@@ -49,13 +51,13 @@ class HSDepthBlurEffect {
       return nil
     }
     let videoImage = CIImage(cvPixelBuffer: videoPixelBuffer.buffer)
-    
+
     // scale disparity image
 //    let scaledDisparityImage = videoImage
 //      .applyingFilter("CIEdgePreserveUpsampleFilter", parameters: [
 //        "inputSmallImage": normalizedDisparityImage,
 //      ])
-    
+
     //      let faceDetector = faceDetector,
     // find face features
 //    let faces = faceDetector.features(in: videoImage)
@@ -113,8 +115,8 @@ fileprivate func minMaxFast(image inputImage: CIImage, context: CIContext = CICo
   guard
     let minMaxFilter = areaMinMaxRedFilter(inputImage: inputImage),
     let areaMinMaxImage = minMaxFilter.outputImage
-    else {
-      return nil
+  else {
+    return nil
   }
   let startTime = CFAbsoluteTimeGetCurrent()
   var pixels = [UInt8](repeating: 0, count: 2)
@@ -126,7 +128,7 @@ fileprivate func minMaxFast(image inputImage: CIImage, context: CIContext = CICo
                  colorSpace: nil)
   let executionTime = CFAbsoluteTimeGetCurrent() - startTime
   print("Execution Time: \(executionTime)")
-  
+
   return (min: Float(pixels[0]) / 255, max: Float(pixels[1]) / 255)
 }
 

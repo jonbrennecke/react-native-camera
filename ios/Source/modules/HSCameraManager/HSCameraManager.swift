@@ -56,7 +56,8 @@ class HSCameraManager: NSObject {
 
   public var depthPixelFormat: OSType {
     guard let activeDepthFormat = videoCaptureDevice?.activeDepthDataFormat else {
-      return kCVPixelFormatType_DisparityFloat16
+      // TODO: if front camera, capture depth by default. Otherwise capture disparity
+      return kCVPixelFormatType_DepthFloat16
     }
     return CMFormatDescriptionGetMediaSubType(activeDepthFormat.formatDescription)
   }
@@ -155,6 +156,19 @@ class HSCameraManager: NSObject {
     if case .failure = setupDepthOutput() {
       return .failure
     }
+    
+// TODO
+//    if let videoCaptureDevice = videoCaptureDevice {
+//       if case .some = try? videoCaptureDevice.lockForConfiguration() {
+//        if videoCaptureDevice.isFocusModeSupported(.locked) {
+//          videoCaptureDevice.focusMode = .locked
+//        }
+//        if videoCaptureDevice.isExposureModeSupported(.locked) {
+//          videoCaptureDevice.exposureMode = .locked
+//        }
+//        videoCaptureDevice.unlockForConfiguration()
+//      }
+//    }
 
     configureActiveFormat()
     outputSynchronizer.setDelegate(self, queue: cameraOutputQueue)
@@ -219,9 +233,6 @@ class HSCameraManager: NSObject {
         if connection.isVideoStabilizationSupported {
           connection.preferredVideoStabilizationMode = .auto
         }
-        if connection.isVideoOrientationSupported {
-          connection.videoOrientation = .portrait
-        }
       }
     } else {
       return .failure
@@ -255,8 +266,7 @@ class HSCameraManager: NSObject {
 
       let depthFormats = supportedDepthFormats.filter { format in
         return
-          CMFormatDescriptionGetMediaSubType(format.formatDescription) == kCVPixelFormatType_DisparityFloat32
-          || CMFormatDescriptionGetMediaSubType(format.formatDescription) == kCVPixelFormatType_DisparityFloat16
+          CMFormatDescriptionGetMediaSubType(format.formatDescription) == kCVPixelFormatType_DepthFloat16 // TODO
       }
 
       let highestResolutionDepthFormat = depthFormats.max { a, b in
