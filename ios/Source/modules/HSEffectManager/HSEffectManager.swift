@@ -72,8 +72,8 @@ class HSEffectManager: NSObject {
     }
     let isDepth = [kCVPixelFormatType_DepthFloat16, kCVPixelFormatType_DepthFloat32].contains(depthData.depthDataType)
     let disparityData = isDepth ? depthData.converting(toDepthDataType: kCVPixelFormatType_DisparityFloat16) : depthData
-    let portraitDisparityData = disparityData.applyingExifOrientation(.right)
-    let depthPixelBuffer = HSPixelBuffer(depthData: portraitDisparityData)
+    let rotatedDisparityData = disparityData.applyingExifOrientation(.right)
+    let depthPixelBuffer = HSPixelBuffer(depthData: rotatedDisparityData)
     guard
       let image = depthBlurEffect.makeEffectImage(
         previewMode: .portraitBlur,
@@ -85,20 +85,8 @@ class HSEffectManager: NSObject {
       return
     }
     if let commandBuffer = commandQueue.makeCommandBuffer(), let drawable = effectView.currentDrawable {
-      let outputImage = flipImageHorizontally(image: image)
-      let aspectRatio = outputImage.extent.width / outputImage.extent.height
-      let scaleHeight = (effectView.frame.height * aspectRatio) / outputImage.extent.width
-      let scaleWidth = effectView.frame.width / outputImage.extent.width
-      let scale = (outputImage.extent.height * scaleWidth) < effectView.frame.height
-        ? scaleHeight
-        : scaleWidth
-      guard let filter = CIFilter(name: "CILanczosScaleTransform") else {
-        return
-      }
-      filter.setValue(outputImage, forKey: kCIInputImageKey)
-      filter.setValue(scale, forKey: kCIInputScaleKey)
-      filter.setValue(1.0, forKey: kCIInputAspectRatioKey)
-      if let resizedImage = filter.outputImage {
+      let outputImage = imageByFlippingHorizontally(image: image)
+      if let resizedImage = imageByResizing(image: outputImage, toFitView: effectView) {
         context.render(
           resizedImage,
           to: drawable.texture,
@@ -124,7 +112,23 @@ class HSEffectManager: NSObject {
   }
 }
 
-fileprivate func flipImageHorizontally(image: CIImage) -> CIImage {
+fileprivate func imageByFlippingHorizontally(image: CIImage) -> CIImage {
   let transform = image.orientationTransform(for: .upMirrored)
   return image.transformed(by: transform)
+}
+
+fileprivate func imageByResizing(image: CIImage, toFitView view: UIView) -> CIImage? {
+  let aspectRatio = image.extent.width / image.extent.height
+  let scaleHeight = (view.frame.height * aspectRatio) / image.extent.width
+  let scaleWidth = view.frame.width / image.extent.width
+  let scale = (image.extent.height * scaleWidth) < view.frame.height
+    ? scaleHeight
+    : scaleWidth
+  guard let filter = CIFilter(name: "CILanczosScaleTransform") else {
+    return nil
+  }
+  filter.setValue(image, forKey: kCIInputImageKey)
+  filter.setValue(scale, forKey: kCIInputScaleKey)
+  filter.setValue(1.0, forKey: kCIInputAspectRatioKey)
+  return filter.outputImage
 }
