@@ -57,6 +57,7 @@ export type CameraCaptureProps = {
   activeCameraSetting: $Keys<typeof CameraSettingIdentifiers>,
   cameraSettings: CameraSettings,
   supportedISORange: CameraISORange,
+  showManualCameraControls?: boolean,
   onRequestFocus: ({ x: number, y: number }) => void,
   onRequestChangeISO: number => void,
   onRequestChangeExposure: number => void,
@@ -73,6 +74,7 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
   cameraRef,
   cameraSettings,
   activeCameraSetting,
+  showManualCameraControls = false,
   onRequestFocus,
   onRequestChangeISO,
   onRequestChangeExposure,
@@ -105,24 +107,28 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
         />
       </View>
       <View style={styles.bottomControls}>
-        <View style={styles.cameraControlsRow}>
-          <RangeInputDial
-            min={cameraSettings[activeCameraSetting].supportedRange.min}
-            max={cameraSettings[activeCameraSetting].supportedRange.max}
-            onSelectValue={updateSelectedCameraSettingValue}
-          />
-        </View>
-        <View style={styles.cameraControlsRow}>
-          <CameraSettingsSelect
-            options={Object.values(CameraSettingIdentifiers)}
-            keyForOption={option => `${CameraSettingIdentifiers[option]}`}
-            labelTextForOption={option =>
-              formatSettingName(option, cameraSettings)
-            }
-            isSelectedOption={option => activeCameraSetting === option}
-            onRequestSelectOption={onRequestSelectActiveCameraSetting}
-          />
-        </View>
+        {showManualCameraControls && (
+          <>
+            <View style={styles.cameraControlsRow}>
+              <RangeInputDial
+                min={cameraSettings[activeCameraSetting].supportedRange.min}
+                max={cameraSettings[activeCameraSetting].supportedRange.max}
+                onSelectValue={updateSelectedCameraSettingValue}
+              />
+            </View>
+            <View style={styles.cameraControlsRow}>
+              <CameraSettingsSelect
+                options={Object.values(CameraSettingIdentifiers)}
+                keyForOption={option => `${CameraSettingIdentifiers[option]}`}
+                labelTextForOption={option =>
+                  formatSettingName(option, cameraSettings)
+                }
+                isSelectedOption={option => activeCameraSetting === option}
+                onRequestSelectOption={onRequestSelectActiveCameraSetting}
+              />
+            </View>
+          </>
+        )}
         <View style={styles.cameraControlsRow}>
           <CaptureButton
             onRequestBeginCapture={onRequestBeginCapture}

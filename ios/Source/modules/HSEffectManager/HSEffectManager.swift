@@ -86,14 +86,28 @@ class HSEffectManager: NSObject {
     }
     if let commandBuffer = commandQueue.makeCommandBuffer(), let drawable = effectView.currentDrawable {
       let outputImage = flipImageHorizontally(image: image)
-      context.render(
-        outputImage,
-        to: drawable.texture,
-        commandBuffer: commandBuffer,
-        bounds: outputImage.extent,
-        colorSpace: colorSpace
-      )
-      effectView.drawableSize = outputImage.extent.size
+      let aspectRatio = outputImage.extent.width / outputImage.extent.height
+      let scaleHeight = (effectView.frame.height * aspectRatio) / outputImage.extent.width
+      let scaleWidth = effectView.frame.width / outputImage.extent.width
+      let scale = (outputImage.extent.height * scaleWidth) < effectView.frame.height
+        ? scaleHeight
+        : scaleWidth
+      guard let filter = CIFilter(name: "CILanczosScaleTransform") else {
+        return
+      }
+      filter.setValue(outputImage, forKey: kCIInputImageKey)
+      filter.setValue(scale, forKey: kCIInputScaleKey)
+      filter.setValue(1.0, forKey: kCIInputAspectRatioKey)
+      if let resizedImage = filter.outputImage {
+        context.render(
+          resizedImage,
+          to: drawable.texture,
+          commandBuffer: commandBuffer,
+          bounds: resizedImage.extent,
+          colorSpace: colorSpace
+        )
+        effectView.drawableSize = effectView.frame.size
+      }
       commandBuffer.present(drawable)
       commandBuffer.commit()
     }
