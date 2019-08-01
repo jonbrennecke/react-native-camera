@@ -76,6 +76,7 @@ const Component = CameraStateContainer(
       <StorybookStateWrapper
         initialState={{
           showFormatModal: false,
+          enableDepthPreview: false,
           cameraRef: React.createRef(),
           activeCameraSetting: CameraSettingIdentifiers.Exposure,
         }}
@@ -133,6 +134,7 @@ const Component = CameraStateContainer(
                 }}
                 supportedISORange={supportedISORange}
                 activeCameraSetting={getState().activeCameraSetting}
+                enableDepthPreview={getState().enableDepthPreview}
                 onRequestBeginCapture={startCapture}
                 onRequestEndCapture={() =>
                   stopCapture({
@@ -151,6 +153,7 @@ const Component = CameraStateContainer(
                   setState({ activeCameraSetting: cameraSetting });
                 }}
                 onRequestShowFormatDialog={() => setState({ showFormatModal: true })}
+                onRequestToggleDepthPreview={() => setState({ enableDepthPreview: !getState().enableDepthPreview })}
               />
             </>
           );

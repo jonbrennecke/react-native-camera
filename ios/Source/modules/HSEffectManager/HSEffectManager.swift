@@ -7,6 +7,7 @@ import UIKit
 @available(iOS 11.0, *)
 @objc
 class HSEffectManager: NSObject {
+  private let printDebugLog = true
   private let preferredFramesPerSecond = 15
 
   private lazy var mtlDevice: MTLDevice! = {
@@ -36,22 +37,12 @@ class HSEffectManager: NSObject {
   private lazy var context = CIContext(mtlDevice: mtlDevice, options: [CIContextOption.workingColorSpace: NSNull()])
   private let grayscaleColorSpace = CGColorSpaceCreateDeviceGray()
   private let colorSpace = CGColorSpaceCreateDeviceRGB()
-  private let printDebugLog = false
   private lazy var depthBlurEffect = HSDepthBlurEffect()
   private lazy var displayLink: CADisplayLink = {
     let displayLink = CADisplayLink(target: self, selector: #selector(handleDisplayLinkUpdate))
     displayLink.preferredFramesPerSecond = preferredFramesPerSecond
     return displayLink
   }()
-
-  @objc(sharedInstance)
-  public static let shared = HSEffectManager()
-
-  @objc
-  public var depthData: AVDepthData?
-
-  @objc
-  public var videoSampleBuffer: CMSampleBuffer?
 
   @objc
   private func handleDisplayLinkUpdate(displayLink: CADisplayLink) {
@@ -73,11 +64,11 @@ class HSEffectManager: NSObject {
     let isDepth = [kCVPixelFormatType_DepthFloat16, kCVPixelFormatType_DepthFloat32].contains(depthData.depthDataType)
     let disparityData = isDepth ? depthData.converting(toDepthDataType: kCVPixelFormatType_DisparityFloat16) : depthData
     let rotatedDisparityData = disparityData.applyingExifOrientation(.right)
-    let depthPixelBuffer = HSPixelBuffer(depthData: rotatedDisparityData)
+    let disparityPixelBuffer = HSPixelBuffer(depthData: rotatedDisparityData)
     guard
       let image = depthBlurEffect.makeEffectImage(
-        previewMode: .portraitBlur,
-        depthPixelBuffer: depthPixelBuffer,
+        previewMode: isDepthPreviewEnabled ? .depth : .portraitBlur,
+        disparityPixelBuffer: disparityPixelBuffer,
         videoPixelBuffer: videoPixelBuffer,
         aperture: HSCameraManager.shared.aperture
       )
@@ -104,6 +95,19 @@ class HSEffectManager: NSObject {
       print("[HSEffectManager]: Render time: \(totalTime)")
     }
   }
+
+  public var isDepthPreviewEnabled = false
+
+  // MARK: - Objective-C interface
+
+  @objc(sharedInstance)
+  public static let shared = HSEffectManager()
+
+  @objc
+  public var depthData: AVDepthData?
+
+  @objc
+  public var videoSampleBuffer: CMSampleBuffer?
 
   @objc(start:)
   public func start(_ completionHandler: @escaping () -> Void) {

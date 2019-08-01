@@ -2,6 +2,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
+import { Units } from '../../constants';
+
 import type { SFC, Style } from '../../types';
 
 const styles = {
@@ -21,22 +23,31 @@ const styles = {
     fontWeight: 'bold',
     textAlign: 'center',
   },
+  separator: {
+    width: Units.small,
+  },
 };
 
 export type TopCameraControlsToolbarProps = {
   style?: ?Style,
   onRequestShowFormatDialog: () => void,
+  onRequestToggleDepthPreview: () => void,
 };
 
 export const TopCameraControlsToolbar: SFC<TopCameraControlsToolbarProps> = ({
   style,
   onRequestShowFormatDialog,
+  onRequestToggleDepthPreview,
 }: TopCameraControlsToolbarProps) => {
   return (
     <View style={[styles.container, style]}>
       <View style={styles.controlsRow}>
         <TouchableOpacity onPress={onRequestShowFormatDialog}>
           <Text style={styles.text}>{'Resolution'.toLocaleUpperCase()}</Text>
+        </TouchableOpacity>
+        <View style={styles.separator} />
+        <TouchableOpacity onPress={onRequestToggleDepthPreview}>
+          <Text style={styles.text}>{'Depth'.toLocaleUpperCase()}</Text>
         </TouchableOpacity>
       </View>
     </View>

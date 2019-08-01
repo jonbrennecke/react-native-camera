@@ -19,4 +19,14 @@ class HSCameraEffectView: UIView {
     super.layoutSubviews()
     effectView.frame = bounds
   }
+
+  @objc
+  public var isDepthPreviewEnabled: Bool {
+    get {
+      return HSEffectManager.shared.isDepthPreviewEnabled
+    }
+    set {
+      HSEffectManager.shared.isDepthPreviewEnabled = newValue
+    }
+  }
 }

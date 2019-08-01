@@ -58,6 +58,7 @@ export type CameraCaptureProps = {
   cameraSettings: CameraSettings,
   supportedISORange: CameraISORange,
   showManualCameraControls?: boolean,
+  enableDepthPreview?: boolean,
   onRequestFocus: ({ x: number, y: number }) => void,
   onRequestChangeISO: number => void,
   onRequestChangeExposure: number => void,
@@ -67,6 +68,7 @@ export type CameraCaptureProps = {
   onRequestBeginCapture: () => void,
   onRequestEndCapture: () => void,
   onRequestShowFormatDialog: () => void,
+  onRequestToggleDepthPreview: () => void,
 };
 
 export const CameraCapture: SFC<CameraCaptureProps> = ({
@@ -75,6 +77,7 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
   cameraSettings,
   activeCameraSetting,
   showManualCameraControls = false,
+  enableDepthPreview = false,
   onRequestFocus,
   onRequestChangeISO,
   onRequestChangeExposure,
@@ -82,6 +85,7 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
   onRequestBeginCapture,
   onRequestEndCapture,
   onRequestShowFormatDialog,
+  onRequestToggleDepthPreview,
 }: CameraCaptureProps) => {
   const updateSelectedCameraSettingValue = (value: number) => {
     switch (activeCameraSetting) {
@@ -98,9 +102,13 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
       <TopCameraControlsToolbar
         style={styles.cameraControlsRow}
         onRequestShowFormatDialog={onRequestShowFormatDialog}
+        onRequestToggleDepthPreview={onRequestToggleDepthPreview}
       />
       <View style={styles.cameraWrap}>
-        <CameraEffect style={styles.flex} />
+        <CameraEffect
+          style={styles.flex}
+          isDepthPreviewEnabled={enableDepthPreview}
+        />
         <CameraFocusArea
           style={styles.absoluteFill}
           onRequestFocus={onRequestFocus}

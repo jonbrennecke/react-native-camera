@@ -4,6 +4,7 @@ import CoreImage
 import HSCameraUtils
 
 class HSDepthBlurEffect {
+
   private lazy var mtlDevice: MTLDevice! = {
     guard let mtlDevice = MTLCreateSystemDefaultDevice() else {
       fatalError("Failed to create Metal device")
@@ -11,16 +12,13 @@ class HSDepthBlurEffect {
     return mtlDevice
   }()
 
-//  private lazy var context = CIContext(mtlDevice: mtlDevice)
-  private lazy var context = CIContext()
-//  private lazy var context = CIContext(options: [
-  ////    CIContextOption.useSoftwareRenderer: true,
-  ////    CIContextOption.workingColorSpace: CGColorSpaceCreateDeviceGray(),
-  ////    CIContextOption.outputColorSpace: CGColorSpaceCreateDeviceGray(),
-//    CIContextOption.workingColorSpace: CGColorSpaceCreateDeviceGray(),
-  ////    CIContextOption.workingFormat: kCVPixelFormatType_OneComponent8
-  ////    kCIImageColorSpace: null
-//  ])
+  private lazy var context = CIContext(
+    mtlDevice: mtlDevice,
+    options: [
+      CIContextOption.useSoftwareRenderer: false,
+      CIContextOption.workingFormat: kCVPixelFormatType_16Gray,
+    ]
+  )
 
   public lazy var faceDetector: CIDetector? = {
     let options = [CIDetectorAccuracy: CIDetectorAccuracyHigh]
@@ -34,13 +32,11 @@ class HSDepthBlurEffect {
 
   public func makeEffectImage(
     previewMode: PreviewMode,
-    depthPixelBuffer: HSPixelBuffer, // Depth or disparity
+    disparityPixelBuffer: HSPixelBuffer,
     videoPixelBuffer: HSPixelBuffer,
     aperture: Float
   ) -> CIImage? {
-    let disparityImage = CIImage(cvPixelBuffer: depthPixelBuffer.buffer)
-//    let isDepth = [kCVPixelFormatType_DepthFloat16, kCVPixelFormatType_DepthFloat32].contains(depthPixelBuffer.pixelFormatType)
-//    let disparityImage = isDepth ? depthOrDisparityImage.applyingFilter("CIDepthToDisparity") : depthOrDisparityImage
+    let disparityImage = CIImage(cvPixelBuffer: disparityPixelBuffer.buffer)
     guard let normalizedDisparityImage = normalize(image: disparityImage, context: context) else {
       return nil
     }
@@ -51,6 +47,8 @@ class HSDepthBlurEffect {
       return nil
     }
     let videoImage = CIImage(cvPixelBuffer: videoPixelBuffer.buffer)
+
+//    videoPixelBuffer.withDataPointer(<#T##fn: (UnsafeRawPointer) -> R##(UnsafeRawPointer) -> R#>)
 
     // TODO: check if videoPixelBuffer.buffer or depthPixelBuffer.buffer are null
 
@@ -120,7 +118,6 @@ fileprivate func minMaxFast(image inputImage: CIImage, context: CIContext = CICo
   else {
     return nil
   }
-  let startTime = CFAbsoluteTimeGetCurrent()
   var pixels = [UInt8](repeating: 0, count: 2)
   context.render(areaMinMaxImage,
                  toBitmap: &pixels,
@@ -128,9 +125,6 @@ fileprivate func minMaxFast(image inputImage: CIImage, context: CIContext = CICo
                  bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
                  format: CIFormat.RG8,
                  colorSpace: nil)
-  let executionTime = CFAbsoluteTimeGetCurrent() - startTime
-  print("Execution Time: \(executionTime)")
-
   return (min: Float(pixels[0]) / 255, max: Float(pixels[1]) / 255)
 }
 

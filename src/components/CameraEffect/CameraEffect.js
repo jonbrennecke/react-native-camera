@@ -8,8 +8,15 @@ const NativeCameraEffectView = requireNativeComponent('HSCameraEffectView');
 
 export type CameraEffectProps = {
   style?: ?Style,
+  isDepthPreviewEnabled?: boolean,
 };
 
 export const CameraEffect: SFC<CameraEffectProps> = ({
   style,
-}: CameraEffectProps) => <NativeCameraEffectView style={style} />;
+  isDepthPreviewEnabled = false,
+}: CameraEffectProps) => (
+  <NativeCameraEffectView
+    style={style}
+    isDepthPreviewEnabled={isDepthPreviewEnabled}
+  />
+);

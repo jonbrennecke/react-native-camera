@@ -8,6 +8,8 @@
 
 RCT_EXPORT_MODULE(HSCameraEffectViewManager)
 
+RCT_EXPORT_VIEW_PROPERTY(isDepthPreviewEnabled, BOOL)
+
 - (UIView *)view {
   HSCameraEffectView *previewView = [[HSCameraEffectView alloc] init];
   return (UIView *)previewView;

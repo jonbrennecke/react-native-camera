@@ -39,7 +39,8 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
     guard
       let depthBlurImage = depthBlurEffect.makeEffectImage(
         previewMode: isDepthPreviewEnabled ? .depth : .portraitBlur,
-        depthPixelBuffer: HSPixelBuffer(pixelBuffer: depthPixelBuffer),
+        // TODO: ensure depthPixelBuffer is disparity, not depth
+        disparityPixelBuffer: HSPixelBuffer(pixelBuffer: depthPixelBuffer),
         videoPixelBuffer: HSPixelBuffer(pixelBuffer: videoPixelBuffer),
         aperture: aperture
       ),
