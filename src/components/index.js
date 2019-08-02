@@ -7,3 +7,4 @@ export * from './CameraFormatList';
 export * from './VideoComposition';
 export * from './VideoCompositionEdit';
 export * from './buttons';
+export * from './CaptureButton';
