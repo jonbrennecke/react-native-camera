@@ -5,3 +5,4 @@ export * from './CameraCapture';
 export * from './CameraFormatList';
 export * from './VideoComposition';
 export * from './VideoCompositionEdit';
+export * from './buttons';

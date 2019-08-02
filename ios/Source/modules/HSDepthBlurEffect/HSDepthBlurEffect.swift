@@ -26,7 +26,7 @@ class HSDepthBlurEffect {
     let options = [CIDetectorAccuracy: CIDetectorAccuracyHigh]
     return CIDetector(ofType: CIDetectorTypeFace, context: nil, options: options)
   }()
-  
+
   public enum QualityMode {
     case previewQuality
     case exportQuality

@@ -3,6 +3,7 @@ import React from 'react';
 import { storiesOf } from '@storybook/react-native';
 import { SafeAreaView, Modal, View } from 'react-native';
 import { Provider } from 'react-redux';
+import noop from 'lodash/noop';
 
 import {
   CameraSettingIdentifiers,
@@ -40,6 +41,10 @@ const styles = {
     width: '100%',
     backgroundColor: '#000',
     bottom: 0,
+  },
+  thumbnail: {
+    backgroundColor: '#000',
+    flex: 1,
   }
 };
 
@@ -71,7 +76,6 @@ const Component = CameraStateContainer(
         console.error(error);
       }
     };
-
     return (
       <StorybookStateWrapper
         initialState={{
@@ -155,6 +159,8 @@ const Component = CameraStateContainer(
                 }}
                 onRequestShowFormatDialog={() => setState({ showFormatModal: true })}
                 onRequestToggleDepthPreview={() => setState({ enableDepthPreview: !getState().enableDepthPreview })}
+                onPressThumbnailButton={() => console.log('onPressThumbnailButton')}
+                renderThumbnail={() => <View style={styles.thumbnail}/>}
               />
             </>
           );

@@ -7,6 +7,7 @@ import { CameraEffect } from '../CameraEffect';
 import { CaptureButton } from '../CaptureButton';
 import { CameraFocusArea } from '../CameraFocusArea';
 import { RangeInputDial } from '../RangeInputDial';
+import { ThumbnailButton } from '../';
 import { CameraSettingsSelect } from '../CameraSettingsSelect';
 import { TopCameraControlsToolbar } from '../cameraControls';
 import { Units, CameraSettingIdentifiers } from '../../constants';
@@ -15,7 +16,7 @@ import {
   makeDefaultValueFormatter,
 } from '../../utils';
 
-import type { SFC, Style, ReturnType } from '../../types';
+import type { SFC, Style, ReturnType, Children } from '../../types';
 import type { CameraISORange } from '../../state';
 
 const styles = {
@@ -34,6 +35,11 @@ const styles = {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  captureRowItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   cameraWrap: (cameraLayoutStyle: 'boxed' | 'fullscreen') =>
     cameraLayoutStyle === 'boxed'
@@ -84,6 +90,7 @@ export type CameraCaptureProps = {
   supportedISORange: CameraISORange,
   showManualCameraControls?: boolean,
   enableDepthPreview?: boolean,
+  renderThumbnail: () => Children,
   onRequestFocus: ({ x: number, y: number }) => void,
   onRequestChangeISO: number => void,
   onRequestChangeExposure: number => void,
@@ -94,6 +101,7 @@ export type CameraCaptureProps = {
   onRequestEndCapture: () => void,
   onRequestShowFormatDialog: () => void,
   onRequestToggleDepthPreview: () => void,
+  onPressThumbnailButton: () => void,
 };
 
 export const CameraCapture: SFC<CameraCaptureProps> = ({
@@ -104,6 +112,7 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
   activeCameraSetting,
   showManualCameraControls = false,
   enableDepthPreview = false,
+  renderThumbnail,
   onRequestFocus,
   onRequestChangeISO,
   onRequestChangeExposure,
@@ -112,6 +121,7 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
   onRequestEndCapture,
   onRequestShowFormatDialog,
   onRequestToggleDepthPreview,
+  onPressThumbnailButton,
 }: CameraCaptureProps) => {
   const updateSelectedCameraSettingValue = (value: number) => {
     switch (activeCameraSetting) {
@@ -165,10 +175,18 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
           </>
         )}
         <View style={styles.cameraControlsRow}>
-          <CaptureButton
-            onRequestBeginCapture={onRequestBeginCapture}
-            onRequestEndCapture={onRequestEndCapture}
-          />
+          <View style={styles.captureRowItem}>
+            <ThumbnailButton onPress={onPressThumbnailButton}>
+              {renderThumbnail()}
+            </ThumbnailButton>
+          </View>
+          <View style={styles.captureRowItem}>
+            <CaptureButton
+              onRequestBeginCapture={onRequestBeginCapture}
+              onRequestEndCapture={onRequestEndCapture}
+            />
+          </View>
+          <View style={styles.captureRowItem} />
         </View>
       </View>
     </View>
