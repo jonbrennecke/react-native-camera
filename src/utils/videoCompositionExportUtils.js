@@ -33,11 +33,11 @@ export const addVideoCompositionExportProgressListener = (
 };
 
 export const addVideoCompositionExportFinishedListener = (
-  listener: () => void
+  listener: (url: string) => void
 ) => {
   return VideoCompositionExportManagerEventEmitter.addListener(
     VideoCompositionExportManagerEvents.DidFinishExport,
-    listener
+    ({ url }) => listener(url)
   );
 };
 

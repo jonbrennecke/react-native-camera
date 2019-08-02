@@ -29,7 +29,10 @@
 }
 
 - (NSArray<NSString *> *)supportedEvents {
-  return @[ @"videoExportManagerDidUpdateProgress" ];
+  return @[
+    @"videoExportManagerDidUpdateProgress", @"videoExportManagerDidFinish",
+    @"videoExportManagerDidFail"
+  ];
 }
 
 RCT_EXPORT_MODULE(HSVideoCompositionExportManager)
@@ -95,9 +98,19 @@ RCT_EXPORT_METHOD(export
 }
 
 - (void)videoExportManagerDidFailWithError:(NSError *_Nonnull)error {
+  if (!hasListeners) {
+    return;
+  }
+  id body = RCTJSErrorFromNSError(error);
+  [self sendEventWithName:@"videoExportManagerDidFail" body:body];
 }
 
 - (void)videoExportManagerDidFinishExporting:(NSURL *_Nonnull)url {
+  if (!hasListeners) {
+    return;
+  }
+  id body = @{@"url" : [url absoluteString]};
+  [self sendEventWithName:@"videoExportManagerDidFinish" body:body];
 }
 
 @end

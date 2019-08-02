@@ -8,6 +8,8 @@ import identity from 'lodash/identity';
 import {
   exportComposition,
   addVideoCompositionExportProgressListener,
+  addVideoCompositionExportFinishedListener,
+  addVideoCompositionExportFailedListener,
 } from '../../utils';
 
 import type { ComponentType } from 'react';
@@ -56,6 +58,12 @@ export function wrapWithVideoCompositionEditState<
       exportListener: ?ReturnType<
         typeof addVideoCompositionExportProgressListener
       >;
+      exportFinishedListener: ?ReturnType<
+        typeof addVideoCompositionExportFinishedListener
+      >;
+      exportFailedListener: ?ReturnType<
+        typeof addVideoCompositionExportFailedListener
+      >;
 
       togglePortraitMode() {
         this.setState({
@@ -73,11 +81,25 @@ export function wrapWithVideoCompositionEditState<
         this.exportListener = addVideoCompositionExportProgressListener(
           this.onExportProgress
         );
+        this.exportFinishedListener = addVideoCompositionExportFinishedListener(
+          this.onExportFinished
+        );
+        this.exportFailedListener = addVideoCompositionExportFailedListener(
+          this.onExportFailed
+        );
         await exportComposition(assetID);
       }
 
       onExportProgress(progress: number) {
         this.setState({ exportProgress: progress });
+      }
+
+      onExportFinished(url: string) {
+        console.log('export finished', url);
+      }
+
+      onExportFailed(error: Error) {
+        console.warn(error);
       }
 
       render() {
