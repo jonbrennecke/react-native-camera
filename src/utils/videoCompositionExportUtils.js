@@ -28,6 +28,6 @@ export const addVideoCompositionExportProgressListener = (
 ) => {
   return VideoCompositionExportManagerEventEmitter.addListener(
     VideoCompositionExportManagerEvents.DidUpdateProgress,
-    listener
+    ({ progress }) => listener(progress)
   );
 };
