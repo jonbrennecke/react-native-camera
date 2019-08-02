@@ -252,6 +252,7 @@
 		FC73F2F522B02C20009B6D9F /* views */ = {
 			isa = PBXGroup;
 			children = (
+				FC03B64D22DFF1F900E283B3 /* HSVideoCompositionView */,
 				FC845E6622B9B10E00522016 /* HSCameraEffectView */,
 				FC845E1C22B98F2100522016 /* HSCameraView */,
 			);
@@ -266,7 +267,6 @@
 				FC552C9E22E9388500775729 /* HSExportManager */,
 				FC20ADFB22E9121600181579 /* HSVideoComposition */,
 				FC31DAB522E6284000D1FADD /* HSDepthBlurEffect */,
-				FC03B64D22DFF1F900E283B3 /* HSVideoCompositionView */,
 				FCBFAF1222CBF38F00A0AC11 /* HSSegmentation */,
 				FC845E6022B9AC4B00522016 /* HSEffectManager */,
 				FC7B9EB022B97EF40012D8D6 /* HSCameraManager */,

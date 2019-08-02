@@ -90,7 +90,7 @@ RCT_EXPORT_METHOD(export
   if (!hasListeners) {
     return;
   }
-  id body = @{ @"progess" : @(progress) };
+  id body = @{ @"progress" : @(progress) };
   [self sendEventWithName:@"videoExportManagerDidUpdateProgress" body:body];
 }
 
