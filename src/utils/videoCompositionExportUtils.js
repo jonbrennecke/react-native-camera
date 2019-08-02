@@ -31,3 +31,21 @@ export const addVideoCompositionExportProgressListener = (
     ({ progress }) => listener(progress)
   );
 };
+
+export const addVideoCompositionExportFinishedListener = (
+  listener: () => void
+) => {
+  return VideoCompositionExportManagerEventEmitter.addListener(
+    VideoCompositionExportManagerEvents.DidFinishExport,
+    listener
+  );
+};
+
+export const addVideoCompositionExportFailedListener = (
+  listener: (error: Error) => void
+) => {
+  return VideoCompositionExportManagerEventEmitter.addListener(
+    VideoCompositionExportManagerEvents.DidFail,
+    listener
+  );
+};
