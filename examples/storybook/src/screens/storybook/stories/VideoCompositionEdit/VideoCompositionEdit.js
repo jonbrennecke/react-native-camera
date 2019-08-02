@@ -30,7 +30,7 @@ const styles = {
   },
   safeArea: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#222',
   },
 };
 

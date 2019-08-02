@@ -5,7 +5,7 @@ import noop from 'lodash/noop';
 
 import { Seekbar } from '@jonbrennecke/react-native-media';
 
-import { SelectableButton } from '../buttons';
+import { SelectableButton, IconButton } from '../buttons';
 import { VideoComposition } from '../VideoComposition';
 import { Units } from '../../constants';
 
@@ -22,6 +22,7 @@ export type VideoCompositionEditProps = {
   onRequestTogglePortraitMode: () => void,
   onRequestToggleDepthPreview: () => void,
   onRequestExport: () => void,
+  onRequestDelete: () => void,
 };
 
 const styles = {
@@ -31,7 +32,13 @@ const styles = {
   container: {
     backgroundColor: '#000',
   },
-  toolbar: ({ align = 'center' }: { align?: 'left' | 'right' | 'center' }) => ({
+  toolbar: ({
+    align = 'center',
+    backgroundColor = 'transparent',
+  }: {
+    align?: 'left' | 'right' | 'center',
+    backgroundColor?: string,
+  }) => ({
     paddingVertical: Units.small,
     paddingHorizontal: align !== 'center' ? Units.small : 0,
     alignItems: 'center',
@@ -41,6 +48,7 @@ const styles = {
       center: 'center',
     }[align],
     flexDirection: 'row',
+    backgroundColor,
   }),
   seekbar: {
     height: 50,
@@ -79,6 +87,7 @@ export const VideoCompositionEdit: SFC<VideoCompositionEditProps> = ({
   onRequestTogglePortraitMode,
   onRequestToggleDepthPreview,
   onRequestExport,
+  onRequestDelete,
 }: VideoCompositionEditProps) => (
   <View style={[styles.container, style]}>
     <View style={styles.toolbar({ align: 'right' })}>
@@ -120,6 +129,10 @@ export const VideoCompositionEdit: SFC<VideoCompositionEditProps> = ({
         isSelected={enableDepthPreview}
         onPress={onRequestToggleDepthPreview}
       />
+    </View>
+    <View style={styles.toolbar({ align: 'left', backgroundColor: '#222' })}>
+      <IconButton isSelected={false} onPress={onRequestExport} />
+      <IconButton isSelected={false} onPress={onRequestDelete} />
     </View>
   </View>
 );
