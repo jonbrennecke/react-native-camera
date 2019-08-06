@@ -76,7 +76,9 @@ class HSEffectManager: NSObject {
       return
     }
     if let commandBuffer = commandQueue.makeCommandBuffer(), let drawable = effectView.currentDrawable {
-      let outputImage = imageByFlippingHorizontally(image: image)
+      // TODO: if back camera, image is not flipped
+//      let outputImage = imageByFlippingHorizontally(image: image)
+      let outputImage = image
       if let resizedImage = imageByResizing(image: outputImage, toFitView: effectView) {
         context.render(
           resizedImage,

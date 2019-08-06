@@ -90,15 +90,17 @@ class HSDepthBlurEffect {
 }
 
 fileprivate func composeDisparityImage(pixelBuffer: HSPixelBuffer, context: CIContext, shouldNormalize: Bool) -> CIImage? {
-  guard let disparityImage = HSImageBuffer(pixelBuffer: pixelBuffer).makeCIImage() else {
+  guard let disparityImage =
+    HSImageBuffer(pixelBuffer: pixelBuffer).makeCIImage()
+//      .oriented(CGImagePropertyOrientation.right)
+//      .transformed(by: CGAffineTransform(scaleX: -1, y: 1))
+  else {
     return nil
   }
-  let orientationFixedDisparityImage = disparityImage.oriented(CGImagePropertyOrientation.right)
   if shouldNormalize {
-    return normalize(image: orientationFixedDisparityImage, context: context)?
-      .applyingFilter("CIGaussianBlur", parameters: ["inputRadius": 0.5])
+    return normalize(image: disparityImage, context: context)
   }
-  return orientationFixedDisparityImage
+  return disparityImage
 }
 
 fileprivate func normalize(image inputImage: CIImage, context: CIContext) -> CIImage? {
@@ -186,7 +188,7 @@ fileprivate func depthBlurEffectFilter(scale: Float, aperture: Float) -> CIFilte
   }
   filter.setDefaults()
   filter.setValue(scale, forKey: "inputScaleFactor")
-  filter.setValue(aperture, forKey: "inputAperture")
+  filter.setValue(aperture, forKey: "inputAperture") // TODO:
   //    filter.setValue(inputCalibrationData, forKey: "inputCalibrationData")
   //    filter.setValue(inputAuxDataMetadata, forKey: "inputAuxDataMetadata")
   //    filter.setValue(inputFocusRect, forKey: "inputFocusRect")

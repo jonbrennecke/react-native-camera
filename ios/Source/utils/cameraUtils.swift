@@ -1,7 +1,7 @@
 import AVFoundation
 
 @available(iOS 11.1, *)
-internal func captureDevice(withPosition position: AVCaptureDevice.Position) -> AVCaptureDevice? {
+internal func depthEnabledCaptureDevice(withPosition position: AVCaptureDevice.Position) -> AVCaptureDevice? {
   let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [
     .builtInTrueDepthCamera, .builtInDualCamera,
   ], mediaType: .video, position: position)
@@ -14,31 +14,31 @@ internal func getOppositeCamera(session: AVCaptureSession) -> AVCaptureDevice? {
   return AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: position)
 }
 
-// NOTE: defaults to the front camera
-fileprivate func getOppositeCameraPosition(session: AVCaptureSession) -> AVCaptureDevice.Position {
-  let device = getActiveCaptureDevice(session: session)
+fileprivate func getOppositeCameraPosition(session: AVCaptureSession, defaultPosition: AVCaptureDevice.Position = .front) -> AVCaptureDevice.Position {
+  let device = activeCaptureDevice(session: session)
   switch device?.position {
   case .some(.back):
     return .front
   case .some(.front):
     return .back
   default:
-    return .front
+    return defaultPosition
   }
 }
 
-fileprivate func getActiveCaptureDevice(session: AVCaptureSession) -> AVCaptureDevice? {
+internal func activeCaptureDevicePosition(session: AVCaptureSession) -> AVCaptureDevice.Position? {
+  let device = activeCaptureDevice(session: session)
+  return device?.position
+}
+
+fileprivate func activeCaptureDevice(session: AVCaptureSession) -> AVCaptureDevice? {
   return session.inputs.reduce(nil) { (device, input) -> AVCaptureDevice? in
     if input.isKind(of: AVCaptureDeviceInput.classForCoder()) {
       let device = (input as! AVCaptureDeviceInput).device
-      if isFrontOrBackCamera(device: device) {
+      if device.position != .unspecified {
         return device
       }
     }
     return device
   }
-}
-
-fileprivate func isFrontOrBackCamera(device: AVCaptureDevice) -> Bool {
-  return [.back, .front].contains(device.position)
 }

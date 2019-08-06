@@ -136,7 +136,7 @@ class HSCameraManager: NSObject {
       captureSession.sessionPreset = preset
     }
 
-    videoCaptureDevice = captureDevice(withPosition: .front)
+    videoCaptureDevice = depthEnabledCaptureDevice(withPosition: .front)
     guard case .some = videoCaptureDevice else {
       return .failure
     }
@@ -156,19 +156,6 @@ class HSCameraManager: NSObject {
     if case .failure = setupDepthOutput() {
       return .failure
     }
-
-    // TODO:
-//    if let videoCaptureDevice = videoCaptureDevice {
-//       if case .some = try? videoCaptureDevice.lockForConfiguration() {
-//        if videoCaptureDevice.isFocusModeSupported(.locked) {
-//          videoCaptureDevice.focusMode = .locked
-//        }
-//        if videoCaptureDevice.isExposureModeSupported(.locked) {
-//          videoCaptureDevice.exposureMode = .locked
-//        }
-//        videoCaptureDevice.unlockForConfiguration()
-//      }
-//    }
 
     configureActiveFormat()
     outputSynchronizer.setDelegate(self, queue: cameraOutputQueue)
@@ -216,6 +203,11 @@ class HSCameraManager: NSObject {
         if connection.isVideoOrientationSupported {
           connection.videoOrientation = .portrait
         }
+        if case .some(.front) = activeCaptureDevicePosition(session: captureSession) {
+          if connection.isVideoMirroringSupported {
+            connection.isVideoMirrored = true
+          }
+        }
       }
     } else {
       return .failure
@@ -233,9 +225,6 @@ class HSCameraManager: NSObject {
         if connection.isVideoStabilizationSupported {
           connection.preferredVideoStabilizationMode = .auto
         }
-//        if connection.isVideoOrientationSupported {
-//          connection.videoOrientation = .portrait
-//        }
       }
     } else {
       return .failure
@@ -593,15 +582,20 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
   func dataOutputSynchronizer(
     _: AVCaptureDataOutputSynchronizer, didOutput collection: AVCaptureSynchronizedDataCollection
   ) {
+    let orientation: CGImagePropertyOrientation = activeCaptureDevicePosition(session: captureSession) == .some(.front)
+      ? .leftMirrored : .right
+    
     if case let .recording(_, startTime) = state {
-      outputProcessingQueue.async { // TODO: weak self
-        if let synchronizedDepthData = collection.synchronizedData(for: self.depthOutput) as? AVCaptureSynchronizedDepthData {
+      outputProcessingQueue.async { [weak self] in
+        guard let strongSelf = self else { return }
+        if let synchronizedDepthData = collection.synchronizedData(for: strongSelf.depthOutput) as? AVCaptureSynchronizedDepthData {
           let presentationTime = synchronizedDepthData.timestamp - startTime
-          self.record(depthData: synchronizedDepthData.depthData, at: presentationTime)
+          let depthData = synchronizedDepthData.depthData.applyingExifOrientation(orientation)
+          strongSelf.record(depthData: depthData, at: presentationTime)
         }
-        if let synchronizedVideoData = collection.synchronizedData(for: self.videoOutput) as? AVCaptureSynchronizedSampleBufferData {
+        if let synchronizedVideoData = collection.synchronizedData(for: strongSelf.videoOutput) as? AVCaptureSynchronizedSampleBufferData {
           let presentationTime = synchronizedVideoData.timestamp - startTime
-          self.record(sampleBuffer: synchronizedVideoData.sampleBuffer, at: presentationTime)
+          strongSelf.record(sampleBuffer: synchronizedVideoData.sampleBuffer, at: presentationTime)
         }
       }
     }
@@ -612,7 +606,8 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
       guard let strongSelf = self, let depthDelegate = strongSelf.depthDelegate else { return }
       if let synchronizedDepthData = collection.synchronizedData(for: strongSelf.depthOutput) as? AVCaptureSynchronizedDepthData {
         if !synchronizedDepthData.depthDataWasDropped {
-          depthDelegate.cameraManagerDidOutput(depthData: synchronizedDepthData.depthData)
+          let depthData = synchronizedDepthData.depthData.applyingExifOrientation(orientation)
+          depthDelegate.cameraManagerDidOutput(depthData: depthData)
         }
       }
       if let synchronizedVideoData = collection.synchronizedData(for: strongSelf.videoOutput) as? AVCaptureSynchronizedSampleBufferData {
