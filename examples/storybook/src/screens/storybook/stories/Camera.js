@@ -55,7 +55,16 @@ stories.add('Camera', () => (
               Depth: 'depth',
               'Portrait mode': 'portraitMode',
             },
-            'depth'
+            'normal'
+          )}
+          resizeMode={select(
+            'Resize mode',
+            {
+              'Scale to fit width': 'scaleAspectWidth',
+              'Scale to fit height': 'scaleAspectHeight',
+              'Scale to fill': 'scaleAspectFill'
+            },
+            'scaleAspectWidth'
           )}
         />
       )}

@@ -21,7 +21,6 @@
 		FC552CA022E9390900775729 /* HSVideoCompositionExportManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC552C9F22E9390900775729 /* HSVideoCompositionExportManagerDelegate.swift */; };
 		FC552CA222E939F800775729 /* HSVideoCompositionExportManagerBridgeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = FC552CA122E939F800775729 /* HSVideoCompositionExportManagerBridgeModule.m */; };
 		FC664EE322CAD98000FD8AE7 /* HSEffectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E5E22B9ABF600522016 /* HSEffectManager.swift */; };
-		FC664EE422CAD98900FD8AE7 /* HSEffectManagerBridgeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = FC845E6122B9AEED00522016 /* HSEffectManagerBridgeModule.m */; };
 		FC664EE522CAD98D00FD8AE7 /* HSCameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7B9EAA22B97DB40012D8D6 /* HSCameraManager.swift */; };
 		FC664EE622CAD98D00FD8AE7 /* HSCameraManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7B9EAC22B97EB90012D8D6 /* HSCameraManagerDelegate.swift */; };
 		FC664EE722CAD98D00FD8AE7 /* HSCameraManagerDepthDataDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC845E6A22B9B30000522016 /* HSCameraManagerDepthDataDelegate.swift */; };
@@ -47,6 +46,8 @@
 		FCBFAF0B22CBE9CB00A0AC11 /* libHSCameraUtils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FC71B6CB22CAB23A003EA230 /* libHSCameraUtils.a */; };
 		FCBFAF0F22CBF07200A0AC11 /* HSSegmentationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBFAF0E22CBF07200A0AC11 /* HSSegmentationModel.swift */; };
 		FCBFAF1122CBF28B00A0AC11 /* createSegmentationMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBFAF1022CBF28B00A0AC11 /* createSegmentationMask.swift */; };
+		FCC96F3622FA9DAA00CDCEB2 /* HSResizeMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC96F3522FA9DAA00CDCEB2 /* HSResizeMode.swift */; };
+		FCC96F3922FA9E1300CDCEB2 /* HSResizeMode+RCTConvert.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC96F3822FA9E1300CDCEB2 /* HSResizeMode+RCTConvert.m */; };
 		FCDE2BD122EB604D0025177E /* HSCameraFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCDE2BD022EB604D0025177E /* HSCameraFormat.swift */; };
 		FCDF906422E6885900AD5F4D /* HSMinMaxInterval.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCDF906322E6885900AD5F4D /* HSMinMaxInterval.swift */; };
 		FCDF906622E6899000AD5F4D /* NSDictionaryConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCDF906522E6899000AD5F4D /* NSDictionaryConvertible.swift */; };
@@ -117,8 +118,8 @@
 		FC7B9EB122B980F60012D8D6 /* permissions.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = permissions.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC7EFBE522FA11A10002B254 /* AVCaptureDevicePosition+RCTConvert.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "AVCaptureDevicePosition+RCTConvert.m"; sourceTree = "<group>"; };
 		FC7EFBE822FA121C0002B254 /* AVCaptureDevicePosition+RCTConvert.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AVCaptureDevicePosition+RCTConvert.h"; sourceTree = "<group>"; };
-		FC7EFBE922FA203E0002B254 /* HSVideoPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSVideoPreviewView.swift; sourceTree = "<group>"; };
-		FC7EFBEB22FA20550002B254 /* HSDepthPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSDepthPreviewView.swift; sourceTree = "<group>"; };
+		FC7EFBE922FA203E0002B254 /* HSVideoPreviewView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSVideoPreviewView.swift; sourceTree = "<group>"; tabWidth = 2; };
+		FC7EFBEB22FA20550002B254 /* HSDepthPreviewView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSDepthPreviewView.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC7EFBED22FA55AF0002B254 /* HSEffectPreviewMode.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSEffectPreviewMode.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC7EFBEF22FA560D0002B254 /* HSEffectPreviewMode+RCTConvert.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "HSEffectPreviewMode+RCTConvert.m"; sourceTree = "<group>"; };
 		FC7EFBF122FA561E0002B254 /* HSEffectPreviewMode+RCTConvert.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HSEffectPreviewMode+RCTConvert.h"; sourceTree = "<group>"; };
@@ -129,8 +130,6 @@
 		FC845E1D22B992B200522016 /* HSCameraManagerBridgeModule.m */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.c.objc; path = HSCameraManagerBridgeModule.m; sourceTree = "<group>"; tabWidth = 2; };
 		FC845E1F22B992BB00522016 /* HSCameraManagerBridgeModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSCameraManagerBridgeModule.h; sourceTree = "<group>"; };
 		FC845E5E22B9ABF600522016 /* HSEffectManager.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSEffectManager.swift; sourceTree = "<group>"; tabWidth = 2; };
-		FC845E6122B9AEED00522016 /* HSEffectManagerBridgeModule.m */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.c.objc; path = HSEffectManagerBridgeModule.m; sourceTree = "<group>"; tabWidth = 2; };
-		FC845E6322B9AEF500522016 /* HSEffectManagerBridgeModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSEffectManagerBridgeModule.h; sourceTree = "<group>"; };
 		FC845E6A22B9B30000522016 /* HSCameraManagerDepthDataDelegate.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSCameraManagerDepthDataDelegate.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC845E7D22BC843100522016 /* mathUtils.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = mathUtils.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC904B8C22EFDB0F0010AD4F /* FromDictionary.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = FromDictionary.swift; sourceTree = "<group>"; tabWidth = 2; };
@@ -143,6 +142,9 @@
 		FCBFAF0722CBE27300A0AC11 /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		FCBFAF0E22CBF07200A0AC11 /* HSSegmentationModel.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSSegmentationModel.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FCBFAF1022CBF28B00A0AC11 /* createSegmentationMask.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = createSegmentationMask.swift; sourceTree = "<group>"; tabWidth = 2; };
+		FCC96F3522FA9DAA00CDCEB2 /* HSResizeMode.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSResizeMode.swift; sourceTree = "<group>"; tabWidth = 2; };
+		FCC96F3822FA9E1300CDCEB2 /* HSResizeMode+RCTConvert.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "HSResizeMode+RCTConvert.m"; sourceTree = "<group>"; };
+		FCC96F3A22FA9E1D00CDCEB2 /* HSResizeMode+RCTConvert.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HSResizeMode+RCTConvert.h"; sourceTree = "<group>"; };
 		FCDE2BD022EB604D0025177E /* HSCameraFormat.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSCameraFormat.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FCDEEBEB22CC534C00B09AF2 /* libHSReactNativeCamera.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHSReactNativeCamera.a; path = "../../../../../Library/Developer/Xcode/DerivedData/Storybook-aykofoufjpltyqchwrnbfzpoimmw/Build/Products/Debug-iphoneos/libHSReactNativeCamera.a"; sourceTree = "<group>"; };
 		FCDF906322E6885900AD5F4D /* HSMinMaxInterval.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSMinMaxInterval.swift; sourceTree = "<group>"; tabWidth = 2; };
@@ -301,10 +303,6 @@
 				FC845E1722B98D6300522016 /* HSCameraView.swift */,
 				FC845E1B22B98E5F00522016 /* HSCameraViewManager.h */,
 				FC845E1922B98E5600522016 /* HSCameraViewManager.m */,
-				FC7EFBE522FA11A10002B254 /* AVCaptureDevicePosition+RCTConvert.m */,
-				FC7EFBE822FA121C0002B254 /* AVCaptureDevicePosition+RCTConvert.h */,
-				FC7EFBEF22FA560D0002B254 /* HSEffectPreviewMode+RCTConvert.m */,
-				FC7EFBF122FA561E0002B254 /* HSEffectPreviewMode+RCTConvert.h */,
 				FC7EFBE922FA203E0002B254 /* HSVideoPreviewView.swift */,
 				FC7EFBEB22FA20550002B254 /* HSDepthPreviewView.swift */,
 			);
@@ -315,8 +313,6 @@
 			isa = PBXGroup;
 			children = (
 				FC845E5E22B9ABF600522016 /* HSEffectManager.swift */,
-				FC845E6122B9AEED00522016 /* HSEffectManagerBridgeModule.m */,
-				FC845E6322B9AEF500522016 /* HSEffectManagerBridgeModule.h */,
 			);
 			path = HSEffectManager;
 			sourceTree = "<group>";
@@ -337,6 +333,7 @@
 				FC904B8F22EFDB280010AD4F /* Size+FromDictionary.swift */,
 				FCDF906322E6885900AD5F4D /* HSMinMaxInterval.swift */,
 				FC904B9122EFDBB20010AD4F /* HSMinMaxInterval+FromDictionary.swift */,
+				FCC96F3522FA9DAA00CDCEB2 /* HSResizeMode.swift */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -361,11 +358,25 @@
 			path = HSSegmentation;
 			sourceTree = "<group>";
 		};
+		FCC96F3722FA9DBC00CDCEB2 /* RCTConvert */ = {
+			isa = PBXGroup;
+			children = (
+				FC7EFBE522FA11A10002B254 /* AVCaptureDevicePosition+RCTConvert.m */,
+				FC7EFBE822FA121C0002B254 /* AVCaptureDevicePosition+RCTConvert.h */,
+				FC7EFBEF22FA560D0002B254 /* HSEffectPreviewMode+RCTConvert.m */,
+				FC7EFBF122FA561E0002B254 /* HSEffectPreviewMode+RCTConvert.h */,
+				FCC96F3822FA9E1300CDCEB2 /* HSResizeMode+RCTConvert.m */,
+				FCC96F3A22FA9E1D00CDCEB2 /* HSResizeMode+RCTConvert.h */,
+			);
+			path = RCTConvert;
+			sourceTree = "<group>";
+		};
 		FCDAC44F22AE01A6004A36E7 /* Source */ = {
 			isa = PBXGroup;
 			children = (
 				FC73F2F622B02D56009B6D9F /* modules */,
 				FC73F2F522B02C20009B6D9F /* views */,
+				FCC96F3722FA9DBC00CDCEB2 /* RCTConvert */,
 				FCA0A4C122ACC92700A93C32 /* utils */,
 			);
 			path = Source;
@@ -489,7 +500,6 @@
 				FC664EE722CAD98D00FD8AE7 /* HSCameraManagerDepthDataDelegate.swift in Sources */,
 				FCEF518522E8F50400672D6A /* HSExportManagerDelegate.swift in Sources */,
 				FC552CA222E939F800775729 /* HSVideoCompositionExportManagerBridgeModule.m in Sources */,
-				FC664EE422CAD98900FD8AE7 /* HSEffectManagerBridgeModule.m in Sources */,
 				FCDF906422E6885900AD5F4D /* HSMinMaxInterval.swift in Sources */,
 				FC664EED22CAD9A500FD8AE7 /* HSCameraView.swift in Sources */,
 				FC904B9222EFDBB20010AD4F /* HSMinMaxInterval+FromDictionary.swift in Sources */,
@@ -513,9 +523,11 @@
 				FCADFE2922E1521B00E3C76A /* HSVideoCompositor.swift in Sources */,
 				FC914B8822E8F3A9001691F7 /* HSExportManager.swift in Sources */,
 				FC7EFBF022FA560D0002B254 /* HSEffectPreviewMode+RCTConvert.m in Sources */,
+				FCC96F3922FA9E1300CDCEB2 /* HSResizeMode+RCTConvert.m in Sources */,
 				FC664EF022CAD9AA00FD8AE7 /* cameraUtils.swift in Sources */,
 				FC664EE922CAD99000FD8AE7 /* HSCameraManagerBridgeModule.m in Sources */,
 				FC03B63022DFDB0700E283B3 /* HSPortraitMaskFactory.swift in Sources */,
+				FCC96F3622FA9DAA00CDCEB2 /* HSResizeMode.swift in Sources */,
 				FC904B8D22EFDB0F0010AD4F /* FromDictionary.swift in Sources */,
 				FCBFAF0F22CBF07200A0AC11 /* HSSegmentationModel.swift in Sources */,
 				FCA6525822E8F63C0000620C /* HSVideoComposition.swift in Sources */,

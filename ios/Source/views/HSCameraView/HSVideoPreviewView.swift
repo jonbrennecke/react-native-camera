@@ -3,10 +3,14 @@ import UIKit
 
 class HSVideoPreviewView: UIView {
   private lazy var previewLayer: AVCaptureVideoPreviewLayer = {
-    let layer = AVCaptureVideoPreviewLayer(session: HSCameraManager.shared.captureSession)
-    layer.videoGravity = .resizeAspectFill
-    return layer
+    return AVCaptureVideoPreviewLayer(session: HSCameraManager.shared.captureSession)
   }()
+    
+  public var resizeMode: HSResizeMode = .scaleAspectWidth {
+    didSet {
+      previewLayer.videoGravity = resizeMode.videoGravity
+    }
+  }
 
   override func didMoveToSuperview() {
     super.didMoveToSuperview()

@@ -16,10 +16,16 @@ export type CameraPosition = 'front' | 'back';
 
 export type CameraPreviewMode = 'normal' | 'depth' | 'portraitMode';
 
+export type CameraResizeMode =
+  | 'scaleAspectWidth'
+  | 'scaleAspectHeight'
+  | 'scaleAspectFill';
+
 export type CameraProps = {
   style?: ?Style,
   cameraPosition?: CameraPosition,
   previewMode?: CameraPreviewMode,
+  resizeMode?: CameraResizeMode,
 };
 
 export class Camera extends Component<CameraProps> {
@@ -40,7 +46,8 @@ export class Camera extends Component<CameraProps> {
       <NativeCameraView
         ref={this.nativeComponentRef}
         cameraPosition={this.props.cameraPosition || 'front'}
-        previewMode={this.props.previewMode || 'depth'}
+        previewMode={this.props.previewMode || 'normal'}
+        resizeMode={this.props.resizeMode || 'scaleAspectWidth'}
         style={this.props.style}
       />
     );

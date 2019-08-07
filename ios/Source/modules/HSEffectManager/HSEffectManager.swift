@@ -44,6 +44,9 @@ class HSEffectManager: NSObject {
     displayLink.preferredFramesPerSecond = preferredFramesPerSecond
     return displayLink
   }()
+  
+  public var previewMode: HSEffectPreviewMode = .portraitMode
+  public var resizeMode: HSResizeMode = .scaleAspectWidth
 
   @objc
   private func handleDisplayLinkUpdate(displayLink: CADisplayLink) {
@@ -79,7 +82,7 @@ class HSEffectManager: NSObject {
       return
     }
     if let commandBuffer = commandQueue.makeCommandBuffer(), let drawable = effectView.currentDrawable {
-      if let resizedImage = resize(image: image, in: effectView.frame.size) {
+      if let resizedImage = resize(image: image, in: effectView.frame.size, resizeMode: resizeMode) {
         context.render(
           resizedImage,
           to: drawable.texture,
@@ -96,8 +99,6 @@ class HSEffectManager: NSObject {
       print("[HSEffectManager]: Render time: \(totalTime)")
     }
   }
-
-  public var previewMode: HSEffectPreviewMode = .portraitMode
 
   public func startDisplayLink() {
     HSCameraManager.shared.depthDelegate = self
@@ -119,13 +120,6 @@ class HSEffectManager: NSObject {
 
   @objc
   public var videoSampleBuffer: CMSampleBuffer?
-
-  // TODO: remove
-  @objc(start:)
-  public func start(_ completionHandler: @escaping () -> Void) {
-    displayLink.add(to: .main, forMode: .default)
-    completionHandler()
-  }
 }
 
 extension HSEffectManager: HSCameraManagerDepthDataDelegate {
@@ -138,13 +132,7 @@ extension HSEffectManager: HSCameraManagerDepthDataDelegate {
   }
 }
 
-fileprivate enum ResizeMode {
-  case scaleToFitWidth
-  case scaleToFitHeight
-  case scaleToFill
-}
-
-fileprivate func resize(image: CIImage, in size: CGSize, resizeMode: ResizeMode = .scaleToFitWidth) -> CIImage? {
+fileprivate func resize(image: CIImage, in size: CGSize, resizeMode: HSResizeMode) -> CIImage? {
   guard let filter = CIFilter(name: "CILanczosScaleTransform") else {
     return nil
   }
@@ -154,18 +142,18 @@ fileprivate func resize(image: CIImage, in size: CGSize, resizeMode: ResizeMode 
   return filter.outputImage
 }
 
-fileprivate func calculateScale(from imageSize: CGSize, in size: CGSize, resizeMode: ResizeMode) -> CGFloat {
+fileprivate func calculateScale(from imageSize: CGSize, in size: CGSize, resizeMode: HSResizeMode) -> CGFloat {
   let aspectRatio = imageSize.width / imageSize.height
   let scaleHeight = (size.height * aspectRatio) / size.width
   let scaleWidth = size.width / imageSize.width
   switch resizeMode {
-  case .scaleToFill:
+  case .scaleAspectFill:
     return (imageSize.height * scaleWidth) < size.height
       ? scaleHeight
       : scaleWidth
-  case .scaleToFitWidth:
+  case .scaleAspectWidth:
     return scaleWidth
-  case .scaleToFitHeight:
+  case .scaleAspectHeight:
     return scaleHeight
   }
 }

@@ -5,6 +5,7 @@
 
 #import "HSCameraViewManager.h"
 #import "HSEffectPreviewMode+RCTConvert.h"
+#import "HSResizeMode+RCTConvert.h"
 #import "HSReactNativeCamera-Swift.h"
 
 @implementation HSCameraViewManager
@@ -19,6 +20,8 @@ RCT_EXPORT_MODULE(HSCameraViewManager)
 RCT_EXPORT_VIEW_PROPERTY(cameraPosition, AVCaptureDevicePosition)
 
 RCT_EXPORT_VIEW_PROPERTY(previewMode, HSEffectPreviewMode)
+
+RCT_EXPORT_VIEW_PROPERTY(resizeMode, HSResizeMode)
 
 RCT_EXPORT_METHOD(focusOnPoint
                   : (nonnull NSNumber *)reactTag point
