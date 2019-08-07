@@ -44,7 +44,7 @@ class HSEffectManager: NSObject {
     displayLink.preferredFramesPerSecond = preferredFramesPerSecond
     return displayLink
   }()
-  
+
   public var previewMode: HSEffectPreviewMode = .portraitMode
   public var resizeMode: HSResizeMode = .scaleAspectWidth
 

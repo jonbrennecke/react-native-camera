@@ -5,8 +5,8 @@
 
 #import "HSCameraViewManager.h"
 #import "HSEffectPreviewMode+RCTConvert.h"
-#import "HSResizeMode+RCTConvert.h"
 #import "HSReactNativeCamera-Swift.h"
+#import "HSResizeMode+RCTConvert.h"
 
 @implementation HSCameraViewManager
 

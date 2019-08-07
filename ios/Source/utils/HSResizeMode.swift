@@ -5,7 +5,7 @@ public enum HSResizeMode: Int {
   case scaleAspectWidth
   case scaleAspectHeight
   case scaleAspectFill
-    
+
   public var videoGravity: AVLayerVideoGravity {
     switch self {
     case .scaleAspectFill:

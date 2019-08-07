@@ -3,9 +3,9 @@ import UIKit
 
 class HSVideoPreviewView: UIView {
   private lazy var previewLayer: AVCaptureVideoPreviewLayer = {
-    return AVCaptureVideoPreviewLayer(session: HSCameraManager.shared.captureSession)
+    AVCaptureVideoPreviewLayer(session: HSCameraManager.shared.captureSession)
   }()
-    
+
   public var resizeMode: HSResizeMode = .scaleAspectWidth {
     didSet {
       previewLayer.videoGravity = resizeMode.videoGravity

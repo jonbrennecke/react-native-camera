@@ -55,7 +55,7 @@ stories.add('Camera', () => (
               Depth: 'depth',
               'Portrait mode': 'portraitMode',
             },
-            'normal'
+            'depth'
           )}
           resizeMode={select(
             'Resize mode',

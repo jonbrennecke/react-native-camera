@@ -66,7 +66,7 @@ class HSCameraView: UIView {
       HSEffectManager.shared.previewMode = newValue
     }
   }
-  
+
   @objc
   public var resizeMode: HSResizeMode = .scaleAspectFill {
     didSet {
