@@ -1,9 +1,9 @@
 // @flow
 import React from 'react';
 import { storiesOf } from '@storybook/react-native';
+import { withKnobs } from '@storybook/addon-knobs';
 import { SafeAreaView, Modal, View } from 'react-native';
 import { Provider } from 'react-redux';
-import noop from 'lodash/noop';
 
 import {
   CameraSettingIdentifiers,
@@ -16,7 +16,7 @@ import {
   filterBestAvailableFormats,
   uniqueKeyForFormat,
   areFormatsEqual,
-  startCameraEffects
+  startCameraEffects,
 } from '@jonbrennecke/react-native-camera';
 
 import { createReduxStore } from './cameraStore';
@@ -45,7 +45,7 @@ const styles = {
   thumbnail: {
     backgroundColor: '#000',
     flex: 1,
-  }
+  },
 };
 
 const CameraStateContainer = createCameraStateHOC();
@@ -63,7 +63,7 @@ const Component = CameraStateContainer(
     loadSupportedFeatures,
     updateISO,
     updateExposure,
-    updateFormat
+    updateFormat,
   }) => {
     const setup = async (): Promise<void> => {
       try {
@@ -88,15 +88,14 @@ const Component = CameraStateContainer(
         render={(getState, setState) => {
           return (
             <>
-              <Modal
-                transparent
-                visible={getState().showFormatModal}
-              >
+              <Modal transparent visible={getState().showFormatModal}>
                 <View style={styles.modal}>
                   <CameraFormatList
                     style={styles.flex}
                     items={filterBestAvailableFormats(supportedFormats)}
-                    keyForItem={({ format, depthFormat }) => uniqueKeyForFormat(format, depthFormat)}
+                    keyForItem={({ format, depthFormat }) =>
+                      uniqueKeyForFormat(format, depthFormat)
+                    }
                     renderItem={({ format, depthFormat }) => (
                       <CameraFormatListItem
                         isActive={areFormatsEqual(format, activeFormat)}
@@ -104,7 +103,7 @@ const Component = CameraStateContainer(
                         depthFormat={depthFormat}
                         onPress={() => {
                           updateFormat(format, depthFormat);
-                          setState({ showFormatModal: false })
+                          setState({ showFormatModal: false });
                         }}
                       />
                     )}
@@ -157,10 +156,18 @@ const Component = CameraStateContainer(
                 onRequestSelectActiveCameraSetting={cameraSetting => {
                   setState({ activeCameraSetting: cameraSetting });
                 }}
-                onRequestShowFormatDialog={() => setState({ showFormatModal: true })}
-                onRequestToggleDepthPreview={() => setState({ enableDepthPreview: !getState().enableDepthPreview })}
-                onPressThumbnailButton={() => console.log('onPressThumbnailButton')}
-                renderThumbnail={() => <View style={styles.thumbnail}/>}
+                onRequestShowFormatDialog={() =>
+                  setState({ showFormatModal: true })
+                }
+                onRequestToggleDepthPreview={() =>
+                  setState({
+                    enableDepthPreview: !getState().enableDepthPreview,
+                  })
+                }
+                onPressThumbnailButton={() =>
+                  console.log('onPressThumbnailButton')
+                }
+                renderThumbnail={() => <View style={styles.thumbnail} />}
               />
             </>
           );
@@ -170,7 +177,9 @@ const Component = CameraStateContainer(
   }
 );
 
-storiesOf('Camera', module).add('Camera Capture', () => (
+const stories = storiesOf('Camera', module);
+stories.addDecorator(withKnobs);
+stories.add('Camera Capture', () => (
   <Provider store={store}>
     <SafeAreaView style={styles.safeArea}>
       <Component />

@@ -154,10 +154,6 @@ RCT_EXPORT_METHOD(stopCameraCapture
                    }];
 }
 
-RCT_EXPORT_METHOD(switchToOppositeCamera) {
-  [HSCameraManager.sharedInstance switchToOppositeCamera];
-}
-
 - (void)startObserving {
   hasListeners = YES;
 }

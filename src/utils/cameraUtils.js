@@ -4,12 +4,8 @@ import { NativeModules } from 'react-native';
 
 import type { CameraFormat } from '../state';
 
-const {
-  HSCameraManager: NativeCameraManager,
-  HSEffectManager: NativeEffectManager,
-} = NativeModules;
+const { HSCameraManager: NativeCameraManager } = NativeModules;
 const CameraManager = Bluebird.promisifyAll(NativeCameraManager);
-const EffectManager = Bluebird.promisifyAll(NativeEffectManager);
 
 export const requestCameraPermissions = async (): Promise<boolean> => {
   return CameraManager.requestCameraPermissionsAsync();
@@ -27,13 +23,6 @@ export const stopCameraPreview = () => {
   CameraManager.stopCameraPreview();
 };
 
-export const startCameraEffects = async () => {
-  const success = await EffectManager.startAsync();
-  if (!success) {
-    throw new Error('Failed to start camera effects');
-  }
-};
-
 export const startCameraCapture = async () => {
   return await CameraManager.startCameraCaptureAsync();
 };
@@ -44,10 +33,6 @@ export const stopCameraCapture = async ({
   saveToCameraRoll: boolean,
 }): Promise<void> => {
   return await CameraManager.stopCameraCaptureAsync(saveToCameraRoll);
-};
-
-export const switchToOppositeCamera = () => {
-  CameraManager.switchToOppositeCamera();
 };
 
 export const getSupportedISORange = async (): Promise<{

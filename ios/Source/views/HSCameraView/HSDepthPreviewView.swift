@@ -1,10 +1,7 @@
-import AVFoundation
 import MetalKit
 import UIKit
 
-@available(iOS 11.1, *)
-@objc
-class HSCameraEffectView: UIView {
+class HSDepthPreviewView: UIView {
   private var effectView: MTKView {
     return HSEffectManager.shared.effectView
   }
@@ -18,15 +15,6 @@ class HSCameraEffectView: UIView {
   override func layoutSubviews() {
     super.layoutSubviews()
     effectView.frame = bounds
-  }
-
-  @objc
-  public var isDepthPreviewEnabled: Bool {
-    get {
-      return HSEffectManager.shared.isDepthPreviewEnabled
-    }
-    set {
-      HSEffectManager.shared.isDepthPreviewEnabled = newValue
-    }
+    effectView.drawableSize = effectView.frame.size
   }
 }

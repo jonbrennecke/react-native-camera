@@ -1,6 +1,7 @@
 // @flow
 import React from 'react';
 import { storiesOf } from '@storybook/react-native';
+import { withKnobs, select } from '@storybook/addon-knobs';
 import { SafeAreaView } from 'react-native';
 
 import {
@@ -30,11 +31,34 @@ const loadAsync = async () => {
   }
 };
 
-storiesOf('Camera', module).add('Camera', () => (
+const stories = storiesOf('Camera', module);
+stories.addDecorator(withKnobs);
+stories.add('Camera', () => (
   <SafeAreaView style={styles.flex}>
     <StorybookAsyncWrapper
       loadAsync={loadAsync}
-      render={() => <Camera style={styles.camera} />}
+      render={() => (
+        <Camera
+          style={styles.camera}
+          cameraPosition={select(
+            'Camera Position',
+            {
+              Front: 'front',
+              Back: 'back',
+            },
+            'front'
+          )}
+          previewMode={select(
+            'Preview mode',
+            {
+              Normal: 'normal',
+              Depth: 'depth',
+              'Portrait mode': 'portraitMode',
+            },
+            'depth'
+          )}
+        />
+      )}
     />
   </SafeAreaView>
 ));

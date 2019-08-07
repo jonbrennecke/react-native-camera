@@ -3,7 +3,6 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 
 import { Camera } from '../Camera';
-import { CameraEffect } from '../CameraEffect';
 import { CaptureButton } from '../CaptureButton';
 import { CameraFocusArea } from '../CameraFocusArea';
 import { RangeInputDial } from '../RangeInputDial';
@@ -142,7 +141,7 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
       />
       <View style={styles.cameraWrapSpacer(cameraLayoutStyle)} />
       <View style={styles.cameraWrap(cameraLayoutStyle)}>
-        <CameraEffect
+        <Camera
           style={styles.flex}
           isDepthPreviewEnabled={enableDepthPreview}
         />

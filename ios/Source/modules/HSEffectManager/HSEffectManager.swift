@@ -24,11 +24,12 @@ class HSEffectManager: NSObject {
     view.preferredFramesPerSecond = preferredFramesPerSecond
     view.autoResizeDrawable = true
     view.enableSetNeedsDisplay = false
+    view.drawableSize = view.frame.size
     return view
   }()
 
   private lazy var commandQueue: MTLCommandQueue! = {
-    guard let commandQueue = mtlDevice.makeCommandQueue() else {
+    guard let commandQueue = mtlDevice.makeCommandQueue(maxCommandBufferCount: 10) else {
       fatalError("Failed to create Metal command queue")
     }
     return commandQueue
@@ -46,14 +47,16 @@ class HSEffectManager: NSObject {
 
   @objc
   private func handleDisplayLinkUpdate(displayLink: CADisplayLink) {
-    guard let depthData = depthData, let videoSampleBuffer = videoSampleBuffer else {
-      return
+    autoreleasepool {
+      guard let depthData = depthData, let videoSampleBuffer = videoSampleBuffer else {
+        return
+      }
+      if printDebugLog {
+        let actualFramesPerSecond = 1 / (displayLink.targetTimestamp - displayLink.timestamp)
+        print("[HSEffectManager]: Frames per second: \(actualFramesPerSecond)")
+      }
+      applyEffects(with: depthData, videoSampleBuffer: videoSampleBuffer)
     }
-    if printDebugLog {
-      let actualFramesPerSecond = 1 / (displayLink.targetTimestamp - displayLink.timestamp)
-      print("[HSEffectManager]: Frames per second: \(actualFramesPerSecond)")
-    }
-    applyEffects(with: depthData, videoSampleBuffer: videoSampleBuffer)
   }
 
   private func applyEffects(with depthData: AVDepthData, videoSampleBuffer: CMSampleBuffer) {
@@ -66,7 +69,7 @@ class HSEffectManager: NSObject {
     let disparityPixelBuffer = HSPixelBuffer(depthData: disparityData)
     guard
       let image = depthBlurEffect.makeEffectImage(
-        previewMode: isDepthPreviewEnabled ? .depth : .portraitBlur,
+        previewMode: previewMode == .depth ? .depth : .portraitBlur,
         qualityMode: .previewQuality,
         disparityPixelBuffer: disparityPixelBuffer,
         videoPixelBuffer: videoPixelBuffer,
@@ -76,10 +79,7 @@ class HSEffectManager: NSObject {
       return
     }
     if let commandBuffer = commandQueue.makeCommandBuffer(), let drawable = effectView.currentDrawable {
-      // TODO: if back camera, image is not flipped
-//      let outputImage = imageByFlippingHorizontally(image: image)
-      let outputImage = image
-      if let resizedImage = imageByResizing(image: outputImage, toFitView: effectView) {
+      if let resizedImage = resize(image: image, in: effectView.frame.size) {
         context.render(
           resizedImage,
           to: drawable.texture,
@@ -87,7 +87,6 @@ class HSEffectManager: NSObject {
           bounds: resizedImage.extent,
           colorSpace: colorSpace
         )
-        effectView.drawableSize = effectView.frame.size
       }
       commandBuffer.present(drawable)
       commandBuffer.commit()
@@ -98,7 +97,17 @@ class HSEffectManager: NSObject {
     }
   }
 
-  public var isDepthPreviewEnabled = false
+  public var previewMode: HSEffectPreviewMode = .portraitMode
+
+  public func startDisplayLink() {
+    HSCameraManager.shared.depthDelegate = self
+    displayLink.add(to: .main, forMode: .default)
+  }
+
+  public func stopDisplayLink() {
+    HSCameraManager.shared.depthDelegate = nil
+    displayLink.remove(from: .main, forMode: .default)
+  }
 
   // MARK: - Objective-C interface
 
@@ -111,6 +120,7 @@ class HSEffectManager: NSObject {
   @objc
   public var videoSampleBuffer: CMSampleBuffer?
 
+  // TODO: remove
   @objc(start:)
   public func start(_ completionHandler: @escaping () -> Void) {
     displayLink.add(to: .main, forMode: .default)
@@ -118,23 +128,44 @@ class HSEffectManager: NSObject {
   }
 }
 
-fileprivate func imageByFlippingHorizontally(image: CIImage) -> CIImage {
-  let transform = image.orientationTransform(for: .upMirrored)
-  return image.transformed(by: transform)
+extension HSEffectManager: HSCameraManagerDepthDataDelegate {
+  func cameraManagerDidOutput(depthData: AVDepthData) {
+    self.depthData = depthData
+  }
+
+  func cameraManagerDidOutput(videoSampleBuffer: CMSampleBuffer) {
+    self.videoSampleBuffer = videoSampleBuffer
+  }
 }
 
-fileprivate func imageByResizing(image: CIImage, toFitView view: UIView) -> CIImage? {
-  let aspectRatio = image.extent.width / image.extent.height
-  let scaleHeight = (view.frame.height * aspectRatio) / image.extent.width
-  let scaleWidth = view.frame.width / image.extent.width
-  let scale = (image.extent.height * scaleWidth) < view.frame.height
-    ? scaleHeight
-    : scaleWidth
+fileprivate enum ResizeMode {
+  case scaleToFitWidth
+  case scaleToFitHeight
+  case scaleToFill
+}
+
+fileprivate func resize(image: CIImage, in size: CGSize, resizeMode: ResizeMode = .scaleToFitWidth) -> CIImage? {
   guard let filter = CIFilter(name: "CILanczosScaleTransform") else {
     return nil
   }
   filter.setValue(image, forKey: kCIInputImageKey)
-  filter.setValue(scale, forKey: kCIInputScaleKey)
+  filter.setValue(calculateScale(from: image.extent.size, in: size, resizeMode: resizeMode), forKey: kCIInputScaleKey)
   filter.setValue(1.0, forKey: kCIInputAspectRatioKey)
   return filter.outputImage
+}
+
+fileprivate func calculateScale(from imageSize: CGSize, in size: CGSize, resizeMode: ResizeMode) -> CGFloat {
+  let aspectRatio = imageSize.width / imageSize.height
+  let scaleHeight = (size.height * aspectRatio) / size.width
+  let scaleWidth = size.width / imageSize.width
+  switch resizeMode {
+  case .scaleToFill:
+    return (imageSize.height * scaleWidth) < size.height
+      ? scaleHeight
+      : scaleWidth
+  case .scaleToFitWidth:
+    return scaleWidth
+  case .scaleToFitHeight:
+    return scaleHeight
+  }
 }

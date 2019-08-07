@@ -10,7 +10,7 @@ import {
   requestCameraPermissions,
   getSupportedFormats,
   filterBestAvailableFormats,
-  uniqueKeyForFormat
+  uniqueKeyForFormat,
 } from '@jonbrennecke/react-native-camera';
 
 import { StorybookStateWrapper } from '../utils';
@@ -18,7 +18,7 @@ import { StorybookStateWrapper } from '../utils';
 import type { CameraFormat } from '@jonbrennecke/react-native-camera';
 
 type State = {
-  bestAvailableFormats: { depthFormat: CameraFormat, format: CameraFormat }[]
+  bestAvailableFormats: { depthFormat: CameraFormat, format: CameraFormat }[],
 };
 
 const styles = {
@@ -28,7 +28,7 @@ const styles = {
   safeArea: {
     flex: 1,
     backgroundColor: '#000',
-  }
+  },
 };
 
 const initialState: State = { bestAvailableFormats: [] };
@@ -38,7 +38,7 @@ const setup = async (getState, setState): Promise<void> => {
     await requestCameraPermissions();
     const formats = await getSupportedFormats();
     const bestAvailableFormats = filterBestAvailableFormats(formats);
-    setState({ bestAvailableFormats })
+    setState({ bestAvailableFormats });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -50,12 +50,14 @@ storiesOf('Camera', module).add('Camera Format List', () => (
     <StorybookStateWrapper
       initialState={initialState}
       onMount={setup}
-      render={(getState) => (
+      render={getState => (
         <View style={styles.flex}>
           <CameraFormatList
             style={styles.flex}
             items={Object.values(getState().bestAvailableFormats)}
-            keyForItem={({ format, depthFormat }) => uniqueKeyForFormat(format, depthFormat)}
+            keyForItem={({ format, depthFormat }) =>
+              uniqueKeyForFormat(format, depthFormat)
+            }
             renderItem={({ format, depthFormat }) => (
               <CameraFormatListItem
                 format={format}

@@ -136,7 +136,7 @@ class HSCameraManager: NSObject {
       captureSession.sessionPreset = preset
     }
 
-    videoCaptureDevice = depthEnabledCaptureDevice(withPosition: .front)
+    videoCaptureDevice = depthEnabledCaptureDevice(withPosition: position)
     guard case .some = videoCaptureDevice else {
       return .failure
     }
@@ -275,31 +275,35 @@ class HSCameraManager: NSObject {
         videoCaptureDevice.activeDepthDataMinFrameDuration = depthFrameDuration
       }
 
+      let zoomFactor = videoCaptureDevice.activeFormat.videoMinZoomFactorForDepthDataDelivery
+      videoCaptureDevice.videoZoomFactor = zoomFactor
+
       videoCaptureDevice.unlockForConfiguration()
     }
   }
 
-  private func attemptToSwitchToOppositeCamera() -> HSCameraSetupResult {
-    guard let device = getOppositeCamera(session: captureSession) else {
-      return .failure
+  public var position: AVCaptureDevice.Position = .front {
+    didSet {
+//      guard let device = depthEnabledCaptureDevice(withPosition: position) else {
+//        return
+//      }
+//      captureSession.inputs.forEach { input in
+//        if input.isEqual(audioCaptureDeviceInput) {
+//          return
+//        }
+//        captureSession.removeInput(input)
+//      }
+//      guard let deviceInput = try? AVCaptureDeviceInput(device: device) else {
+//        return
+//      }
+//      if captureSession.canAddInput(deviceInput) {
+//        captureSession.addInput(deviceInput)
+//      } else {
+//        return
+//      }
+//      videoCaptureDevice = device
+//      videoCaptureDeviceInput = deviceInput
     }
-    captureSession.inputs.forEach { input in
-      if input.isEqual(audioCaptureDeviceInput) {
-        return
-      }
-      captureSession.removeInput(input)
-    }
-    guard let deviceInput = try? AVCaptureDeviceInput(device: device) else {
-      return .failure
-    }
-    if captureSession.canAddInput(deviceInput) {
-      captureSession.addInput(deviceInput)
-    } else {
-      return .failure
-    }
-    videoCaptureDevice = device
-    videoCaptureDeviceInput = deviceInput
-    return .success
   }
 
   public func focus(on point: CGPoint) {
@@ -543,15 +547,6 @@ class HSCameraManager: NSObject {
       }
     }
   }
-
-  @objc
-  public func switchToOppositeCamera() {
-    captureSession.beginConfiguration()
-    if case .failure = attemptToSwitchToOppositeCamera() {
-      // TODO:
-    }
-    captureSession.commitConfiguration()
-  }
 }
 
 @available(iOS 11.1, *)
@@ -559,7 +554,6 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
   private func record(depthData: AVDepthData, at presentationTime: CMTime) {
     let isDepth = [kCVPixelFormatType_DepthFloat16, kCVPixelFormatType_DepthFloat32].contains(depthData.depthDataType)
     let disparityData = isDepth ? depthData.converting(toDepthDataType: kCVPixelFormatType_DisparityFloat16) : depthData
-//    let rotatedDisparityData = disparityData.applyingExifOrientation(.right)
     if let depthBuffer = depthDataConverter?.convert(depthData: disparityData) {
       let frameBuffer = HSVideoFrameBuffer(
         pixelBuffer: depthBuffer, presentationTime: presentationTime
@@ -584,7 +578,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
   ) {
     let orientation: CGImagePropertyOrientation = activeCaptureDevicePosition(session: captureSession) == .some(.front)
       ? .leftMirrored : .right
-    
+
     if case let .recording(_, startTime) = state {
       outputProcessingQueue.async { [weak self] in
         guard let strongSelf = self else { return }

@@ -90,11 +90,7 @@ class HSDepthBlurEffect {
 }
 
 fileprivate func composeDisparityImage(pixelBuffer: HSPixelBuffer, context: CIContext, shouldNormalize: Bool) -> CIImage? {
-  guard let disparityImage =
-    HSImageBuffer(pixelBuffer: pixelBuffer).makeCIImage()
-//      .oriented(CGImagePropertyOrientation.right)
-//      .transformed(by: CGAffineTransform(scaleX: -1, y: 1))
-  else {
+  guard let disparityImage = HSImageBuffer(pixelBuffer: pixelBuffer).makeCIImage() else {
     return nil
   }
   if shouldNormalize {

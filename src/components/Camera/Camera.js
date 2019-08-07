@@ -12,8 +12,14 @@ const NativeCameraView = requireNativeComponent('HSCameraView');
 
 const { HSCameraViewManager } = NativeModules;
 
+export type CameraPosition = 'front' | 'back';
+
+export type CameraPreviewMode = 'normal' | 'depth' | 'portraitMode';
+
 export type CameraProps = {
   style?: ?Style,
+  cameraPosition?: CameraPosition,
+  previewMode?: CameraPreviewMode,
 };
 
 export class Camera extends Component<CameraProps> {
@@ -33,6 +39,8 @@ export class Camera extends Component<CameraProps> {
     return (
       <NativeCameraView
         ref={this.nativeComponentRef}
+        cameraPosition={this.props.cameraPosition || 'front'}
+        previewMode={this.props.previewMode || 'depth'}
         style={this.props.style}
       />
     );
