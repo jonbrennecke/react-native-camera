@@ -29,4 +29,9 @@ class HSVideoPreviewView: UIView {
     let rectAtOrigin = CGRect(origin: .zero, size: centeredRect.size)
     previewLayer.frame = rectAtOrigin
   }
+
+  public func focus(on point: CGPoint) {
+    let focusPoint = previewLayer.captureDevicePointConverted(fromLayerPoint: point)
+    HSCameraManager.shared.focus(on: focusPoint)
+  }
 }

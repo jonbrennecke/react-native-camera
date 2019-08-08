@@ -5,14 +5,14 @@ import UIKit
 @objc
 class HSCameraView: UIView {
   private enum PreviewView {
-    case depth(HSDepthPreviewView)
+    case effect(HSEffectPreviewView)
     case video(HSVideoPreviewView)
   }
 
   private var previewView: PreviewView = .video(HSVideoPreviewView()) {
     didSet {
       switch previewView {
-      case let .depth(view):
+      case let .effect(view):
         subviews.forEach { $0.removeFromSuperview() }
         view.frame = bounds
         addSubview(view)
@@ -41,7 +41,7 @@ class HSCameraView: UIView {
   override func layoutSubviews() {
     super.layoutSubviews()
     switch previewView {
-    case let .depth(view):
+    case let .effect(view):
       view.frame = bounds
     case let .video(view):
       view.frame = bounds
@@ -51,10 +51,13 @@ class HSCameraView: UIView {
   // MARK: - objc interface
 
   @objc(focusOnPoint:)
-  public func focus(on _: CGPoint) {
-//    TODO:
-//    let focusPoint = previewLayer.captureDevicePointConverted(fromLayerPoint: point)
-//    HSCameraManager.shared.focus(on: focusPoint)
+  public func focus(on point: CGPoint) {
+    switch previewView {
+    case let .effect(view):
+      view.focus(on: point)
+    case let .video(view):
+      view.focus(on: point)
+    }
   }
 
   @objc
@@ -76,7 +79,7 @@ class HSCameraView: UIView {
       switch newValue {
       case .depth, .portraitMode:
         HSEffectManager.shared.isPaused = true
-        previewView = .depth(HSDepthPreviewView())
+        previewView = .effect(HSEffectPreviewView())
         HSEffectManager.shared.isPaused = false
       case .normal:
         HSEffectManager.shared.isPaused = true
@@ -90,8 +93,8 @@ class HSCameraView: UIView {
   public var resizeMode: HSResizeMode = .scaleAspectFill {
     didSet {
       switch previewView {
-      case .depth:
-        HSEffectManager.shared.resizeMode = resizeMode
+      case .effect(let view):
+        view.resizeMode = resizeMode
       case let .video(view):
         view.resizeMode = resizeMode
       }

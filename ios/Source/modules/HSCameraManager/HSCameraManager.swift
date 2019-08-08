@@ -99,7 +99,7 @@ class HSCameraManager: NSObject {
   public var delegate: HSCameraManagerDelegate?
 
   @objc
-  public var depthDelegate: HSCameraManagerDepthDataDelegate?
+  public weak var depthDelegate: HSCameraManagerDepthDataDelegate?
 
   private func setupAssetWriter(to outputURL: URL) -> HSCameraSetupResult {
     assetWriter = HSVideoWriter()

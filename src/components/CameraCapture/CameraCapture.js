@@ -143,6 +143,7 @@ export const CameraCapture: SFC<CameraCaptureProps> = ({
       <View style={styles.cameraWrap(cameraLayoutStyle)}>
         <Camera
           style={styles.flex}
+          ref={cameraRef}
           isDepthPreviewEnabled={enableDepthPreview}
         />
         <CameraFocusArea
