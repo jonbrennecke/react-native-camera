@@ -102,7 +102,7 @@ class HSEffectManager: NSObject {
       print("[HSEffectManager]: Render time: \(totalTime)")
     }
   }
-  
+
   public var isPaused: Bool {
     get {
       return displayLink.isPaused
@@ -111,8 +111,7 @@ class HSEffectManager: NSObject {
       if newValue {
         HSCameraManager.shared.depthDelegate = nil
         displayLink.isPaused = true
-      }
-      else {
+      } else {
         HSCameraManager.shared.depthDelegate = self
         displayLink.add(to: .main, forMode: .default)
         displayLink.isPaused = false

@@ -16,7 +16,6 @@ import {
   filterBestAvailableFormats,
   uniqueKeyForFormat,
   areFormatsEqual,
-  startCameraEffects,
 } from '@jonbrennecke/react-native-camera';
 
 import { createReduxStore } from './cameraStore';
@@ -69,7 +68,6 @@ const Component = CameraStateContainer(
       try {
         await requestCameraPermissions();
         startCameraPreview();
-        await startCameraEffects();
         await loadSupportedFeatures();
       } catch (error) {
         // eslint-disable-next-line no-console

@@ -4,27 +4,26 @@ import UIKit
 @available(iOS 11.1, *)
 @objc
 class HSCameraView: UIView {
-  
   private enum PreviewView {
     case depth(HSDepthPreviewView)
     case video(HSVideoPreviewView)
   }
-  
+
   private var previewView: PreviewView = .video(HSVideoPreviewView()) {
     didSet {
       switch previewView {
-      case .depth(let view):
+      case let .depth(view):
         subviews.forEach { $0.removeFromSuperview() }
         view.frame = bounds
         addSubview(view)
-      case .video(let view):
+      case let .video(view):
         subviews.forEach { $0.removeFromSuperview() }
         view.frame = bounds
         addSubview(view)
       }
     }
   }
-  
+
   init() {
     super.init(frame: .zero)
     previewMode = .portraitMode
@@ -42,9 +41,9 @@ class HSCameraView: UIView {
   override func layoutSubviews() {
     super.layoutSubviews()
     switch previewView {
-    case .depth(let view):
+    case let .depth(view):
       view.frame = bounds
-    case .video(let view):
+    case let .video(view):
       view.frame = bounds
     }
   }
@@ -91,9 +90,9 @@ class HSCameraView: UIView {
   public var resizeMode: HSResizeMode = .scaleAspectFill {
     didSet {
       switch previewView {
-      case .depth(_):
+      case .depth:
         HSEffectManager.shared.resizeMode = resizeMode
-      case .video(let view):
+      case let .video(view):
         view.resizeMode = resizeMode
       }
     }

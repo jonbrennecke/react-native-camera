@@ -37,7 +37,11 @@ class HSCameraManager: NSObject {
     guard let size = depthResolution else {
       return nil
     }
-    return HSAVDepthDataToPixelBufferConverter(size: size, pixelFormatType: kCVPixelFormatType_OneComponent8)
+    return HSAVDepthDataToPixelBufferConverter(
+      size: size,
+      input: kCVPixelFormatType_DisparityFloat32,
+      output: kCVPixelFormatType_OneComponent8
+    )
   }()
 
   internal var captureSession = AVCaptureSession()
@@ -206,7 +210,7 @@ class HSCameraManager: NSObject {
         if connection.isVideoOrientationSupported {
           connection.videoOrientation = .portrait
         }
-        if position == .front && connection.isVideoMirroringSupported {
+        if position == .front, connection.isVideoMirroringSupported {
           connection.isVideoMirrored = true
         }
       }
@@ -269,7 +273,6 @@ class HSCameraManager: NSObject {
       }
 
       if let format = highestResolutionDepthFormat {
-
         videoCaptureDevice.activeDepthDataFormat = format
         let maxFrameRateRange = format.videoSupportedFrameRateRanges.max { $0.maxFrameRate < $1.maxFrameRate }
         let depthFrameDuration = CMTimeMake(
@@ -505,24 +508,25 @@ class HSCameraManager: NSObject {
 
   @objc
   public func startCapture(completionHandler: @escaping (Error?, Bool) -> Void) {
-    cameraSetupQueue.async {
-      guard self.videoCaptureDevice != nil else {
+    cameraSetupQueue.async { [weak self] in
+      guard let strongSelf = self else { return }
+      guard strongSelf.videoCaptureDevice != nil else {
         completionHandler(nil, false)
         return
       }
       do {
         let outputURL = try makeEmptyVideoOutputFile()
-        guard case .success = self.setupAssetWriter(to: outputURL) else {
+        guard case .success = strongSelf.setupAssetWriter(to: outputURL) else {
           completionHandler(nil, false)
           return
         }
-        self.setupMetadata()
-        let startTime = CMClockGetTime(self.clock)
-        guard case .success = self.assetWriter.startRecording(at: startTime) else {
+        strongSelf.setupMetadata()
+        let startTime = CMClockGetTime(strongSelf.clock)
+        guard case .success = strongSelf.assetWriter.startRecording(at: startTime) else {
           completionHandler(nil, false)
           return
         }
-        self.state = .recording(toURL: outputURL, startTime: startTime)
+        strongSelf.state = .recording(toURL: outputURL, startTime: startTime)
         completionHandler(nil, true)
       } catch {
         completionHandler(error, false)
@@ -564,9 +568,7 @@ class HSCameraManager: NSObject {
 @available(iOS 11.1, *)
 extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
   private func record(depthData: AVDepthData, at presentationTime: CMTime) {
-    let isDepth = [kCVPixelFormatType_DepthFloat16, kCVPixelFormatType_DepthFloat32].contains(depthData.depthDataType)
-    let disparityData = isDepth ? depthData.converting(toDepthDataType: kCVPixelFormatType_DisparityFloat16) : depthData
-    if let depthBuffer = depthDataConverter?.convert(depthData: disparityData) {
+    if let depthBuffer = depthDataConverter?.convert(depthData: depthData) {
       let frameBuffer = HSVideoFrameBuffer(
         pixelBuffer: depthBuffer, presentationTime: presentationTime
       )

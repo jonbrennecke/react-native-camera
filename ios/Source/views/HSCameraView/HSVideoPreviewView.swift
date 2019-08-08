@@ -1,6 +1,6 @@
 import AVFoundation
-import UIKit
 import HSCameraUtils
+import UIKit
 
 class HSVideoPreviewView: UIView {
   private lazy var previewLayer: AVCaptureVideoPreviewLayer = {
