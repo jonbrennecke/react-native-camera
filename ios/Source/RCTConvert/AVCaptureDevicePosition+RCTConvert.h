@@ -4,5 +4,4 @@
 #import <React/RCTConvert.h>
 
 @interface RCTConvert (AVCaptureDevicePosition)
-
 @end

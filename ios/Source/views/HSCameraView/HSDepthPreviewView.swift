@@ -8,6 +8,7 @@ class HSDepthPreviewView: UIView {
 
   override func didMoveToSuperview() {
     super.didMoveToSuperview()
+    layer.backgroundColor = UIColor.black.cgColor
     addSubview(effectView)
     layoutSubviews()
   }

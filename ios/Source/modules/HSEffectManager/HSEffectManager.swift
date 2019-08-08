@@ -45,7 +45,7 @@ class HSEffectManager: NSObject {
     return displayLink
   }()
 
-  public var previewMode: HSEffectPreviewMode = .portraitMode
+  public var previewMode: HSEffectPreviewMode = .depth
   public var resizeMode: HSResizeMode = .scaleAspectWidth
 
   @objc
@@ -82,6 +82,9 @@ class HSEffectManager: NSObject {
       return
     }
     if let commandBuffer = commandQueue.makeCommandBuffer(), let drawable = effectView.currentDrawable {
+      if drawable.presentedTime != .zero {
+        return
+      }
       if let resizedImage = resize(image: image, in: effectView.frame.size, resizeMode: resizeMode) {
         context.render(
           resizedImage,
@@ -99,15 +102,22 @@ class HSEffectManager: NSObject {
       print("[HSEffectManager]: Render time: \(totalTime)")
     }
   }
-
-  public func startDisplayLink() {
-    HSCameraManager.shared.depthDelegate = self
-    displayLink.add(to: .main, forMode: .default)
-  }
-
-  public func stopDisplayLink() {
-    HSCameraManager.shared.depthDelegate = nil
-    displayLink.remove(from: .main, forMode: .default)
+  
+  public var isPaused: Bool {
+    get {
+      return displayLink.isPaused
+    }
+    set {
+      if newValue {
+        HSCameraManager.shared.depthDelegate = nil
+        displayLink.isPaused = true
+      }
+      else {
+        HSCameraManager.shared.depthDelegate = self
+        displayLink.add(to: .main, forMode: .default)
+        displayLink.isPaused = false
+      }
+    }
   }
 
   // MARK: - Objective-C interface

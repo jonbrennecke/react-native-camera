@@ -10,6 +10,6 @@ RCT_ENUM_CONVERTER(HSEffectPreviewMode, (@{
                      @"portraitMode" : @(HSEffectPreviewModePortraitMode),
                      @"depth" : @(HSEffectPreviewModeDepth),
                    }),
-                   HSEffectPreviewModePortraitMode, integerValue)
+                   HSEffectPreviewModeDepth, integerValue)
 
 @end

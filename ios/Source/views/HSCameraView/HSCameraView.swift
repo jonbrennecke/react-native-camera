@@ -4,9 +4,27 @@ import UIKit
 @available(iOS 11.1, *)
 @objc
 class HSCameraView: UIView {
-  private lazy var depthPreviewView = HSDepthPreviewView()
-  private lazy var videoPreviewView = HSVideoPreviewView()
-
+  
+  private enum PreviewView {
+    case depth(HSDepthPreviewView)
+    case video(HSVideoPreviewView)
+  }
+  
+  private var previewView: PreviewView = .video(HSVideoPreviewView()) {
+    didSet {
+      switch previewView {
+      case .depth(let view):
+        subviews.forEach { $0.removeFromSuperview() }
+        view.frame = bounds
+        addSubview(view)
+      case .video(let view):
+        subviews.forEach { $0.removeFromSuperview() }
+        view.frame = bounds
+        addSubview(view)
+      }
+    }
+  }
+  
   init() {
     super.init(frame: .zero)
     previewMode = .portraitMode
@@ -23,8 +41,12 @@ class HSCameraView: UIView {
 
   override func layoutSubviews() {
     super.layoutSubviews()
-    depthPreviewView.frame = bounds
-    videoPreviewView.frame = bounds
+    switch previewView {
+    case .depth(let view):
+      view.frame = bounds
+    case .video(let view):
+      view.frame = bounds
+    }
   }
 
   // MARK: - objc interface
@@ -52,16 +74,14 @@ class HSCameraView: UIView {
       return HSEffectManager.shared.previewMode
     }
     set {
-      if newValue == .normal {
-        HSEffectManager.shared.stopDisplayLink()
-        subviews.forEach { $0.removeFromSuperview() }
-        videoPreviewView.frame = bounds
-        addSubview(videoPreviewView)
-      } else {
-        HSEffectManager.shared.startDisplayLink()
-        subviews.forEach { $0.removeFromSuperview() }
-        depthPreviewView.frame = bounds
-        addSubview(depthPreviewView)
+      switch newValue {
+      case .depth, .portraitMode:
+        HSEffectManager.shared.isPaused = true
+        previewView = .depth(HSDepthPreviewView())
+        HSEffectManager.shared.isPaused = false
+      case .normal:
+        HSEffectManager.shared.isPaused = true
+        previewView = .video(HSVideoPreviewView())
       }
       HSEffectManager.shared.previewMode = newValue
     }
@@ -70,8 +90,12 @@ class HSCameraView: UIView {
   @objc
   public var resizeMode: HSResizeMode = .scaleAspectFill {
     didSet {
-      HSEffectManager.shared.resizeMode = resizeMode
-      videoPreviewView.resizeMode = resizeMode
+      switch previewView {
+      case .depth(_):
+        HSEffectManager.shared.resizeMode = resizeMode
+      case .video(let view):
+        view.resizeMode = resizeMode
+      }
     }
   }
 }

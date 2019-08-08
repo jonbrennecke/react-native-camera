@@ -45,9 +45,9 @@ export class Camera extends Component<CameraProps> {
     return (
       <NativeCameraView
         ref={this.nativeComponentRef}
-        cameraPosition={this.props.cameraPosition || 'front'}
-        previewMode={this.props.previewMode || 'normal'}
-        resizeMode={this.props.resizeMode || 'scaleAspectWidth'}
+        cameraPosition={this.props.cameraPosition}
+        previewMode={this.props.previewMode}
+        resizeMode={this.props.resizeMode}
         style={this.props.style}
       />
     );

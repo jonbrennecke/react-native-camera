@@ -4,20 +4,11 @@ import CoreImage
 import HSCameraUtils
 
 class HSDepthBlurEffect {
-  private lazy var mtlDevice: MTLDevice! = {
-    guard let mtlDevice = MTLCreateSystemDefaultDevice() else {
-      fatalError("Failed to create Metal device")
-    }
-    return mtlDevice
-  }()
-
   private lazy var context = CIContext(
-    mtlDevice: mtlDevice,
     options: [
       CIContextOption.useSoftwareRenderer: false,
       CIContextOption.workingColorSpace: NSNull(),
       CIContextOption.workingFormat: kCVPixelFormatType_16Gray,
-      //      CIContextOption.workingFormat: CIFormat.RGBAh,
       CIContextOption.outputColorSpace: NSNull(),
     ]
   )

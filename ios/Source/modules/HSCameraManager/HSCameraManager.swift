@@ -23,7 +23,7 @@ class HSCameraManager: NSObject {
   private let depthOutput = AVCaptureDepthDataOutput()
   private let metadataOutput = AVCaptureMetadataOutput()
   private lazy var outputSynchronizer = AVCaptureDataOutputSynchronizer(
-    dataOutputs: [depthOutput, videoOutput, metadataOutput]
+    dataOutputs: [videoOutput, depthOutput]
   )
   private var videoCaptureDevice: AVCaptureDevice?
   private var videoCaptureDeviceInput: AVCaptureDeviceInput?
@@ -59,8 +59,8 @@ class HSCameraManager: NSObject {
       return CMFormatDescriptionGetMediaSubType(activeDepthFormat.formatDescription)
     }
     // TODO: if front camera, capture depth by default. Otherwise capture disparity
-    return kCVPixelFormatType_DepthFloat16
-//    return kCVPixelFormatType_DisparityFloat16
+//    return kCVPixelFormatType_DepthFloat16
+    return kCVPixelFormatType_DisparityFloat16
   }
 
   public var videoResolution: Size<Int>? {
@@ -83,7 +83,7 @@ class HSCameraManager: NSObject {
     let dimensions = CMVideoFormatDescriptionGetDimensions(format.formatDescription)
     let width = Int(dimensions.width)
     let height = Int(dimensions.height)
-    if let connection = depthOutput.connection(with: .depthData), connection.videoOrientation == .portrait {
+    if let connection = videoOutput.connection(with: .video), connection.videoOrientation == .portrait {
       return Size(width: height, height: width)
     }
     return Size(width: width, height: height)
@@ -97,8 +97,6 @@ class HSCameraManager: NSObject {
 
   @objc
   public var depthDelegate: HSCameraManagerDepthDataDelegate?
-
-  internal var resolutionDelegate: HSCameraManagerResolutionDelegate?
 
   private func setupAssetWriter(to outputURL: URL) -> HSCameraSetupResult {
     assetWriter = HSVideoWriter()
@@ -138,7 +136,7 @@ class HSCameraManager: NSObject {
     }
 
     videoCaptureDevice = depthEnabledCaptureDevice(withPosition: position)
-    guard case .some = videoCaptureDevice else {
+    if case .none = videoCaptureDevice {
       return .failure
     }
 
@@ -209,10 +207,8 @@ class HSCameraManager: NSObject {
         if connection.isVideoOrientationSupported {
           connection.videoOrientation = .portrait
         }
-        if case .some(.front) = activeCaptureDevicePosition(session: captureSession) {
-          if connection.isVideoMirroringSupported {
-            connection.isVideoMirrored = true
-          }
+        if position == .front && connection.isVideoMirroringSupported {
+          connection.isVideoMirrored = true
         }
       }
     } else {
@@ -222,16 +218,15 @@ class HSCameraManager: NSObject {
   }
 
   private func setupDepthOutput() -> HSCameraSetupResult {
-    captureSession.removeOutput(depthOutput)
+    if captureSession.outputs.contains(depthOutput) {
+      captureSession.removeOutput(depthOutput)
+    }
     depthOutput.alwaysDiscardsLateDepthData = false
     depthOutput.isFilteringEnabled = true
     if captureSession.canAddOutput(depthOutput) {
       captureSession.addOutput(depthOutput)
       if let connection = depthOutput.connection(with: .depthData) {
         connection.isEnabled = true
-        if connection.isVideoStabilizationSupported {
-          connection.preferredVideoStabilizationMode = .auto
-        }
       }
     } else {
       return .failure
@@ -266,6 +261,8 @@ class HSCameraManager: NSObject {
       let depthFormats = supportedDepthFormats.filter { format in
         return
           CMFormatDescriptionGetMediaSubType(format.formatDescription) == kCVPixelFormatType_DepthFloat16
+        //        TODO: use depth if the front camera is active, disparity otherwise
+//          || CMFormatDescriptionGetMediaSubType(format.formatDescription) == kCVPixelFormatType_DisparityFloat16
       }
 
       let highestResolutionDepthFormat = depthFormats.max { a, b in
@@ -273,10 +270,6 @@ class HSCameraManager: NSObject {
       }
 
       if let format = highestResolutionDepthFormat {
-        let dimensions = CMVideoFormatDescriptionGetDimensions(format.formatDescription)
-        let subtype = CMFormatDescriptionGetMediaSubType(format.formatDescription)
-        print("dimensions: \(dimensions)")
-        print("media subtype: \(subtype)")
 
         videoCaptureDevice.activeDepthDataFormat = format
         let maxFrameRateRange = format.videoSupportedFrameRateRanges.max { $0.maxFrameRate < $1.maxFrameRate }
@@ -299,13 +292,22 @@ class HSCameraManager: NSObject {
       guard position != oldValue else {
         return
       }
-      cameraSetupQueue.async { [weak self] in
+      cameraSetupQueue.sync { [weak self] in
         guard let strongSelf = self else { return }
+        let isRunning = strongSelf.captureSession.isRunning
+        if isRunning {
+          strongSelf.captureSession.stopRunning()
+        }
         strongSelf.captureSession.beginConfiguration()
+        captureSession.inputs.forEach { captureSession.removeInput($0) }
+        captureSession.outputs.forEach { captureSession.removeOutput($0) }
         if case .failure = strongSelf.attemptToSetupCameraCaptureSession() {
           print("Failed to set up camera capture session")
         }
         strongSelf.captureSession.commitConfiguration()
+        if isRunning {
+          strongSelf.captureSession.startRunning()
+        }
       }
     }
   }
@@ -445,15 +447,8 @@ class HSCameraManager: NSObject {
 
   @objc
   public func setFormat(_ format: HSCameraFormat, withDepthFormat depthFormat: HSCameraFormat, completionHandler: @escaping () -> Void) {
-    guard let videoCaptureDevice = videoCaptureDevice else {
-      if let videoResolution = videoResolution, let depthResolution = depthResolution {
-        resolutionDelegate?.cameraManagerDidUpdate(
-          videoResolution: videoResolution, depthResolution: depthResolution
-        )
-      }
-      return completionHandler()
-    }
     if
+      let videoCaptureDevice = videoCaptureDevice,
       let activeFormat = videoCaptureDevice.formats.first(where: { format.isEqual($0) }),
       let activeDepthFormat = activeFormat.supportedDepthDataFormats.first(where: { depthFormat.isEqual($0) }) {
       if case .some = try? videoCaptureDevice.lockForConfiguration() {
@@ -462,26 +457,35 @@ class HSCameraManager: NSObject {
         videoCaptureDevice.unlockForConfiguration()
       }
     }
+    completionHandler()
   }
 
   @objc
   public func setupCameraCaptureSession() {
-    if captureSession.isRunning {
-      return
+    cameraSetupQueue.async { [weak self] in
+      guard let strongSelf = self else { return }
+      let isRunning = strongSelf.captureSession.isRunning
+      if isRunning {
+        strongSelf.captureSession.stopRunning()
+      }
+      strongSelf.captureSession.beginConfiguration()
+      if case .failure = strongSelf.attemptToSetupCameraCaptureSession() {
+        print("Failed to set up camera capture session")
+      }
+      strongSelf.captureSession.commitConfiguration()
+      if isRunning {
+        strongSelf.captureSession.startRunning()
+      }
     }
-    captureSession.beginConfiguration()
-    if case .failure = attemptToSetupCameraCaptureSession() {
-      // TODO:
-    }
-    captureSession.commitConfiguration()
   }
 
   @objc
   public func startPreview() {
-    cameraSetupQueue.sync {
+    cameraSetupQueue.async { [weak self] in
+      guard let strongSelf = self else { return }
       if case .authorized = AVCaptureDevice.authorizationStatus(for: .video) {
-        guard captureSession.isRunning else {
-          captureSession.startRunning()
+        guard strongSelf.captureSession.isRunning else {
+          strongSelf.captureSession.startRunning()
           return
         }
         return
@@ -491,11 +495,12 @@ class HSCameraManager: NSObject {
 
   @objc
   public func stopPreview() {
-    cameraSetupQueue.sync {
-      guard captureSession.isRunning else {
+    cameraSetupQueue.async { [weak self] in
+      guard let strongSelf = self else { return }
+      guard strongSelf.captureSession.isRunning else {
         return
       }
-      captureSession.stopRunning()
+      strongSelf.captureSession.stopRunning()
     }
   }
 
