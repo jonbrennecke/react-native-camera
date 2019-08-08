@@ -1,7 +1,7 @@
-import MetalKit
-import UIKit
 import AVFoundation
 import HSCameraUtils
+import MetalKit
+import UIKit
 
 class HSMetalEffectView: MTKView {
   private lazy var commandQueue: MTLCommandQueue! = {
@@ -21,36 +21,37 @@ class HSMetalEffectView: MTKView {
   private var imageExtent: CGRect = .zero
   private let colorSpace = CGColorSpaceCreateDeviceRGB()
   private weak var effectManager: HSEffectManager?
-  
+
   public var resizeMode: HSResizeMode = .scaleAspectWidth
-  
+  public var blurAperture: Float = 0
+
   public init(effectManager: HSEffectManager) {
     guard let mtlDevice = MTLCreateSystemDefaultDevice() else {
       fatalError("Failed to create Metal device")
     }
     super.init(frame: .zero, device: mtlDevice)
     self.effectManager = effectManager
-    self.framebufferOnly = false
-    self.preferredFramesPerSecond = 15
-    self.autoResizeDrawable = true
-    self.enableSetNeedsDisplay = false
-    self.drawableSize = self.frame.size
+    framebufferOnly = false
+    preferredFramesPerSecond = 15
+    autoResizeDrawable = true
+    enableSetNeedsDisplay = false
+    drawableSize = frame.size
   }
-  
-  required init(coder: NSCoder) {
+
+  required init(coder _: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  
-  override func draw(_ rect: CGRect) {
+
+  override func draw(_: CGRect) {
     autoreleasepool {
-      guard let image = effectManager?.makeEffectImage() else {
+      guard let image = effectManager?.makeEffectImage(blurAperture: blurAperture) else {
         return
       }
       imageExtent = image.extent
       present(image: image, resizeMode: resizeMode)
     }
   }
-  
+
   private func present(image: CIImage, resizeMode: HSResizeMode) {
     if let commandBuffer = commandQueue.makeCommandBuffer(), let drawable = currentDrawable {
       if drawable.presentedTime != .zero {
@@ -71,7 +72,7 @@ class HSMetalEffectView: MTKView {
       commandBuffer.waitUntilCompleted()
     }
   }
-  
+
   public func captureDevicePointConverted(fromLayerPoint layerPoint: CGPoint) -> CGPoint {
     if let videoSize = HSCameraManager.shared.videoResolution {
       let scale = calculateScale(from: imageExtent.size, in: frame.size, resizeMode: resizeMode)

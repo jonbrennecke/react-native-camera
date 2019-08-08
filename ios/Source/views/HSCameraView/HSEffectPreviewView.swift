@@ -3,15 +3,24 @@ import UIKit
 
 class HSEffectPreviewView: UIView {
   private lazy var effectView: HSMetalEffectView = {
-    return HSMetalEffectView(effectManager: HSEffectManager.shared)
+    HSMetalEffectView(effectManager: HSEffectManager.shared)
   }()
-  
+
   public var resizeMode: HSResizeMode {
     get {
       return effectView.resizeMode
     }
     set {
       effectView.resizeMode = resizeMode
+    }
+  }
+
+  public var blurAperture: Float {
+    get {
+      return effectView.blurAperture
+    }
+    set {
+      effectView.blurAperture = newValue
     }
   }
 

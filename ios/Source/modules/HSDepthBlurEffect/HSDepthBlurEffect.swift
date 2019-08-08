@@ -36,6 +36,7 @@ class HSDepthBlurEffect {
     aperture: Float,
     shouldNormalize: Bool = true
   ) -> CIImage? {
+    print(aperture)
     guard let disparityImage = composeDisparityImage(
       pixelBuffer: disparityPixelBuffer,
       context: context,
@@ -175,7 +176,7 @@ fileprivate func depthBlurEffectFilter(scale: Float, aperture: Float) -> CIFilte
   }
   filter.setDefaults()
   filter.setValue(scale, forKey: "inputScaleFactor")
-  filter.setValue(aperture, forKey: "inputAperture") // TODO:
+  filter.setValue(aperture, forKey: "inputAperture")
   //    filter.setValue(inputCalibrationData, forKey: "inputCalibrationData")
   //    filter.setValue(inputAuxDataMetadata, forKey: "inputAuxDataMetadata")
   //    filter.setValue(inputFocusRect, forKey: "inputFocusRect")

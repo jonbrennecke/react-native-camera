@@ -11,8 +11,8 @@ class HSEffectManager: NSObject {
   private lazy var depthBlurEffect = HSDepthBlurEffect()
 
   public var previewMode: HSEffectPreviewMode = .depth
-  
-  internal func makeEffectImage() -> CIImage? {
+
+  internal func makeEffectImage(blurAperture: Float = 0) -> CIImage? {
     guard
       let depthData = depthData,
       let videoSampleBuffer = videoSampleBuffer,
@@ -28,10 +28,10 @@ class HSEffectManager: NSObject {
       qualityMode: .previewQuality,
       disparityPixelBuffer: disparityPixelBuffer,
       videoPixelBuffer: videoPixelBuffer,
-      aperture: HSCameraManager.shared.aperture
+      aperture: blurAperture
     )
   }
-  
+
   override init() {
     super.init()
     HSCameraManager.shared.depthDelegate = self

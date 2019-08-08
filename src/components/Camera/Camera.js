@@ -26,6 +26,7 @@ export type CameraProps = {
   cameraPosition?: CameraPosition,
   previewMode?: CameraPreviewMode,
   resizeMode?: CameraResizeMode,
+  blurAperture?: number,
 };
 
 export class Camera extends Component<CameraProps> {
@@ -48,6 +49,7 @@ export class Camera extends Component<CameraProps> {
         cameraPosition={this.props.cameraPosition}
         previewMode={this.props.previewMode}
         resizeMode={this.props.resizeMode}
+        blurAperture={this.props.blurAperture}
         style={this.props.style}
       />
     );

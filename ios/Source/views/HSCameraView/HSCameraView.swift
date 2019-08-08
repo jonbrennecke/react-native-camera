@@ -93,10 +93,25 @@ class HSCameraView: UIView {
   public var resizeMode: HSResizeMode = .scaleAspectFill {
     didSet {
       switch previewView {
-      case .effect(let view):
+      case let .effect(view):
         view.resizeMode = resizeMode
       case let .video(view):
         view.resizeMode = resizeMode
+      }
+    }
+  }
+
+  @objc
+  public var blurAperture: Float {
+    get {
+      if case let .effect(view) = previewView {
+        return view.blurAperture
+      }
+      return 0
+    }
+    set {
+      if case let .effect(view) = previewView {
+        view.blurAperture = newValue
       }
     }
   }
