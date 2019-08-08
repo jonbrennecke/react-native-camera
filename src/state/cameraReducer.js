@@ -16,6 +16,7 @@ const CameraState = createCameraState({
   supportedISORange: { min: 0, max: 16000 },
   supportedExposureRange: { min: 0, max: 16000 },
   supportedFormats: [],
+  blurAperture: 0,
   iso: 0,
   exposure: 0,
   format: null,
@@ -111,6 +112,16 @@ const reducers = {
       return state;
     }
     return state.setDepthFormat(payload.depthFormat);
+  },
+
+  setBlurAperture: (
+    state,
+    { payload }: Action<{ blurAperture: number }>
+  ): ICameraState => {
+    if (!payload) {
+      return state;
+    }
+    return state.setBlurAperture(payload.blurAperture);
   },
 };
 

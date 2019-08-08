@@ -24,6 +24,7 @@ type StateProps = {
   supportedISORange: CameraISORange,
   supportedExposureRange: CameraExposureRange,
   supportedFormats: CameraFormat[],
+  blurAperture: number,
   iso: number,
   exposure: number,
   format: ?CameraFormat,
@@ -40,6 +41,7 @@ type DispatchProps = {
   updateFormat: (format: CameraFormat, depthFormat: CameraFormat) => any,
   loadCameraPermissions: () => any,
   requestCameraPermissions: () => any,
+  setBlurAperture: (blurAperture: number) => any,
 };
 
 export type CameraStateHOCProps = OwnProps & StateProps & DispatchProps;
@@ -54,6 +56,7 @@ function mapCameraStateToProps(state: ICameraState): $Exact<StateProps> {
     exposure: selectors.selectExposure(state),
     format: selectors.selectFormat(state),
     depthFormat: selectors.selectDepthFormat(state),
+    blurAperture: selectors.selectBlurAperture(state),
     hasCameraPermissions: selectors.selectHasCameraPermissions(state),
   };
 }
@@ -76,6 +79,8 @@ function mapCameraDispatchToProps(
       dispatch(actionCreators.loadCameraPermissions()),
     requestCameraPermissions: () =>
       dispatch(actionCreators.requestCameraPermissions()),
+    setBlurAperture: (blurAperture: number) =>
+      dispatch(actionCreators.setBlurAperture({ blurAperture })),
   };
 }
 

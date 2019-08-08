@@ -27,3 +27,6 @@ export const selectFormat = (state: ICameraState) => state.getFormat();
 
 export const selectDepthFormat = (state: ICameraState) =>
   state.getDepthFormat();
+
+export const selectBlurAperture = (state: ICameraState) =>
+  state.getBlurAperture();

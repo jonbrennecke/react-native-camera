@@ -24,6 +24,7 @@ export type CameraStateObject = {
   supportedISORange: CameraISORange,
   supportedExposureRange: CameraExposureRange,
   supportedFormats: CameraFormat[],
+  blurAperture: number,
   iso: number,
   exposure: number,
   format: ?CameraFormat,
@@ -60,6 +61,9 @@ export interface ICameraState {
 
   getDepthFormat(): ?CameraFormat;
   setDepthFormat(depthFormat: CameraFormat): ICameraState;
+
+  getBlurAperture(): number;
+  setBlurAperture(blurAperture: number): ICameraState;
 }
 
 // eslint-disable-next-line flowtype/generic-spacing
@@ -137,5 +141,13 @@ export const createCameraState: CameraStateObject => Class<
 
     setDepthFormat(depthFormat: CameraFormat): ICameraState {
       return this.set('depthFormat', depthFormat);
+    }
+
+    getBlurAperture(): number {
+      return this.get('blurAperture') || 0;
+    }
+
+    setBlurAperture(blurAperture: number): ICameraState {
+      return this.set('blurAperture', blurAperture);
     }
   };
