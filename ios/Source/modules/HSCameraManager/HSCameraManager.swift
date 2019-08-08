@@ -59,7 +59,6 @@ class HSCameraManager: NSObject {
       return CMFormatDescriptionGetMediaSubType(activeDepthFormat.formatDescription)
     }
     // TODO: if front camera, capture depth by default. Otherwise capture disparity
-//    return kCVPixelFormatType_DepthFloat16
     return kCVPixelFormatType_DisparityFloat16
   }
 
