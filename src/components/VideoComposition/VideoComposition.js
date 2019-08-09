@@ -42,6 +42,26 @@ export class VideoComposition extends Component<VideoCompositionProps> {
     );
   }
 
+  seekToTime(seconds: number) {
+    if (!this.nativeComponentRef) {
+      return;
+    }
+    HSVideoCompositionViewManager.seekToTime(
+      findNodeHandle(this.nativeComponentRef.current),
+      seconds
+    );
+  }
+
+  seekToProgress(progress: number) {
+    if (!this.nativeComponentRef) {
+      return;
+    }
+    HSVideoCompositionViewManager.seekToProgress(
+      findNodeHandle(this.nativeComponentRef.current),
+      progress
+    );
+  }
+
   render() {
     return (
       <NativeVideoCompositionView

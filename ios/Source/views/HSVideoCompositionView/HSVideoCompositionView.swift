@@ -6,7 +6,7 @@ import UIKit
 @objc
 class HSVideoCompositionView: UIView {
   private let loadingQueue = DispatchQueue(label: "com.jonbrennecke.HSVideoCompositionView.loadingQueue")
-  private var player: AVQueuePlayer?
+  private var player: AVPlayer?
   private var playerItem: AVPlayerItem?
 
   private var composition: HSVideoComposition? {
@@ -55,7 +55,7 @@ class HSVideoCompositionView: UIView {
       compositor.isDepthPreviewEnabled = isDepthPreviewEnabled
       compositor.isPortraitModeEnabled = isPortraitModeEnabled
     }
-    player = AVQueuePlayer(playerItem: playerItem)
+    player = AVPlayer(playerItem: playerItem)
     player?.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.old, .new], context: nil)
     DispatchQueue.main.async {
       self.playerLayer.player = self.player
@@ -119,6 +119,15 @@ class HSVideoCompositionView: UIView {
   @objc
   public func seek(to time: CMTime) {
     player?.seek(to: time)
+  }
+  
+  @objc(seekToProgress:)
+  public func seek(to progress: Double) {
+    if let duration = player?.currentItem?.duration {
+      let durationSeconds = CMTimeGetSeconds(duration)
+      let time = CMTimeMakeWithSeconds(durationSeconds * progress, preferredTimescale: 600)
+      seek(to: time)
+    }
   }
 }
 

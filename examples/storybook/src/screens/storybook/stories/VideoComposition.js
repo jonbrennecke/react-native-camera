@@ -55,6 +55,11 @@ class StoryComponent extends Component<Props, State> {
         this.compositionRef.current.pause();
       }
     });
+    button('Seek to middle', () => {
+      if (this.compositionRef.current) {
+        this.compositionRef.current.seekToProgress(0.5);
+      }
+    });
   }
 
   render() {

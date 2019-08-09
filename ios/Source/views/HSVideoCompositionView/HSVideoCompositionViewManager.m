@@ -62,4 +62,37 @@ RCT_EXPORT_METHOD(pause : (nonnull NSNumber *)reactTag) {
   }];
 }
 
+RCT_EXPORT_METHOD(seekToTime : (nonnull NSNumber *)reactTag withSeconds:(nonnull NSNumber *)seconds) {
+  [self.bridge.uiManager addUIBlock:^(
+                                      RCTUIManager *uiManager,
+                                      NSDictionary<NSNumber *, UIView *> *viewRegistry) {
+    HSVideoCompositionView *view =
+    (HSVideoCompositionView *)viewRegistry[reactTag];
+    if (!view || ![view isKindOfClass:[HSVideoCompositionView class]]) {
+      RCTLogError(@"Cannot find HSVideoCompositionView with tag #%@", reactTag);
+      return;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+      CMTime time = CMTimeMakeWithSeconds([seconds floatValue], 600);
+      [view seekTo:time];
+    });
+  }];
+}
+
+RCT_EXPORT_METHOD(seekToProgress : (nonnull NSNumber *)reactTag withProgress:(nonnull NSNumber *)progress) {
+  [self.bridge.uiManager addUIBlock:^(
+                                      RCTUIManager *uiManager,
+                                      NSDictionary<NSNumber *, UIView *> *viewRegistry) {
+    HSVideoCompositionView *view =
+    (HSVideoCompositionView *)viewRegistry[reactTag];
+    if (!view || ![view isKindOfClass:[HSVideoCompositionView class]]) {
+      RCTLogError(@"Cannot find HSVideoCompositionView with tag #%@", reactTag);
+      return;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [view seekToProgress:[progress doubleValue]];
+    });
+  }];
+}
+
 @end
