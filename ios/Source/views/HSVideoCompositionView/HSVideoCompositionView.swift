@@ -52,8 +52,7 @@ class HSVideoCompositionView: UIView {
       compositor.depthTrackID = composition.depthTrackID
       compositor.videoTrackID = composition.videoTrackID
       compositor.aperture = composition.aperture
-      compositor.isDepthPreviewEnabled = isDepthPreviewEnabled
-      compositor.isPortraitModeEnabled = isPortraitModeEnabled
+      compositor.previewMode = previewMode
     }
     player = AVPlayer(playerItem: playerItem)
     player?.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.old, .new], context: nil)
@@ -84,16 +83,21 @@ class HSVideoCompositionView: UIView {
   // MARK: - objc interface
 
   @objc
-  public var isDepthPreviewEnabled: Bool = false {
+  public var previewMode: HSEffectPreviewMode = .portraitMode {
     didSet {
-      configurePlayer()
-    }
-  }
-
-  @objc
-  public var isPortraitModeEnabled: Bool = false {
-    didSet {
-      configurePlayer()
+      guard
+        let composition = composition,
+        let (_, avVideoComposition) = composition.makeAVComposition()
+      else {
+        return
+      }
+      playerItem?.videoComposition = avVideoComposition
+      if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
+        compositor.depthTrackID = composition.depthTrackID
+        compositor.videoTrackID = composition.videoTrackID
+        compositor.aperture = composition.aperture
+        compositor.previewMode = previewMode
+      }
     }
   }
 
@@ -120,7 +124,7 @@ class HSVideoCompositionView: UIView {
   public func seek(to time: CMTime) {
     player?.seek(to: time)
   }
-  
+
   @objc(seekToProgress:)
   public func seek(to progress: Double) {
     if let duration = player?.currentItem?.duration {

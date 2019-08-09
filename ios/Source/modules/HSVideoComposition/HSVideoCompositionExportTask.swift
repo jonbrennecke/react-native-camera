@@ -34,7 +34,6 @@ class HSVideoCompositionExportTask: HSExportTask {
       compositor.depthTrackID = composition.depthTrackID
       compositor.videoTrackID = composition.videoTrackID
       compositor.aperture = composition.aperture
-      compositor.isPortraitModeEnabled = true // TODO:
     }
     assetExportSession?.outputFileType = .mov
     assetExportSession?.outputURL = try? makeEmptyVideoOutputFile()

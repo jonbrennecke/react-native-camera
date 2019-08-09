@@ -20,15 +20,7 @@ RCT_CUSTOM_VIEW_PROPERTY(assetID, NSString, HSVideoCompositionView) {
   [view loadAssetByID:assetID];
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(isDepthPreviewEnabled, BOOL, HSVideoCompositionView) {
-  BOOL isDepthPreviewEnabled = [RCTConvert BOOL:json];
-  view.isDepthPreviewEnabled = isDepthPreviewEnabled;
-}
-
-RCT_CUSTOM_VIEW_PROPERTY(isPortraitModeEnabled, BOOL, HSVideoCompositionView) {
-  BOOL isPortraitModeEnabled = [RCTConvert BOOL:json];
-  view.isPortraitModeEnabled = isPortraitModeEnabled;
-}
+RCT_EXPORT_VIEW_PROPERTY(previewMode, HSEffectPreviewMode)
 
 RCT_EXPORT_METHOD(play : (nonnull NSNumber *)reactTag) {
   [self.bridge.uiManager addUIBlock:^(
@@ -62,12 +54,14 @@ RCT_EXPORT_METHOD(pause : (nonnull NSNumber *)reactTag) {
   }];
 }
 
-RCT_EXPORT_METHOD(seekToTime : (nonnull NSNumber *)reactTag withSeconds:(nonnull NSNumber *)seconds) {
+RCT_EXPORT_METHOD(seekToTime
+                  : (nonnull NSNumber *)reactTag withSeconds
+                  : (nonnull NSNumber *)seconds) {
   [self.bridge.uiManager addUIBlock:^(
-                                      RCTUIManager *uiManager,
-                                      NSDictionary<NSNumber *, UIView *> *viewRegistry) {
+                             RCTUIManager *uiManager,
+                             NSDictionary<NSNumber *, UIView *> *viewRegistry) {
     HSVideoCompositionView *view =
-    (HSVideoCompositionView *)viewRegistry[reactTag];
+        (HSVideoCompositionView *)viewRegistry[reactTag];
     if (!view || ![view isKindOfClass:[HSVideoCompositionView class]]) {
       RCTLogError(@"Cannot find HSVideoCompositionView with tag #%@", reactTag);
       return;
@@ -79,12 +73,14 @@ RCT_EXPORT_METHOD(seekToTime : (nonnull NSNumber *)reactTag withSeconds:(nonnull
   }];
 }
 
-RCT_EXPORT_METHOD(seekToProgress : (nonnull NSNumber *)reactTag withProgress:(nonnull NSNumber *)progress) {
+RCT_EXPORT_METHOD(seekToProgress
+                  : (nonnull NSNumber *)reactTag withProgress
+                  : (nonnull NSNumber *)progress) {
   [self.bridge.uiManager addUIBlock:^(
-                                      RCTUIManager *uiManager,
-                                      NSDictionary<NSNumber *, UIView *> *viewRegistry) {
+                             RCTUIManager *uiManager,
+                             NSDictionary<NSNumber *, UIView *> *viewRegistry) {
     HSVideoCompositionView *view =
-    (HSVideoCompositionView *)viewRegistry[reactTag];
+        (HSVideoCompositionView *)viewRegistry[reactTag];
     if (!view || ![view isKindOfClass:[HSVideoCompositionView class]]) {
       RCTLogError(@"Cannot find HSVideoCompositionView with tag #%@", reactTag);
       return;

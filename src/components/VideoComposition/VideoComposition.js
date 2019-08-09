@@ -8,6 +8,8 @@ import {
 
 import type { Style } from '../../types';
 
+import type { CameraPreviewMode } from '../Camera';
+
 const NativeVideoCompositionView = requireNativeComponent(
   'HSVideoCompositionView'
 );
@@ -17,8 +19,7 @@ const { HSVideoCompositionViewManager } = NativeModules;
 export type VideoCompositionProps = {
   style?: ?Style,
   assetID: ?string,
-  enableDepthPreview?: boolean,
-  enablePortraitMode?: boolean,
+  previewMode?: CameraPreviewMode,
 };
 
 export class VideoComposition extends Component<VideoCompositionProps> {
@@ -68,8 +69,7 @@ export class VideoComposition extends Component<VideoCompositionProps> {
         ref={this.nativeComponentRef}
         style={this.props.style}
         assetID={this.props.assetID}
-        isDepthPreviewEnabled={this.props.enableDepthPreview}
-        isPortraitModeEnabled={this.props.enablePortraitMode}
+        previewMode={this.props.previewMode}
       />
     );
   }
