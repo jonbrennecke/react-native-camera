@@ -79,6 +79,15 @@ class StoryComponent extends Component<Props, State> {
           },
           'portraitMode'
         )}
+        resizeMode={select(
+          'Resize mode',
+          {
+            'Scale to fit width': 'scaleAspectWidth',
+            'Scale to fit height': 'scaleAspectHeight',
+            'Scale to fill': 'scaleAspectFill',
+          },
+          'scaleAspectWidth'
+        )}
       />
     );
   }

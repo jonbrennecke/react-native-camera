@@ -22,6 +22,8 @@ RCT_CUSTOM_VIEW_PROPERTY(assetID, NSString, HSVideoCompositionView) {
 
 RCT_EXPORT_VIEW_PROPERTY(previewMode, HSEffectPreviewMode)
 
+RCT_EXPORT_VIEW_PROPERTY(resizeMode, HSResizeMode)
+
 RCT_EXPORT_METHOD(play : (nonnull NSNumber *)reactTag) {
   [self.bridge.uiManager addUIBlock:^(
                              RCTUIManager *uiManager,

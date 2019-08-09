@@ -33,11 +33,6 @@ class HSVideoCompositionView: UIView {
     return layer as! AVPlayerLayer
   }
 
-  override func didMoveToSuperview() {
-    super.didMoveToSuperview()
-    playerLayer.videoGravity = .resizeAspectFill
-  }
-
   private func configurePlayer() {
     guard
       let composition = composition,
@@ -97,6 +92,18 @@ class HSVideoCompositionView: UIView {
         compositor.videoTrackID = composition.videoTrackID
         compositor.aperture = composition.aperture
         compositor.previewMode = previewMode
+      }
+    }
+  }
+
+  @objc
+  public var resizeMode: HSResizeMode = .scaleAspectFill {
+    didSet {
+      switch resizeMode {
+      case .scaleAspectFill, .scaleAspectHeight:
+        playerLayer.videoGravity = .resizeAspectFill
+      case .scaleAspectWidth:
+        playerLayer.videoGravity = .resizeAspect
       }
     }
   }
