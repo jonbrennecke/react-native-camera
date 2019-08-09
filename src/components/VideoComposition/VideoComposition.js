@@ -1,12 +1,18 @@
 // @flow
-import React from 'react';
-import { requireNativeComponent } from 'react-native';
+import React, { Component } from 'react';
+import {
+  requireNativeComponent,
+  findNodeHandle,
+  NativeModules,
+} from 'react-native';
 
-import type { SFC, Style } from '../../types';
+import type { Style } from '../../types';
 
 const NativeVideoCompositionView = requireNativeComponent(
   'HSVideoCompositionView'
 );
+
+const { HSVideoCompositionViewManager } = NativeModules;
 
 export type VideoCompositionProps = {
   style?: ?Style,
@@ -15,16 +21,36 @@ export type VideoCompositionProps = {
   enablePortraitMode?: boolean,
 };
 
-export const VideoComposition: SFC<VideoCompositionProps> = ({
-  style,
-  assetID,
-  enableDepthPreview = true,
-  enablePortraitMode = true,
-}: VideoCompositionProps) => (
-  <NativeVideoCompositionView
-    style={style}
-    assetID={assetID}
-    isDepthPreviewEnabled={enableDepthPreview}
-    isPortraitModeEnabled={enablePortraitMode}
-  />
-);
+export class VideoComposition extends Component<VideoCompositionProps> {
+  nativeComponentRef = React.createRef();
+
+  play() {
+    if (!this.nativeComponentRef) {
+      return;
+    }
+    HSVideoCompositionViewManager.play(
+      findNodeHandle(this.nativeComponentRef.current)
+    );
+  }
+
+  pause() {
+    if (!this.nativeComponentRef) {
+      return;
+    }
+    HSVideoCompositionViewManager.pause(
+      findNodeHandle(this.nativeComponentRef.current)
+    );
+  }
+
+  render() {
+    return (
+      <NativeVideoCompositionView
+        ref={this.nativeComponentRef}
+        style={this.props.style}
+        assetID={this.props.assetID}
+        isDepthPreviewEnabled={this.props.enableDepthPreview}
+        isPortraitModeEnabled={this.props.enablePortraitMode}
+      />
+    );
+  }
+}

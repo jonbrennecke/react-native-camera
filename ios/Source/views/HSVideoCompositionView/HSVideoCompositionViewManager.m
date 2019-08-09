@@ -1,3 +1,6 @@
+#import <React/RCTBridge.h>
+#import <React/RCTConvert.h>
+#import <React/RCTUIManager.h>
 #import <React/RCTUtils.h>
 
 #import "HSReactNativeCamera-Swift.h"
@@ -25,6 +28,38 @@ RCT_CUSTOM_VIEW_PROPERTY(isDepthPreviewEnabled, BOOL, HSVideoCompositionView) {
 RCT_CUSTOM_VIEW_PROPERTY(isPortraitModeEnabled, BOOL, HSVideoCompositionView) {
   BOOL isPortraitModeEnabled = [RCTConvert BOOL:json];
   view.isPortraitModeEnabled = isPortraitModeEnabled;
+}
+
+RCT_EXPORT_METHOD(play : (nonnull NSNumber *)reactTag) {
+  [self.bridge.uiManager addUIBlock:^(
+                             RCTUIManager *uiManager,
+                             NSDictionary<NSNumber *, UIView *> *viewRegistry) {
+    HSVideoCompositionView *view =
+        (HSVideoCompositionView *)viewRegistry[reactTag];
+    if (!view || ![view isKindOfClass:[HSVideoCompositionView class]]) {
+      RCTLogError(@"Cannot find HSVideoCompositionView with tag #%@", reactTag);
+      return;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [view play];
+    });
+  }];
+}
+
+RCT_EXPORT_METHOD(pause : (nonnull NSNumber *)reactTag) {
+  [self.bridge.uiManager addUIBlock:^(
+                             RCTUIManager *uiManager,
+                             NSDictionary<NSNumber *, UIView *> *viewRegistry) {
+    HSVideoCompositionView *view =
+        (HSVideoCompositionView *)viewRegistry[reactTag];
+    if (!view || ![view isKindOfClass:[HSVideoCompositionView class]]) {
+      RCTLogError(@"Cannot find HSVideoCompositionView with tag #%@", reactTag);
+      return;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [view pause];
+    });
+  }];
 }
 
 @end

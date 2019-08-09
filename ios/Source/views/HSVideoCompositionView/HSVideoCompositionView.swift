@@ -47,7 +47,6 @@ class HSVideoCompositionView: UIView {
       return
     }
     playerItem = AVPlayerItem(asset: avComposition)
-    playerItem?.addObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), options: [.old, .new], context: nil)
     playerItem?.videoComposition = avVideoComposition
     if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
       compositor.depthTrackID = composition.depthTrackID
@@ -75,17 +74,11 @@ class HSVideoCompositionView: UIView {
         onReadyToPlay()
       }
     }
-//    if
-//      keyPath == #keyPath(AVPlayerItem.status),
-//      let statusRawValue = change?[.newKey] as? NSNumber,
-//      let status = AVPlayerItem.Status(rawValue: statusRawValue.intValue) {
-//      // TODO:
-//    }
   }
-  
+
   private func onReadyToPlay() {
     player?.seek(to: .zero)
-//    player?.pause()
+    player?.pause()
   }
 
   // MARK: - objc interface
@@ -111,6 +104,21 @@ class HSVideoCompositionView: UIView {
         self.asset = asset
       }
     }
+  }
+
+  @objc
+  public func play() {
+    player?.play()
+  }
+
+  @objc
+  public func pause() {
+    player?.pause()
+  }
+
+  @objc
+  public func seek(to time: CMTime) {
+    player?.seek(to: time)
   }
 }
 

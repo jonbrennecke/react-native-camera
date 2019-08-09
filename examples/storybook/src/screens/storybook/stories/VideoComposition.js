@@ -1,6 +1,7 @@
 // @flow
-import React from 'react';
+import React, { Component, createRef } from 'react';
 import { storiesOf } from '@storybook/react-native';
+import { withKnobs, select, button } from '@storybook/addon-knobs';
 import { SafeAreaView } from 'react-native';
 
 import {
@@ -8,8 +9,6 @@ import {
   queryVideos,
 } from '@jonbrennecke/react-native-media';
 import { VideoComposition } from '@jonbrennecke/react-native-camera';
-
-import { StorybookStateWrapper } from '../utils';
 
 import type { MediaObject } from '@jonbrennecke/react-native-media';
 
@@ -23,38 +22,67 @@ const styles = {
   },
 };
 
-const initialState: { asset: ?MediaObject } = { asset: null };
+type Props = {};
 
-const onMount = async (getState, setState): Promise<void> => {
-  try {
+type State = {
+  asset: ?MediaObject
+};
+
+class StoryComponent extends Component<Props, State> {
+  state = {
+    asset: null
+  };
+  compositionRef = createRef()
+
+  async componentDidMount() {
     await authorizeMediaLibrary();
     const assets = await queryVideos({ limit: 1 });
     if (!assets.length) {
       throw 'Could not find a video in the media library';
     }
     const asset = assets[0];
-    setState({ asset });
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
+    this.setState({ asset });
   }
-};
 
-storiesOf('Media Effects', module).add('Video Composition', () => (
+  configureButtons() {
+    button('Play', () => {
+      if (this.compositionRef.current) {
+        this.compositionRef.current.play();
+      }
+    });
+    button('Pause', () => {
+      if (this.compositionRef.current) {
+        this.compositionRef.current.pause();
+      }
+    });
+  }
+
+  render() {
+    this.configureButtons();
+    const { asset } = this.state;
+    return (
+      <VideoComposition
+        ref={this.compositionRef}
+        style={styles.flex}
+        assetID={asset?.assetID}
+        previewMode={select(
+          'Preview mode',
+          {
+            Normal: 'normal',
+            Depth: 'depth',
+            'Portrait mode': 'portraitMode',
+          },
+          'portraitMode'
+        )}
+      />
+    );
+  }
+}
+
+const stories = storiesOf('Media Effects', module)
+stories.addDecorator(withKnobs);
+stories.add('Video Composition', () => (
   <SafeAreaView style={styles.safeArea}>
-    <StorybookStateWrapper
-      initialState={initialState}
-      onMount={onMount}
-      render={getState => {
-        const { asset } = getState();
-        return (
-          <VideoComposition
-            style={styles.flex}
-            assetID={asset?.assetID}
-            enableDepthPreview={false}
-          />
-        );
-      }}
-    />
+    <StoryComponent/>
   </SafeAreaView>
 ));
