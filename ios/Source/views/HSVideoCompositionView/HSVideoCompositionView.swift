@@ -90,9 +90,6 @@ class HSVideoCompositionView: UIView {
     playerLooper = AVPlayerLooper(
       player: player, templateItem: templateItem, timeRange: timeRange
     )
-    if playerLooper?.status == .some(.unknown) {
-      print("Looper status is unknown")
-    }
   }
 
   // MARK: - objc interface

@@ -10,14 +10,7 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
   private var renderingQueue = DispatchQueue(label: "com.jonbrennecke.hsvideocompositor.renderingqueue")
   private var renderContext: AVVideoCompositionRenderContext?
 
-  private lazy var mtlDevice: MTLDevice! = {
-    guard let mtlDevice = MTLCreateSystemDefaultDevice() else {
-      fatalError("Failed to create Metal device")
-    }
-    return mtlDevice
-  }()
-
-  private lazy var context = CIContext(mtlDevice: mtlDevice)
+  private lazy var context = CIContext()
   private lazy var depthBlurEffect = HSDepthBlurEffect()
 
   public var depthTrackID: CMPersistentTrackID = kCMPersistentTrackID_Invalid
@@ -27,29 +20,33 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
   public var aperture: Float = 0
 
   private func composePixelBuffer(with request: AVAsynchronousVideoCompositionRequest) -> CVPixelBuffer? {
-    if !isPortraitModeEnabled {
-      return request.sourceFrame(byTrackID: videoTrackID)
+    return autoreleasepool {
+      if !isPortraitModeEnabled {
+        return request.sourceFrame(byTrackID: videoTrackID)
+      }
+      guard
+        let videoTrackPixelBuffer = request.sourceFrame(byTrackID: videoTrackID),
+        let depthTrackPixelBuffer = request.sourceFrame(byTrackID: depthTrackID)
+      else {
+        return nil
+      }
+      guard
+        let depthBlurImage = depthBlurEffect.makeEffectImage(
+          previewMode: isDepthPreviewEnabled ? .depth : .portraitBlur,
+          qualityMode: .exportQuality,
+          disparityPixelBuffer: HSPixelBuffer(pixelBuffer: depthTrackPixelBuffer),
+          videoPixelBuffer: HSPixelBuffer(pixelBuffer: videoTrackPixelBuffer),
+          aperture: aperture
+        ),
+        let outputPixelBuffer = renderContext?.newPixelBuffer()
+      else {
+        return nil
+      }
+      withLockedBaseAddress(outputPixelBuffer, flags: CVPixelBufferLockFlags(rawValue: 0)) { _ in
+        context.render(depthBlurImage, to: outputPixelBuffer)
+      }
+      return outputPixelBuffer
     }
-    guard
-      let videoTrackPixelBuffer = request.sourceFrame(byTrackID: videoTrackID),
-      let depthTrackPixelBuffer = request.sourceFrame(byTrackID: depthTrackID)
-    else {
-      return nil
-    }
-    guard
-      let depthBlurImage = depthBlurEffect.makeEffectImage(
-        previewMode: isDepthPreviewEnabled ? .depth : .portraitBlur,
-        qualityMode: .exportQuality,
-        disparityPixelBuffer: HSPixelBuffer(pixelBuffer: depthTrackPixelBuffer),
-        videoPixelBuffer: HSPixelBuffer(pixelBuffer: videoTrackPixelBuffer),
-        aperture: aperture
-      ),
-      let outputPixelBuffer = renderContext?.newPixelBuffer()
-    else {
-      return nil
-    }
-    context.render(depthBlurImage, to: outputPixelBuffer)
-    return outputPixelBuffer
   }
 
   // MARK: - AVVideoCompositing implementation

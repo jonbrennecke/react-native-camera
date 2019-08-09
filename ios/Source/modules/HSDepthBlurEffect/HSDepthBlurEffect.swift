@@ -6,10 +6,11 @@ import HSCameraUtils
 class HSDepthBlurEffect {
   private lazy var context = CIContext(
     options: [
-      CIContextOption.useSoftwareRenderer: false,
-      CIContextOption.workingColorSpace: NSNull(),
-      CIContextOption.workingFormat: kCVPixelFormatType_16Gray,
-      CIContextOption.outputColorSpace: NSNull(),
+      CIContextOption.useSoftwareRenderer: true
+//      CIContextOption.useSoftwareRenderer: false,
+//      CIContextOption.workingColorSpace: NSNull(),
+//      CIContextOption.workingFormat: kCVPixelFormatType_16Gray,
+//      CIContextOption.outputColorSpace: NSNull(),
     ]
   )
 
@@ -36,7 +37,6 @@ class HSDepthBlurEffect {
     aperture: Float,
     shouldNormalize: Bool = true
   ) -> CIImage? {
-    print(aperture)
     guard let disparityImage = composeDisparityImage(
       pixelBuffer: disparityPixelBuffer,
       context: context,
@@ -109,7 +109,7 @@ fileprivate func minMax(image inputImage: CIImage, context: CIContext = CIContex
   else {
     return nil
   }
-  var pixels = [UInt16](repeating: 0, count: 2)
+  var pixels = [UInt16](repeating: 0, count: 4)
   context.render(areaMinMaxImage,
                  toBitmap: &pixels,
                  rowBytes: 32,
