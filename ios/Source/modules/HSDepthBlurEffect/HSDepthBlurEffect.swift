@@ -6,11 +6,10 @@ import HSCameraUtils
 class HSDepthBlurEffect {
   private lazy var context = CIContext(
     options: [
-      CIContextOption.useSoftwareRenderer: true
-//      CIContextOption.useSoftwareRenderer: false,
-//      CIContextOption.workingColorSpace: NSNull(),
-//      CIContextOption.workingFormat: kCVPixelFormatType_16Gray,
-//      CIContextOption.outputColorSpace: NSNull(),
+      CIContextOption.useSoftwareRenderer: true,
+      CIContextOption.workingColorSpace: NSNull(),
+      CIContextOption.workingFormat: kCVPixelFormatType_16Gray,
+      CIContextOption.outputColorSpace: NSNull(),
     ]
   )
 
@@ -93,7 +92,7 @@ fileprivate func composeDisparityImage(pixelBuffer: HSPixelBuffer, context: CICo
 
 fileprivate func normalize(image inputImage: CIImage, context: CIContext) -> CIImage? {
   guard
-    let (min, max) = minMax(image: inputImage, context: context),
+    let (min, max) = minMaxFast(image: inputImage, context: context),
     let normalizeFilter = applyNormalizeFilter(inputImage: inputImage, min: min, max: max),
     let normalizedImage = normalizeFilter.outputImage
   else {
@@ -112,9 +111,9 @@ fileprivate func minMax(image inputImage: CIImage, context: CIContext = CIContex
   var pixels = [UInt16](repeating: 0, count: 4)
   context.render(areaMinMaxImage,
                  toBitmap: &pixels,
-                 rowBytes: 32,
+                 rowBytes: 16,
                  bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
-                 format: CIFormat.RGh,
+                 format: CIFormat.RG16,
                  colorSpace: nil)
   var output = [Float](repeating: 0, count: 2)
   var bufferFloat16 = vImage_Buffer(data: &pixels, height: 1, width: 2, rowBytes: 2)
@@ -133,12 +132,12 @@ fileprivate func minMaxFast(image inputImage: CIImage, context: CIContext = CICo
   else {
     return nil
   }
-  var pixels = [UInt8](repeating: 0, count: 2)
+  var pixels = [UInt8](repeating: 0, count: 4)
   context.render(areaMinMaxImage,
                  toBitmap: &pixels,
                  rowBytes: 4,
                  bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
-                 format: CIFormat.RG8,
+                 format: CIFormat.RGBA8,
                  colorSpace: nil)
   return (min: Float(pixels[0]) / 255, max: Float(pixels[1]) / 255)
 }

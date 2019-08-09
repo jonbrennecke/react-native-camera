@@ -8,7 +8,6 @@ class HSVideoCompositionView: UIView {
   private let loadingQueue = DispatchQueue(label: "com.jonbrennecke.HSVideoCompositionView.loadingQueue")
   private var player: AVQueuePlayer?
   private var playerItem: AVPlayerItem?
-  private var playerLooper: AVPlayerLooper?
 
   private var composition: HSVideoComposition? {
     didSet {
@@ -59,7 +58,6 @@ class HSVideoCompositionView: UIView {
     }
     player = AVQueuePlayer(playerItem: playerItem)
     player?.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.old, .new], context: nil)
-//    configureLooping(timeRange: CMTimeRangeMake(start: CMTime.zero, duration: avComposition.duration))
     DispatchQueue.main.async {
       self.playerLayer.player = self.player
       self.player?.play()
@@ -73,23 +71,21 @@ class HSVideoCompositionView: UIView {
       keyPath == #keyPath(AVPlayer.status),
       let statusRawValue = change?[.newKey] as? NSNumber,
       let status = AVPlayer.Status(rawValue: statusRawValue.intValue) {
-      // TODO:
+      if case .readyToPlay = status {
+        onReadyToPlay()
+      }
     }
-    if
-      keyPath == #keyPath(AVPlayerItem.status),
-      let statusRawValue = change?[.newKey] as? NSNumber,
-      let status = AVPlayerItem.Status(rawValue: statusRawValue.intValue) {
-      // TODO:
-    }
+//    if
+//      keyPath == #keyPath(AVPlayerItem.status),
+//      let statusRawValue = change?[.newKey] as? NSNumber,
+//      let status = AVPlayerItem.Status(rawValue: statusRawValue.intValue) {
+//      // TODO:
+//    }
   }
-
-  private func configureLooping(timeRange: CMTimeRange) {
-    guard shouldLoopVideo, let player = player, let templateItem = playerItem else {
-      return
-    }
-    playerLooper = AVPlayerLooper(
-      player: player, templateItem: templateItem, timeRange: timeRange
-    )
+  
+  private func onReadyToPlay() {
+    player?.seek(to: .zero)
+//    player?.pause()
   }
 
   // MARK: - objc interface
@@ -107,9 +103,6 @@ class HSVideoCompositionView: UIView {
       configurePlayer()
     }
   }
-
-  @objc
-  public var shouldLoopVideo: Bool = true
 
   @objc(loadAssetByID:)
   public func loadAsset(byID assetID: String) {

@@ -27,9 +27,4 @@ RCT_CUSTOM_VIEW_PROPERTY(isPortraitModeEnabled, BOOL, HSVideoCompositionView) {
   view.isPortraitModeEnabled = isPortraitModeEnabled;
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(shouldLoopVideo, BOOL, HSVideoCompositionView) {
-  BOOL shouldLoopVideo = [RCTConvert BOOL:json];
-  view.shouldLoopVideo = shouldLoopVideo;
-}
-
 @end
