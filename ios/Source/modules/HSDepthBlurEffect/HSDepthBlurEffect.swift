@@ -92,7 +92,7 @@ fileprivate func composeDisparityImage(pixelBuffer: HSPixelBuffer, context: CICo
 
 fileprivate func normalize(image inputImage: CIImage, context: CIContext) -> CIImage? {
   guard
-    let (min, max) = minMaxFast(image: inputImage, context: context),
+    let (min, max) = minMax(image: inputImage, context: context),
     let normalizeFilter = applyNormalizeFilter(inputImage: inputImage, min: min, max: max),
     let normalizedImage = normalizeFilter.outputImage
   else {
@@ -113,7 +113,7 @@ fileprivate func minMax(image inputImage: CIImage, context: CIContext = CIContex
                  toBitmap: &pixels,
                  rowBytes: 32,
                  bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
-                 format: CIFormat.RG16,
+                 format: CIFormat.RGh,
                  colorSpace: nil)
   var output = [Float](repeating: 0, count: 2)
   var bufferFloat16 = vImage_Buffer(data: &pixels, height: 1, width: 2, rowBytes: 2)
