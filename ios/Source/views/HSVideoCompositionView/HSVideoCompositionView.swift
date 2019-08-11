@@ -6,8 +6,10 @@ import UIKit
 @objc
 class HSVideoCompositionView: UIView {
   private let loadingQueue = DispatchQueue(label: "com.jonbrennecke.HSVideoCompositionView.loadingQueue")
+  private let playerLayer = AVPlayerLayer()
   private var player: AVPlayer?
   private var playerItem: AVPlayerItem?
+  private let imageView = UIImageView(frame: .zero)
 
   private var composition: HSVideoComposition? {
     didSet {
@@ -18,19 +20,53 @@ class HSVideoCompositionView: UIView {
   private var asset: AVAsset? {
     didSet {
       if let asset = asset {
-        HSVideoComposition.composition(ByLoading: asset) { composition in
-          self.composition = composition
+        loadPreviewImage(with: asset)
+        loadComposition(with: asset)
+      }
+    }
+  }
+  
+  /// MARK - UIView methods
+  
+  override func didMoveToSuperview() {
+    super.didMoveToSuperview()
+    layer.addSublayer(playerLayer)
+    addSubview(imageView)
+  }
+  
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    playerLayer.frame = bounds
+    imageView.frame = bounds
+  }
+  
+  /// MARK - private methods
+  
+  private func loadPreviewImage(with asset: AVAsset) {
+    loadingQueue.async { [weak self] in
+      let imageGenerator = AVAssetImageGenerator(asset: asset)
+      imageGenerator.generateCGImagesAsynchronously(
+      forTimes: [NSValue(time: .zero)]) { [weak self] (_, image, _, _, _) in
+        guard let image = image else { return }
+        DispatchQueue.main.async { [weak self] in
+          self?.imageView.image = UIImage(cgImage: image)
         }
       }
     }
   }
-
-  override class var layerClass: AnyClass {
-    return AVPlayerLayer.self
+  
+  private func showPreviewImage() {
+    addSubview(imageView)
   }
-
-  private var playerLayer: AVPlayerLayer {
-    return layer as! AVPlayerLayer
+  
+  private func hidePreviewImage() {
+    imageView.removeFromSuperview()
+  }
+  
+  private func loadComposition(with asset: AVAsset) {
+    HSVideoComposition.composition(ByLoading: asset) { [weak self] composition in
+      self?.composition = composition
+    }
   }
 
   private func configurePlayer() {
@@ -102,8 +138,10 @@ class HSVideoCompositionView: UIView {
       switch resizeMode {
       case .scaleAspectFill, .scaleAspectHeight:
         playerLayer.videoGravity = .resizeAspectFill
+        imageView.contentMode = .scaleAspectFill
       case .scaleAspectWidth:
         playerLayer.videoGravity = .resizeAspect
+        imageView.contentMode = .scaleAspectFit
       }
     }
   }
@@ -119,6 +157,7 @@ class HSVideoCompositionView: UIView {
 
   @objc
   public func play() {
+    hidePreviewImage()
     player?.play()
   }
 
