@@ -21,7 +21,6 @@ class HSVideoCompositionView: UIView {
   private var asset: AVAsset? {
     didSet {
       if let asset = asset {
-        loadPreviewImage(with: asset)
         loadComposition(with: asset)
       }
     }
@@ -43,15 +42,32 @@ class HSVideoCompositionView: UIView {
 
   // MARK: - private methods
 
-  private func loadPreviewImage(with asset: AVAsset) {
+  private func loadPreviewImage() {
     loadingQueue.async { [weak self] in
-      let imageGenerator = AVAssetImageGenerator(asset: asset)
+      guard
+        let strongSelf = self,
+        let composition = strongSelf.composition,
+        let (avComposition, avVideoComposition) = composition.makeAVComposition()
+      else {
+        return
+      }
+      let imageGenerator = AVAssetImageGenerator(asset: avComposition)
+      imageGenerator.videoComposition = avVideoComposition
+      if let compositor = imageGenerator.customVideoCompositor as? HSVideoCompositor {
+        compositor.depthTrackID = composition.depthTrackID
+        compositor.videoTrackID = composition.videoTrackID
+        compositor.aperture = composition.aperture
+        compositor.previewMode = strongSelf.previewMode
+      }
+      let durationSeconds = CMTimeGetSeconds(avComposition.duration)
+      let time = CMTimeMakeWithSeconds(durationSeconds * 0.5, preferredTimescale: 600)
       imageGenerator.generateCGImagesAsynchronously(
-        forTimes: [NSValue(time: .zero)]
+        forTimes: [NSValue(time: time)]
       ) { [weak self] _, image, _, _, _ in
         guard let image = image else { return }
         DispatchQueue.main.async { [weak self] in
           self?.imageView.image = UIImage(cgImage: image)
+          self?.showPreviewImage()
         }
       }
     }
@@ -62,20 +78,27 @@ class HSVideoCompositionView: UIView {
       imageView.alpha = 0
       addSubview(imageView)
     }
-    UIView.animate(withDuration: 0.1) { [weak self] in
+    UIView.animate(withDuration: 0.15) { [weak self] in
       self?.imageView.alpha = 1
     }
   }
 
   private func hidePreviewImage() {
-    UIView.animate(withDuration: 0.1) { [weak self] in
-      self?.imageView.alpha = 0
-    }
+    let options = UIView.AnimationOptions.curveEaseInOut
+    UIView.animate(
+      withDuration: 0.15,
+      delay: 0.15,
+      options: options,
+      animations: { [weak self] in
+        self?.imageView.alpha = 0
+      }, completion: nil
+    )
   }
 
   private func loadComposition(with asset: AVAsset) {
     HSVideoComposition.composition(ByLoading: asset) { [weak self] composition in
       self?.composition = composition
+      self?.loadPreviewImage()
     }
   }
 
