@@ -1,7 +1,7 @@
 // @flow
 import React, { Component, createRef } from 'react';
 import { storiesOf } from '@storybook/react-native';
-import { withKnobs, select, button } from '@storybook/addon-knobs';
+import { withKnobs, number, select, button } from '@storybook/addon-knobs';
 import { SafeAreaView } from 'react-native';
 
 import {
@@ -25,14 +25,14 @@ const styles = {
 type Props = {};
 
 type State = {
-  asset: ?MediaObject
+  asset: ?MediaObject,
 };
 
 class StoryComponent extends Component<Props, State> {
   state = {
-    asset: null
+    asset: null,
   };
-  compositionRef = createRef()
+  compositionRef = createRef();
 
   async componentDidMount() {
     await authorizeMediaLibrary();
@@ -88,15 +88,21 @@ class StoryComponent extends Component<Props, State> {
           },
           'scaleAspectWidth'
         )}
+        blurAperture={number('Blur aperture', 1.4, {
+          range: true,
+          min: 1.4,
+          max: 20,
+          step: 0.1,
+        })}
       />
     );
   }
 }
 
-const stories = storiesOf('Media Effects', module)
+const stories = storiesOf('Media Effects', module);
 stories.addDecorator(withKnobs);
 stories.add('Video Composition', () => (
   <SafeAreaView style={styles.safeArea}>
-    <StoryComponent/>
+    <StoryComponent />
   </SafeAreaView>
 ));

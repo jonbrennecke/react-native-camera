@@ -21,6 +21,7 @@ export type VideoCompositionProps = {
   assetID: ?string,
   previewMode?: CameraPreviewMode,
   resizeMode?: CameraResizeMode,
+  blurAperture?: number,
 };
 
 export class VideoComposition extends Component<VideoCompositionProps> {
@@ -72,6 +73,7 @@ export class VideoComposition extends Component<VideoCompositionProps> {
         assetID={this.props.assetID}
         previewMode={this.props.previewMode}
         resizeMode={this.props.resizeMode}
+        blurAperture={this.props.blurAperture}
       />
     );
   }

@@ -56,7 +56,7 @@ class HSVideoCompositionView: UIView {
       if let compositor = imageGenerator.customVideoCompositor as? HSVideoCompositor {
         compositor.depthTrackID = composition.depthTrackID
         compositor.videoTrackID = composition.videoTrackID
-        compositor.aperture = composition.aperture
+        compositor.aperture = strongSelf.blurAperture
         compositor.previewMode = strongSelf.previewMode
       }
       let durationSeconds = CMTimeGetSeconds(avComposition.duration)
@@ -67,7 +67,6 @@ class HSVideoCompositionView: UIView {
         guard let image = image else { return }
         DispatchQueue.main.async { [weak self] in
           self?.imageView.image = UIImage(cgImage: image)
-          self?.showPreviewImage()
         }
       }
     }
@@ -115,7 +114,7 @@ class HSVideoCompositionView: UIView {
     if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
       compositor.depthTrackID = composition.depthTrackID
       compositor.videoTrackID = composition.videoTrackID
-      compositor.aperture = composition.aperture
+      compositor.aperture = blurAperture
       compositor.previewMode = previewMode
     }
     player = AVPlayer(playerItem: playerItem)
@@ -148,6 +147,26 @@ class HSVideoCompositionView: UIView {
   // MARK: - objc interface
 
   @objc
+  public var blurAperture: Float = 1.4 {
+    didSet {
+      guard
+        let composition = composition,
+        let (_, avVideoComposition) = composition.makeAVComposition()
+        else {
+          return
+      }
+      playerItem?.videoComposition = avVideoComposition
+      if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
+        compositor.depthTrackID = composition.depthTrackID
+        compositor.videoTrackID = composition.videoTrackID
+        compositor.aperture = blurAperture
+        compositor.previewMode = previewMode
+      }
+      loadPreviewImage()
+    }
+  }
+
+  @objc
   public var previewMode: HSEffectPreviewMode = .portraitMode {
     didSet {
       guard
@@ -160,7 +179,7 @@ class HSVideoCompositionView: UIView {
       if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
         compositor.depthTrackID = composition.depthTrackID
         compositor.videoTrackID = composition.videoTrackID
-        compositor.aperture = composition.aperture
+        compositor.aperture = blurAperture
         compositor.previewMode = previewMode
       }
     }

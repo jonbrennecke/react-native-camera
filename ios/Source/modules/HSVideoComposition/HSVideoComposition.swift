@@ -6,14 +6,12 @@ class HSVideoComposition: NSObject {
 
   internal let videoTrackID: CMPersistentTrackID
   internal let depthTrackID: CMPersistentTrackID
-  internal let aperture: Float
 
   @objc
-  public init(asset: AVAsset, videoTrackID: CMPersistentTrackID, depthTrackID: CMPersistentTrackID, aperture: Float) {
+  public init(asset: AVAsset, videoTrackID: CMPersistentTrackID, depthTrackID: CMPersistentTrackID) {
     self.asset = asset
     self.videoTrackID = videoTrackID
     self.depthTrackID = depthTrackID
-    self.aperture = aperture
   }
 
   private static func parse(metadata: [AVMetadataItem]) -> Float? {
@@ -39,12 +37,10 @@ class HSVideoComposition: NSObject {
         completionHandler(nil)
         return
       }
-      let aperture = parse(metadata: asset.metadata) ?? 2.2
       let composition = HSVideoComposition(
         asset: asset,
         videoTrackID: videoTrack.trackID,
-        depthTrackID: depthTrack.trackID,
-        aperture: aperture
+        depthTrackID: depthTrack.trackID
       )
       completionHandler(composition)
     }

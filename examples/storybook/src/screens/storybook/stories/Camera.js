@@ -66,7 +66,12 @@ stories.add('Camera', () => (
             },
             'scaleAspectWidth'
           )}
-          blurAperture={number('Blur aperture', 0)}
+          blurAperture={number('Blur aperture', 1.4, {
+            range: true,
+            min: 1.4,
+            max: 20,
+            step: 0.1,
+          })}
         />
       )}
     />
