@@ -6,10 +6,11 @@ import UIKit
 @objc
 class HSVideoCompositionView: UIView {
   private let loadingQueue = DispatchQueue(label: "com.jonbrennecke.HSVideoCompositionView.loadingQueue")
+  private let imageView = UIImageView(frame: .zero)
   private let playerLayer = AVPlayerLayer()
   private var player: AVPlayer?
   private var playerItem: AVPlayerItem?
-  private let imageView = UIImageView(frame: .zero)
+  private var videoAssetRequestID: PHImageRequestID?
 
   private var composition: HSVideoComposition? {
     didSet {
@@ -25,28 +26,29 @@ class HSVideoCompositionView: UIView {
       }
     }
   }
-  
-  /// MARK - UIView methods
-  
+
+  // MARK: - UIView methods
+
   override func didMoveToSuperview() {
     super.didMoveToSuperview()
     layer.addSublayer(playerLayer)
     addSubview(imageView)
   }
-  
+
   override func layoutSubviews() {
     super.layoutSubviews()
     playerLayer.frame = bounds
     imageView.frame = bounds
   }
-  
-  /// MARK - private methods
-  
+
+  // MARK: - private methods
+
   private func loadPreviewImage(with asset: AVAsset) {
     loadingQueue.async { [weak self] in
       let imageGenerator = AVAssetImageGenerator(asset: asset)
       imageGenerator.generateCGImagesAsynchronously(
-      forTimes: [NSValue(time: .zero)]) { [weak self] (_, image, _, _, _) in
+        forTimes: [NSValue(time: .zero)]
+      ) { [weak self] _, image, _, _, _ in
         guard let image = image else { return }
         DispatchQueue.main.async { [weak self] in
           self?.imageView.image = UIImage(cgImage: image)
@@ -54,15 +56,23 @@ class HSVideoCompositionView: UIView {
       }
     }
   }
-  
+
   private func showPreviewImage() {
-    addSubview(imageView)
+    if imageView.superview != self {
+      imageView.alpha = 0
+      addSubview(imageView)
+    }
+    UIView.animate(withDuration: 0.1) { [weak self] in
+      self?.imageView.alpha = 1
+    }
   }
-  
+
   private func hidePreviewImage() {
-    imageView.removeFromSuperview()
+    UIView.animate(withDuration: 0.1) { [weak self] in
+      self?.imageView.alpha = 0
+    }
   }
-  
+
   private func loadComposition(with asset: AVAsset) {
     HSVideoComposition.composition(ByLoading: asset) { [weak self] composition in
       self?.composition = composition
@@ -87,9 +97,10 @@ class HSVideoCompositionView: UIView {
     }
     player = AVPlayer(playerItem: playerItem)
     player?.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.old, .new], context: nil)
-    DispatchQueue.main.async {
-      self.playerLayer.player = self.player
-      self.player?.play()
+    DispatchQueue.main.async { [weak self] in
+      guard let strongSelf = self else { return }
+      strongSelf.playerLayer.player = strongSelf.player
+      strongSelf.player?.play()
     }
   }
 
@@ -148,9 +159,13 @@ class HSVideoCompositionView: UIView {
 
   @objc(loadAssetByID:)
   public func loadAsset(byID assetID: String) {
-    loadingQueue.async {
-      loadVideoAsset(assetID: assetID) { asset in
-        self.asset = asset
+    loadingQueue.async { [weak self] in
+      guard let strongSelf = self else { return }
+      if let requestID = strongSelf.videoAssetRequestID {
+        PHImageManager.default().cancelImageRequest(requestID)
+      }
+      strongSelf.videoAssetRequestID = loadVideoAsset(assetID: assetID) { [weak self] asset in
+        self?.asset = asset
       }
     }
   }
@@ -181,14 +196,15 @@ class HSVideoCompositionView: UIView {
   }
 }
 
-fileprivate func loadVideoAsset(assetID: String, _ callback: @escaping (AVAsset?) -> Void) {
+fileprivate func loadVideoAsset(assetID: String, _ callback: @escaping (AVAsset?) -> Void) -> PHImageRequestID? {
   let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil)
   guard let asset = fetchResult.firstObject else {
-    return callback(nil)
+    callback(nil)
+    return nil
   }
   let videoRequestOptions = PHVideoRequestOptions()
   videoRequestOptions.deliveryMode = .highQualityFormat
-  PHImageManager.default()
+  return PHImageManager.default()
     .requestAVAsset(forVideo: asset, options: videoRequestOptions) { asset, _, _ in
       callback(asset)
     }
