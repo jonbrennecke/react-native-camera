@@ -19,31 +19,33 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
   public var aperture: Float = 0 // TODO: rename to blurAperture
 
   private func composePixelBuffer(with request: AVAsynchronousVideoCompositionRequest) -> CVPixelBuffer? {
-    if case .normal = previewMode {
-      return request.sourceFrame(byTrackID: videoTrackID)
+    return autoreleasepool {
+      if case .normal = previewMode {
+        return request.sourceFrame(byTrackID: videoTrackID)
+      }
+      guard
+        let videoTrackPixelBuffer = request.sourceFrame(byTrackID: videoTrackID),
+        let depthTrackPixelBuffer = request.sourceFrame(byTrackID: depthTrackID)
+      else {
+        return nil
+      }
+      guard
+        let depthBlurImage = depthBlurEffect.makeEffectImage(
+          previewMode: previewMode == .depth ? .depth : .portraitBlur,
+          qualityMode: .exportQuality,
+          disparityPixelBuffer: HSPixelBuffer(pixelBuffer: depthTrackPixelBuffer),
+          videoPixelBuffer: HSPixelBuffer(pixelBuffer: videoTrackPixelBuffer),
+          aperture: aperture
+        ),
+        let outputPixelBuffer = renderContext?.newPixelBuffer()
+      else {
+        return nil
+      }
+      withLockedBaseAddress(outputPixelBuffer, flags: CVPixelBufferLockFlags(rawValue: 0)) { _ in
+        context.render(depthBlurImage, to: outputPixelBuffer)
+      }
+      return outputPixelBuffer
     }
-    guard
-      let videoTrackPixelBuffer = request.sourceFrame(byTrackID: videoTrackID),
-      let depthTrackPixelBuffer = request.sourceFrame(byTrackID: depthTrackID)
-    else {
-      return nil
-    }
-    guard
-      let depthBlurImage = depthBlurEffect.makeEffectImage(
-        previewMode: previewMode == .depth ? .depth : .portraitBlur,
-        qualityMode: .exportQuality,
-        disparityPixelBuffer: HSPixelBuffer(pixelBuffer: depthTrackPixelBuffer),
-        videoPixelBuffer: HSPixelBuffer(pixelBuffer: videoTrackPixelBuffer),
-        aperture: aperture
-      ),
-      let outputPixelBuffer = renderContext?.newPixelBuffer()
-    else {
-      return nil
-    }
-    withLockedBaseAddress(outputPixelBuffer, flags: CVPixelBufferLockFlags(rawValue: 0)) { _ in
-      context.render(depthBlurImage, to: outputPixelBuffer)
-    }
-    return outputPixelBuffer
   }
 
   // MARK: - AVVideoCompositing implementation

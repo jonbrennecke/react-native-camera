@@ -61,12 +61,6 @@ class HSDepthBlurEffect {
 
     // TODO: check if videoPixelBuffer.buffer or depthPixelBuffer.buffer are null
 
-    // scale disparity image
-//    let scaledDisparityImage = videoImage
-//      .applyingFilter("CIEdgePreserveUpsampleFilter", parameters: [
-//        "inputSmallImage": disparityImage,
-//        ])
-
     //      let faceDetector = faceDetector,
     // find face features
 //    let faces = faceDetector.features(in: videoImage)
