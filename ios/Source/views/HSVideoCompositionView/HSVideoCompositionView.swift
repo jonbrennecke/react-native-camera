@@ -11,10 +11,13 @@ class HSVideoCompositionView: UIView {
   private var player: AVPlayer?
   private var playerItem: AVPlayerItem?
   private var videoAssetRequestID: PHImageRequestID?
+  private var shouldPlayWhenReady: Bool = false
 
   private var composition: HSVideoComposition? {
     didSet {
-      configurePlayer()
+      if isReadyToLoad {
+        configurePlayer()
+      }
     }
   }
 
@@ -144,10 +147,24 @@ class HSVideoCompositionView: UIView {
 
   private func onReadyToPlay() {
     player?.seek(to: .zero)
-    player?.pause()
+    if shouldPlayWhenReady {
+      player?.play()
+    }
+    else {
+      player?.pause()
+    }
   }
 
   // MARK: - objc interface
+
+  @objc
+  public var isReadyToLoad: Bool = false {
+    didSet {
+      if isReadyToLoad {
+        configurePlayer()
+      }
+    }
+  }
 
   @objc
   public var blurAperture: Float = 1.4 {
@@ -219,6 +236,8 @@ class HSVideoCompositionView: UIView {
   @objc
   public func play() {
     hidePreviewImage()
+    shouldPlayWhenReady = true
+    isReadyToLoad = true
     player?.play()
   }
 

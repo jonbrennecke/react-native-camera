@@ -26,6 +26,8 @@ RCT_EXPORT_VIEW_PROPERTY(resizeMode, HSResizeMode)
 
 RCT_EXPORT_VIEW_PROPERTY(blurAperture, float)
 
+RCT_EXPORT_VIEW_PROPERTY(isReadyToLoad, BOOL)
+
 RCT_EXPORT_METHOD(play : (nonnull NSNumber *)reactTag) {
   [self.bridge.uiManager addUIBlock:^(
                              RCTUIManager *uiManager,
