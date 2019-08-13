@@ -133,7 +133,7 @@ class HSCameraManager: NSObject {
   }
 
   private func attemptToSetupCameraCaptureSession() -> HSCameraSetupResult {
-    let preset: AVCaptureSession.Preset = .vga640x480
+    let preset: AVCaptureSession.Preset = .hd1280x720
     if captureSession.canSetSessionPreset(preset) {
       captureSession.sessionPreset = preset
     }

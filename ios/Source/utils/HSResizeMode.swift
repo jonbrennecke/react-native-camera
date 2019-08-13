@@ -1,4 +1,5 @@
 import AVFoundation
+import UIKit
 
 @objc
 public enum HSResizeMode: Int {
@@ -10,10 +11,17 @@ public enum HSResizeMode: Int {
     switch self {
     case .scaleAspectFill:
       return .resizeAspectFill
-    case .scaleAspectWidth:
+    case .scaleAspectWidth, .scaleAspectHeight:
       return .resizeAspect
-    case .scaleAspectHeight:
-      return .resizeAspect
+    }
+  }
+
+  public var contentMode: UIView.ContentMode {
+    switch self {
+    case .scaleAspectFill:
+      return .scaleAspectFill
+    case .scaleAspectWidth, .scaleAspectHeight:
+      return .scaleAspectFit
     }
   }
 }

@@ -66,7 +66,10 @@ class HSVideoCompositionView: UIView {
       ) { [weak self] _, image, _, _, _ in
         guard let image = image else { return }
         DispatchQueue.main.async { [weak self] in
-          self?.imageView.image = UIImage(cgImage: image)
+          guard let strongSelf = self else { return }
+          let uiImage = UIImage(cgImage: image)
+          strongSelf.imageView.contentMode = strongSelf.resizeMode.contentMode
+          strongSelf.imageView.image = uiImage
         }
       }
     }
@@ -182,6 +185,7 @@ class HSVideoCompositionView: UIView {
         compositor.aperture = blurAperture
         compositor.previewMode = previewMode
       }
+      loadPreviewImage()
     }
   }
 

@@ -36,15 +36,21 @@ class HSDepthBlurEffect {
     aperture: Float,
     shouldNormalize: Bool = true
   ) -> CIImage? {
-    guard let disparityImage = composeDisparityImage(
-      pixelBuffer: disparityPixelBuffer,
-      context: context,
-      shouldNormalize: previewMode == .depth || shouldNormalize
-    ) else {
+    guard
+      let disparityImage = composeDisparityImage(
+        pixelBuffer: disparityPixelBuffer,
+        context: context,
+        shouldNormalize: previewMode == .depth || shouldNormalize
+      ),
+      let videoImage = HSImageBuffer(pixelBuffer: videoPixelBuffer).makeCIImage()
+    else {
       return nil
     }
     if case .depth = previewMode {
-      return disparityImage
+      return videoImage
+        .applyingFilter("CIEdgePreserveUpsampleFilter", parameters: [
+          "inputSmallImage": disparityImage,
+        ])
     }
     guard let depthBlurFilter = depthBlurEffectFilter(
       scale: qualityMode == .exportQuality ? 1 : 0.1,
@@ -52,15 +58,14 @@ class HSDepthBlurEffect {
     ) else {
       return nil
     }
-    let videoImage = HSImageBuffer(pixelBuffer: videoPixelBuffer).makeCIImage()!
 
     // TODO: check if videoPixelBuffer.buffer or depthPixelBuffer.buffer are null
 
     // scale disparity image
 //    let scaledDisparityImage = videoImage
 //      .applyingFilter("CIEdgePreserveUpsampleFilter", parameters: [
-//        "inputSmallImage": normalizedDisparityImage,
-//      ])
+//        "inputSmallImage": disparityImage,
+//        ])
 
     //      let faceDetector = faceDetector,
     // find face features
