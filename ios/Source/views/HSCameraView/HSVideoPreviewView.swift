@@ -11,14 +11,16 @@ class HSVideoPreviewView: UIView {
   public var resizeMode: HSResizeMode = .scaleAspectWidth {
     didSet {
       previewLayer.videoGravity = resizeMode.videoGravity
+      layoutSubviews()
     }
   }
 
   override func didMoveToSuperview() {
     super.didMoveToSuperview()
-    layer.backgroundColor = UIColor.black.cgColor
+    backgroundColor = .black
     layer.sublayers = nil
     layer.addSublayer(previewLayer)
+    layoutSubviews()
   }
 
   override func layoutSubviews() {

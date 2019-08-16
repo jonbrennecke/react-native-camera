@@ -27,6 +27,7 @@ class HSCameraView: UIView {
   init() {
     super.init(frame: .zero)
     previewMode = .portraitMode
+    HSCameraManager.shared.playbackDelegate = self
   }
 
   required init?(coder _: NSCoder) {
@@ -115,4 +116,24 @@ class HSCameraView: UIView {
       }
     }
   }
+}
+
+extension HSCameraView: HSCameraManagerPlaybackDelegate {
+  func cameraManagerDidBeginCapture() {}
+
+  func cameraManagerDidEndCapture() {}
+
+  func cameraManagerDidBeginPreview() {
+    DispatchQueue.main.async { [weak self] in
+      guard let strongSelf = self else { return }
+      switch strongSelf.previewView {
+      case let .effect(view):
+        view.layoutSubviews()
+      case let .video(view):
+        view.layoutSubviews()
+      }
+    }
+  }
+
+  func cameraManagerDidEndPreview() {}
 }

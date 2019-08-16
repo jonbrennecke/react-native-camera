@@ -96,9 +96,9 @@ class HSCameraManager: NSObject {
   public static let shared = HSCameraManager()
 
   @objc
-  public var delegate: HSCameraManagerDelegate?
-
+  public weak var delegate: HSCameraManagerDelegate?
   public weak var depthDelegate: HSCameraManagerDepthDataDelegate?
+  public weak var playbackDelegate: HSCameraManagerPlaybackDelegate?
 
   private func setupAssetWriter(to outputURL: URL) -> HSCameraSetupResult {
     assetWriter = HSVideoWriter()
@@ -487,6 +487,7 @@ class HSCameraManager: NSObject {
       if case .authorized = AVCaptureDevice.authorizationStatus(for: .video) {
         guard strongSelf.captureSession.isRunning else {
           strongSelf.captureSession.startRunning()
+          strongSelf.playbackDelegate?.cameraManagerDidBeginPreview()
           return
         }
         return
@@ -501,6 +502,7 @@ class HSCameraManager: NSObject {
       guard strongSelf.captureSession.isRunning else {
         return
       }
+      strongSelf.playbackDelegate?.cameraManagerDidEndPreview()
       strongSelf.captureSession.stopRunning()
     }
   }
@@ -526,6 +528,7 @@ class HSCameraManager: NSObject {
           return
         }
         strongSelf.state = .recording(toURL: outputURL, startTime: startTime)
+        strongSelf.playbackDelegate?.cameraManagerDidBeginCapture()
         completionHandler(nil, true)
       } catch {
         completionHandler(error, false)
@@ -545,15 +548,17 @@ class HSCameraManager: NSObject {
 
   @objc(stopCaptureAndSaveToCameraRoll:completionHandler:)
   public func stopCapture(andSaveToCameraRoll _: Bool, _ completionHandler: @escaping (Bool) -> Void) {
-    cameraSetupQueue.async {
-      if case let .recording(_, startTime) = self.state {
-        self.assetWriterVideoInput?.finish()
-        self.assetWriterDepthInput?.finish()
-        let endTime = CMClockGetTime(self.clock)
-        self.state = .stopped(startTime: startTime, endTime: endTime)
-        self.assetWriter.stopRecording(at: endTime) { url in
+    cameraSetupQueue.async { [weak self] in
+      guard let strongSelf = self else { return }
+      if case let .recording(_, startTime) = strongSelf.state {
+        strongSelf.assetWriterVideoInput?.finish()
+        strongSelf.assetWriterDepthInput?.finish()
+        let endTime = CMClockGetTime(strongSelf.clock)
+        strongSelf.state = .stopped(startTime: startTime, endTime: endTime)
+        strongSelf.assetWriter.stopRecording(at: endTime) { url in
           PHPhotoLibrary.shared().performChanges({
             PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
+            strongSelf.playbackDelegate?.cameraManagerDidEndCapture()
             completionHandler(true)
           })
         }
