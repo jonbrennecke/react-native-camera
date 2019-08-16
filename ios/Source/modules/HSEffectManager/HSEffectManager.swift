@@ -14,15 +14,11 @@ class HSEffectManager: NSObject {
 
   internal func makeEffectImage(blurAperture: Float = 0) -> CIImage? {
     guard
-      let depthData = depthData,
-      let videoSampleBuffer = videoSampleBuffer,
-      let videoPixelBuffer = HSPixelBuffer(sampleBuffer: videoSampleBuffer)
+      let disparityPixelBuffer = disparityPixelBuffer,
+      let videoPixelBuffer = videoPixelBuffer
     else {
       return nil
     }
-    let isDepth = [kCVPixelFormatType_DepthFloat16, kCVPixelFormatType_DepthFloat32].contains(depthData.depthDataType)
-    let disparityData = isDepth ? depthData.converting(toDepthDataType: kCVPixelFormatType_DisparityFloat16) : depthData
-    let disparityPixelBuffer = HSPixelBuffer(depthData: disparityData)
     return depthBlurEffect.makeEffectImage(
       previewMode: previewMode == .depth ? .depth : .portraitBlur,
       qualityMode: .previewQuality,
@@ -52,19 +48,17 @@ class HSEffectManager: NSObject {
   @objc(sharedInstance)
   public static let shared = HSEffectManager()
 
-  @objc
-  public var depthData: AVDepthData?
+  public var disparityPixelBuffer: HSPixelBuffer?
 
-  @objc
-  public var videoSampleBuffer: CMSampleBuffer?
+  public var videoPixelBuffer: HSPixelBuffer?
 }
 
 extension HSEffectManager: HSCameraManagerDepthDataDelegate {
-  func cameraManagerDidOutput(depthData: AVDepthData) {
-    self.depthData = depthData
+  func cameraManagerDidOutput(disparityPixelBuffer: HSPixelBuffer) {
+    self.disparityPixelBuffer = disparityPixelBuffer
   }
 
-  func cameraManagerDidOutput(videoSampleBuffer: CMSampleBuffer) {
-    self.videoSampleBuffer = videoSampleBuffer
+  func cameraManagerDidOutput(videoPixelBuffer: HSPixelBuffer) {
+    self.videoPixelBuffer = videoPixelBuffer
   }
 }

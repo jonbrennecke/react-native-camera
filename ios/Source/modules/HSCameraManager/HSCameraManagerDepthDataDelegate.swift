@@ -1,10 +1,8 @@
 import AVFoundation
+import HSCameraUtils
 
 @available(iOS 11.0, *)
-@objc
-protocol HSCameraManagerDepthDataDelegate {
-  @objc(cameraManagerDidOutputDepthData:)
-  func cameraManagerDidOutput(depthData: AVDepthData)
-  @objc(cameraManagerDidOutputVideoSampleBuffer:)
-  func cameraManagerDidOutput(videoSampleBuffer: CMSampleBuffer)
+protocol HSCameraManagerDepthDataDelegate: AnyObject {
+  func cameraManagerDidOutput(disparityPixelBuffer: HSPixelBuffer)
+  func cameraManagerDidOutput(videoPixelBuffer: HSPixelBuffer)
 }

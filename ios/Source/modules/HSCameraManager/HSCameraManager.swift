@@ -98,7 +98,6 @@ class HSCameraManager: NSObject {
   @objc
   public var delegate: HSCameraManagerDelegate?
 
-  @objc
   public weak var depthDelegate: HSCameraManagerDepthDataDelegate?
 
   private func setupAssetWriter(to outputURL: URL) -> HSCameraSetupResult {
@@ -567,24 +566,18 @@ class HSCameraManager: NSObject {
 
 @available(iOS 11.1, *)
 extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
-  private func record(depthData: AVDepthData, at presentationTime: CMTime) {
-    if let depthBuffer = depthDataConverter?.convert(depthData: depthData) {
-      let frameBuffer = HSVideoFrameBuffer(
-        pixelBuffer: depthBuffer, presentationTime: presentationTime
-      )
-      assetWriterDepthInput?.append(frameBuffer)
-    } else {
-      print("[HSCameraManager]: Dropped depth frame")
-    }
+  private func record(disparityPixelBuffer: HSPixelBuffer, at presentationTime: CMTime) {
+    let frameBuffer = HSVideoFrameBuffer(
+      pixelBuffer: disparityPixelBuffer, presentationTime: presentationTime
+    )
+    assetWriterDepthInput?.append(frameBuffer)
   }
 
-  private func record(sampleBuffer: CMSampleBuffer, at presentationTime: CMTime) {
-    if let videoBuffer = HSPixelBuffer(sampleBuffer: sampleBuffer) {
-      let frameBuffer = HSVideoFrameBuffer(
-        pixelBuffer: videoBuffer, presentationTime: presentationTime
-      )
-      assetWriterVideoInput?.append(frameBuffer)
-    }
+  private func record(videoPixelBuffer: HSPixelBuffer, at presentationTime: CMTime) {
+    let frameBuffer = HSVideoFrameBuffer(
+      pixelBuffer: videoPixelBuffer, presentationTime: presentationTime
+    )
+    assetWriterVideoInput?.append(frameBuffer)
   }
 
   func dataOutputSynchronizer(
@@ -597,23 +590,25 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
       if let synchronizedDepthData = collection.synchronizedData(for: strongSelf.depthOutput) as? AVCaptureSynchronizedDepthData {
         if !synchronizedDepthData.depthDataWasDropped {
           let depthData = synchronizedDepthData.depthData.applyingExifOrientation(orientation)
-          if case let .recording(_, startTime) = strongSelf.state {
+          let disparityPixelBuffer = strongSelf.depthDataConverter?.convert(depthData: depthData)
+          if case let .recording(_, startTime) = strongSelf.state, let disparityPixelBuffer = disparityPixelBuffer {
             let presentationTime = synchronizedDepthData.timestamp - startTime
-            strongSelf.record(depthData: depthData, at: presentationTime)
+            strongSelf.record(disparityPixelBuffer: disparityPixelBuffer, at: presentationTime)
           }
-          if let depthDelegate = strongSelf.depthDelegate {
-            depthDelegate.cameraManagerDidOutput(depthData: depthData)
+          if let depthDelegate = strongSelf.depthDelegate, let disparityPixelBuffer = disparityPixelBuffer {
+            depthDelegate.cameraManagerDidOutput(disparityPixelBuffer: disparityPixelBuffer)
           }
         }
       }
       if let synchronizedVideoData = collection.synchronizedData(for: strongSelf.videoOutput) as? AVCaptureSynchronizedSampleBufferData {
         if !synchronizedVideoData.sampleBufferWasDropped {
-          if case let .recording(_, startTime) = strongSelf.state {
+          let videoPixelBuffer = HSPixelBuffer(sampleBuffer: synchronizedVideoData.sampleBuffer)
+          if case let .recording(_, startTime) = strongSelf.state, let videoPixelBuffer = videoPixelBuffer {
             let presentationTime = synchronizedVideoData.timestamp - startTime
-            strongSelf.record(sampleBuffer: synchronizedVideoData.sampleBuffer, at: presentationTime)
+            strongSelf.record(videoPixelBuffer: videoPixelBuffer, at: presentationTime)
           }
-          if let depthDelegate = strongSelf.depthDelegate {
-            depthDelegate.cameraManagerDidOutput(videoSampleBuffer: synchronizedVideoData.sampleBuffer)
+          if let depthDelegate = strongSelf.depthDelegate, let videoPixelBuffer = videoPixelBuffer {
+            depthDelegate.cameraManagerDidOutput(videoPixelBuffer: videoPixelBuffer)
           }
         }
       }
