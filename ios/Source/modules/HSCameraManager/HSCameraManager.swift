@@ -590,37 +590,31 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
   func dataOutputSynchronizer(
     _: AVCaptureDataOutputSynchronizer, didOutput collection: AVCaptureSynchronizedDataCollection
   ) {
-    let orientation: CGImagePropertyOrientation = activeCaptureDevicePosition(session: captureSession) == .some(.front)
-      ? .leftMirrored : .right
-
-    if case let .recording(_, startTime) = state {
-      outputProcessingQueue.async { [weak self] in
-        guard let strongSelf = self else { return }
-        if let synchronizedDepthData = collection.synchronizedData(for: strongSelf.depthOutput) as? AVCaptureSynchronizedDepthData {
-          let presentationTime = synchronizedDepthData.timestamp - startTime
-          let depthData = synchronizedDepthData.depthData.applyingExifOrientation(orientation)
-          strongSelf.record(depthData: depthData, at: presentationTime)
-        }
-        if let synchronizedVideoData = collection.synchronizedData(for: strongSelf.videoOutput) as? AVCaptureSynchronizedSampleBufferData {
-          let presentationTime = synchronizedVideoData.timestamp - startTime
-          strongSelf.record(sampleBuffer: synchronizedVideoData.sampleBuffer, at: presentationTime)
-        }
-      }
-    }
-
-    // MARK: - send data to delegates
-
     outputProcessingQueue.async { [weak self] in
-      guard let strongSelf = self, let depthDelegate = strongSelf.depthDelegate else { return }
+      guard let strongSelf = self else { return }
+      let orientation: CGImagePropertyOrientation = activeCaptureDevicePosition(session: strongSelf.captureSession) == .some(.front)
+        ? .leftMirrored : .right
       if let synchronizedDepthData = collection.synchronizedData(for: strongSelf.depthOutput) as? AVCaptureSynchronizedDepthData {
         if !synchronizedDepthData.depthDataWasDropped {
           let depthData = synchronizedDepthData.depthData.applyingExifOrientation(orientation)
-          depthDelegate.cameraManagerDidOutput(depthData: depthData)
+          if case let .recording(_, startTime) = strongSelf.state {
+            let presentationTime = synchronizedDepthData.timestamp - startTime
+            strongSelf.record(depthData: depthData, at: presentationTime)
+          }
+          if let depthDelegate = strongSelf.depthDelegate {
+            depthDelegate.cameraManagerDidOutput(depthData: depthData)
+          }
         }
       }
       if let synchronizedVideoData = collection.synchronizedData(for: strongSelf.videoOutput) as? AVCaptureSynchronizedSampleBufferData {
         if !synchronizedVideoData.sampleBufferWasDropped {
-          depthDelegate.cameraManagerDidOutput(videoSampleBuffer: synchronizedVideoData.sampleBuffer)
+          if case let .recording(_, startTime) = strongSelf.state {
+            let presentationTime = synchronizedVideoData.timestamp - startTime
+            strongSelf.record(sampleBuffer: synchronizedVideoData.sampleBuffer, at: presentationTime)
+          }
+          if let depthDelegate = strongSelf.depthDelegate {
+            depthDelegate.cameraManagerDidOutput(videoSampleBuffer: synchronizedVideoData.sampleBuffer)
+          }
         }
       }
     }

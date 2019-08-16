@@ -149,8 +149,7 @@ class HSVideoCompositionView: UIView {
     player?.seek(to: .zero)
     if shouldPlayWhenReady {
       player?.play()
-    }
-    else {
+    } else {
       player?.pause()
     }
   }
