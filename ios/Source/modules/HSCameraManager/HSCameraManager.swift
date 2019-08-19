@@ -14,6 +14,7 @@ class HSCameraManager: NSObject {
     case waitingForFileOutputToFinish(toURL: URL)
   }
 
+  private let isDebugLogEnabled = false
   private var state: State = .none
   private let cameraOutputQueue = DispatchQueue(label: "com.jonbrennecke.HSCameraManager.cameraOutputQueue")
   private let cameraSetupQueue = DispatchQueue(label: "com.jonbrennecke.HSCameraManager.cameraSetupQueue")
@@ -590,6 +591,15 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
   ) {
     outputProcessingQueue.async { [weak self] in
       guard let strongSelf = self else { return }
+
+      let startTime = CFAbsoluteTimeGetCurrent()
+      defer {
+        let executionTime = CFAbsoluteTimeGetCurrent() - startTime
+        if strongSelf.isDebugLogEnabled {
+          print("[\(String(describing: HSCameraManager.self))]: execution time: \(executionTime)")
+        }
+      }
+
       let orientation: CGImagePropertyOrientation = activeCaptureDevicePosition(session: strongSelf.captureSession) == .some(.front)
         ? .leftMirrored : .right
       if let synchronizedDepthData = collection.synchronizedData(for: strongSelf.depthOutput) as? AVCaptureSynchronizedDepthData {
@@ -605,6 +615,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
           }
         }
       }
+
       if let synchronizedVideoData = collection.synchronizedData(for: strongSelf.videoOutput) as? AVCaptureSynchronizedSampleBufferData {
         if !synchronizedVideoData.sampleBufferWasDropped {
           let videoPixelBuffer = HSPixelBuffer(sampleBuffer: synchronizedVideoData.sampleBuffer)

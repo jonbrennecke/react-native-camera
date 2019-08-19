@@ -18,6 +18,7 @@ class HSMetalEffectView: MTKView {
     return CIContext(mtlDevice: device, options: [CIContextOption.workingColorSpace: NSNull()])
   }()
 
+  private let isDebugLogEnabled = false
   private var imageExtent: CGRect = .zero
   private let colorSpace = CGColorSpaceCreateDeviceRGB()
   private weak var effectManager: HSEffectManager?
@@ -32,7 +33,7 @@ class HSMetalEffectView: MTKView {
     super.init(frame: .zero, device: mtlDevice)
     self.effectManager = effectManager
     framebufferOnly = false
-    preferredFramesPerSecond = 15
+    preferredFramesPerSecond = 30
     autoResizeDrawable = true
     enableSetNeedsDisplay = false
     drawableSize = frame.size
@@ -42,14 +43,28 @@ class HSMetalEffectView: MTKView {
     fatalError("init(coder:) has not been implemented")
   }
 
-  override func draw(_: CGRect) {
+  override func draw(_ rect: CGRect) {
     autoreleasepool {
+      super.draw(rect)
+      let startTime = CFAbsoluteTimeGetCurrent()
+      defer {
+        let executionTime = CFAbsoluteTimeGetCurrent() - startTime
+        if isDebugLogEnabled {
+          print("\(debugPrefix(describing: #selector(draw(_:)))) \(executionTime)")
+        }
+      }
       guard let image = effectManager?.makeEffectImage(blurAperture: blurAperture) else {
         return
       }
       imageExtent = image.extent
       present(image: image, resizeMode: resizeMode)
     }
+  }
+
+  private func debugPrefix(describing selector: Selector) -> String {
+    return """
+    [\(String(describing: HSMetalEffectView.self)) \(String(describing: selector))]:
+    """
   }
 
   private func present(image: CIImage, resizeMode: HSResizeMode) {
@@ -69,7 +84,6 @@ class HSMetalEffectView: MTKView {
       )
       commandBuffer.present(drawable)
       commandBuffer.commit()
-      commandBuffer.waitUntilCompleted()
     }
   }
 
