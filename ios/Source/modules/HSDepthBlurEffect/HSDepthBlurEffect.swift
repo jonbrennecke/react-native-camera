@@ -30,7 +30,7 @@ class HSDepthBlurEffect {
 
   public func makeEffectImage(
     previewMode: PreviewMode,
-    qualityMode: QualityMode,
+    qualityMode _: QualityMode,
     disparityPixelBuffer: HSPixelBuffer,
     videoPixelBuffer: HSPixelBuffer,
     aperture: Float,
@@ -53,7 +53,7 @@ class HSDepthBlurEffect {
         ])
     }
     guard let depthBlurFilter = depthBlurEffectFilter(
-      scale: qualityMode == .exportQuality ? 1 : 0.1,
+      scale: 0.1,
       aperture: aperture
     ) else {
       return nil

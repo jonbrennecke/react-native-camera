@@ -1,6 +1,7 @@
 import AVFoundation
 import CoreImage
 import HSCameraUtils
+import Metal
 
 class HSVideoCompositor: NSObject, AVVideoCompositing {
   private enum VideoCompositionRequestError: Error {
@@ -10,7 +11,13 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
   private var renderingQueue = DispatchQueue(label: "com.jonbrennecke.hsvideocompositor.renderingqueue")
   private var renderContext: AVVideoCompositionRenderContext?
 
-  private lazy var context = CIContext()
+  private lazy var context: CIContext! = {
+    guard let device = MTLCreateSystemDefaultDevice() else {
+      fatalError("Failed to get Metal device")
+    }
+    return CIContext(mtlDevice: device, options: [CIContextOption.workingColorSpace: NSNull()])
+  }()
+
   private lazy var depthBlurEffect = HSDepthBlurEffect()
 
   public var depthTrackID: CMPersistentTrackID = kCMPersistentTrackID_Invalid
@@ -41,9 +48,12 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
       else {
         return nil
       }
-      withLockedBaseAddress(outputPixelBuffer, flags: CVPixelBufferLockFlags(rawValue: 0)) { _ in
-        context.render(depthBlurImage, to: outputPixelBuffer)
-      }
+      context.render(
+        depthBlurImage,
+        to: outputPixelBuffer,
+        bounds: depthBlurImage.extent,
+        colorSpace: nil
+      )
       return outputPixelBuffer
     }
   }

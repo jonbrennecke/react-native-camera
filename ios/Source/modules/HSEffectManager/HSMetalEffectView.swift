@@ -3,7 +3,7 @@ import HSCameraUtils
 import MetalKit
 import UIKit
 
-class HSMetalEffectView: MTKView {
+class HSMetalEffectView: MTKView, HSDebuggable {
   private lazy var commandQueue: MTLCommandQueue! = {
     guard let commandQueue = device?.makeCommandQueue(maxCommandBufferCount: 10) else {
       fatalError("Failed to create Metal command queue")
@@ -18,10 +18,11 @@ class HSMetalEffectView: MTKView {
     return CIContext(mtlDevice: device, options: [CIContextOption.workingColorSpace: NSNull()])
   }()
 
-  private let isDebugLogEnabled = false
   private var imageExtent: CGRect = .zero
   private let colorSpace = CGColorSpaceCreateDeviceRGB()
   private weak var effectManager: HSEffectManager?
+
+  internal var isDebugLogEnabled = false
 
   public var resizeMode: HSResizeMode = .scaleAspectWidth
   public var blurAperture: Float = 0
@@ -59,12 +60,6 @@ class HSMetalEffectView: MTKView {
       imageExtent = image.extent
       present(image: image, resizeMode: resizeMode)
     }
-  }
-
-  private func debugPrefix(describing selector: Selector) -> String {
-    return """
-    [\(String(describing: HSMetalEffectView.self)) \(String(describing: selector))]:
-    """
   }
 
   private func present(image: CIImage, resizeMode: HSResizeMode) {
