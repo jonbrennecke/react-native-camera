@@ -34,13 +34,13 @@ class HSDepthBlurEffect {
     disparityPixelBuffer: HSPixelBuffer,
     videoPixelBuffer: HSPixelBuffer,
     aperture: Float,
-    shouldNormalize: Bool = true
+    shouldNormalize: Bool = false
   ) -> CIImage? {
     guard
       let disparityImage = composeDisparityImage(
         pixelBuffer: disparityPixelBuffer,
         context: context,
-        shouldNormalize: previewMode == .depth || shouldNormalize
+        shouldNormalize: shouldNormalize
       ),
       let videoImage = HSImageBuffer(pixelBuffer: videoPixelBuffer).makeCIImage()
     else {
