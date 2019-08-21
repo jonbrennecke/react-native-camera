@@ -5,7 +5,7 @@ import UIKit
 
 class HSMetalEffectView: MTKView, HSDebuggable {
   private lazy var commandQueue: MTLCommandQueue! = {
-    guard let commandQueue = device?.makeCommandQueue(maxCommandBufferCount: 10) else {
+    guard let commandQueue = device?.makeCommandQueue(maxCommandBufferCount: 3) else {
       fatalError("Failed to create Metal command queue")
     }
     return commandQueue
