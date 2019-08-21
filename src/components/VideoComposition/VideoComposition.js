@@ -16,6 +16,8 @@ const NativeVideoCompositionView = requireNativeComponent(
 
 const { HSVideoCompositionViewManager } = NativeModules;
 
+export type PlaybackState = 'playing' | 'paused' | 'waiting';
+
 export type VideoCompositionProps = {
   style?: ?Style,
   assetID: ?string,
@@ -24,6 +26,7 @@ export type VideoCompositionProps = {
   blurAperture?: number,
   isReadyToLoad?: boolean,
   onPlaybackProgress?: (progress: number) => void,
+  onPlaybackStateChange?: (playbackState: PlaybackState) => void,
 };
 
 export class VideoComposition extends Component<VideoCompositionProps> {
@@ -78,10 +81,16 @@ export class VideoComposition extends Component<VideoCompositionProps> {
         blurAperture={this.props.blurAperture}
         isReadyToLoad={this.props.isReadyToLoad}
         onPlaybackProgress={({ nativeEvent }) => {
-          if (!nativeEvent) {
+          if (!nativeEvent || !this.props.onPlaybackProgress) {
             return;
           }
           this.props.onPlaybackProgress(nativeEvent.progress);
+        }}
+        onPlaybackStateChange={({ nativeEvent }) => {
+          if (!nativeEvent || !this.props.onPlaybackStateChange) {
+            return;
+          }
+          this.props.onPlaybackStateChange(nativeEvent.playbackState);
         }}
       />
     );

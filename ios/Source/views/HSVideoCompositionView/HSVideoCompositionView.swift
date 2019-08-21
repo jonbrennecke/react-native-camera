@@ -129,6 +129,7 @@ class HSVideoCompositionView: UIView {
     }
     player.replaceCurrentItem(with: playerItem)
     player.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.old, .new], context: nil)
+    player.addObserver(self, forKeyPath: #keyPath(AVPlayer.timeControlStatus), options: [.old, .new], context: nil)
     DispatchQueue.main.async { [weak self] in
       guard let strongSelf = self else { return }
       strongSelf.playerLayer.player = strongSelf.player
@@ -145,6 +146,22 @@ class HSVideoCompositionView: UIView {
       let status = AVPlayer.Status(rawValue: statusRawValue.intValue) {
       if case .readyToPlay = status {
         onReadyToPlay()
+      }
+    }
+
+    if
+      keyPath == #keyPath(AVPlayer.timeControlStatus),
+      let statusRawValue = change?[.newKey] as? NSNumber,
+      let status = AVPlayer.TimeControlStatus(rawValue: statusRawValue.intValue) {
+      switch status {
+      case .waitingToPlayAtSpecifiedRate:
+        playbackDelegate?.videoComposition(view: self, didChangePlaybackState: .waiting)
+      case .paused:
+        playbackDelegate?.videoComposition(view: self, didChangePlaybackState: .paused)
+      case .playing:
+        playbackDelegate?.videoComposition(view: self, didChangePlaybackState: .playing)
+        @unknown default:
+        break
       }
     }
   }

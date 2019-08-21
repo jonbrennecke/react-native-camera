@@ -5,6 +5,7 @@
 
 #import "HSReactNativeCamera-Swift.h"
 #import "HSVideoCompositionViewManager.h"
+#import "HSVideoPlaybackState+RCTConvert.h"
 
 @implementation HSVideoCompositionViewManager
 
@@ -31,6 +32,8 @@ RCT_EXPORT_VIEW_PROPERTY(blurAperture, float)
 RCT_EXPORT_VIEW_PROPERTY(isReadyToLoad, BOOL)
 
 RCT_EXPORT_VIEW_PROPERTY(onPlaybackProgress, RCTDirectEventBlock)
+
+RCT_EXPORT_VIEW_PROPERTY(onPlaybackStateChange, RCTDirectEventBlock)
 
 RCT_EXPORT_METHOD(play : (nonnull NSNumber *)reactTag) {
   [self.bridge.uiManager addUIBlock:^(
@@ -110,6 +113,18 @@ RCT_EXPORT_METHOD(seekToProgress
       (HSVideoCompositionBridgeView *)view;
   if (bridgeView.onPlaybackProgress) {
     bridgeView.onPlaybackProgress(@{ @"progress" : @(progress) });
+  }
+}
+
+- (void)videoCompositionView:(HSVideoCompositionView *_Nonnull)view
+      didChangePlaybackState:(enum HSVideoPlaybackState)playbackState {
+  if (![view isKindOfClass:[HSVideoCompositionBridgeView class]]) {
+    return;
+  }
+  HSVideoCompositionBridgeView *bridgeView =
+      (HSVideoCompositionBridgeView *)view;
+  if (bridgeView.onPlaybackStateChange) {
+    bridgeView.onPlaybackStateChange(@{ @"playbackState" : @(playbackState) });
   }
 }
 

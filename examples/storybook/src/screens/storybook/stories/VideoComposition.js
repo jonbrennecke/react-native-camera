@@ -99,7 +99,10 @@ class StoryComponent extends Component<Props, State> {
           // eslint-disable-next-line no-console
           console.log(`progress: ${progress}`);
         }}
-
+        onPlaybackStateChange={playbackState => {
+          // eslint-disable-next-line no-console
+          console.log(`playback state: ${playbackState}`);
+        }}
       />
     );
   }
