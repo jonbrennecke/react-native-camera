@@ -11,7 +11,9 @@
 RCT_EXPORT_MODULE()
 
 - (UIView *)view {
-  HSVideoCompositionView *view = [[HSVideoCompositionView alloc] init];
+  HSVideoCompositionBridgeView *view =
+      [[HSVideoCompositionBridgeView alloc] init];
+  view.playbackDelegate = self;
   return view;
 }
 
@@ -28,7 +30,7 @@ RCT_EXPORT_VIEW_PROPERTY(blurAperture, float)
 
 RCT_EXPORT_VIEW_PROPERTY(isReadyToLoad, BOOL)
 
-// TODO: RCT_EXPORT_VIEW_PROPERTY(onPlaybackProgress, RCTBubblingEventBlock)
+RCT_EXPORT_VIEW_PROPERTY(onPlaybackProgress, RCTDirectEventBlock)
 
 RCT_EXPORT_METHOD(play : (nonnull NSNumber *)reactTag) {
   [self.bridge.uiManager addUIBlock:^(
@@ -97,6 +99,18 @@ RCT_EXPORT_METHOD(seekToProgress
       [view seekToProgress:[progress doubleValue]];
     });
   }];
+}
+
+- (void)videoCompositionView:(HSVideoCompositionView *_Nonnull)view
+           didUpdateProgress:(CFTimeInterval)progress {
+  if (![view isKindOfClass:[HSVideoCompositionBridgeView class]]) {
+    return;
+  }
+  HSVideoCompositionBridgeView *bridgeView =
+      (HSVideoCompositionBridgeView *)view;
+  if (bridgeView.onPlaybackProgress) {
+    bridgeView.onPlaybackProgress(@{ @"progress" : @(progress) });
+  }
 }
 
 @end

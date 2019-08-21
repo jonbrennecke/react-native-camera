@@ -30,6 +30,7 @@ class HSVideoCompositionView: UIView {
     }
   }
 
+  @objc
   public weak var playbackDelegate: HSVideoCompositionViewPlaybackDelegate?
 
   // MARK: - UIView methods
@@ -159,7 +160,7 @@ class HSVideoCompositionView: UIView {
         let playbackTimeSeconds = CMTimeGetSeconds(playbackTime)
         let durationSeconds = CMTimeGetSeconds(duration)
         let progress = clamp(playbackTimeSeconds / durationSeconds, min: 0, max: durationSeconds)
-        strongSelf.playbackDelegate?.videoComposition(didUpdateProgress: progress)
+        strongSelf.playbackDelegate?.videoComposition(view: strongSelf, didUpdateProgress: progress)
       }
     )
   }

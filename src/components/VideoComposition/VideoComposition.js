@@ -23,7 +23,7 @@ export type VideoCompositionProps = {
   resizeMode?: CameraResizeMode,
   blurAperture?: number,
   isReadyToLoad?: boolean,
-  onProgress?: (progress: number) => void,
+  onPlaybackProgress?: (progress: number) => void,
 };
 
 export class VideoComposition extends Component<VideoCompositionProps> {
@@ -77,7 +77,12 @@ export class VideoComposition extends Component<VideoCompositionProps> {
         resizeMode={this.props.resizeMode}
         blurAperture={this.props.blurAperture}
         isReadyToLoad={this.props.isReadyToLoad}
-        onProgress={this.props.onProgress}
+        onPlaybackProgress={({ nativeEvent }) => {
+          if (!nativeEvent) {
+            return;
+          }
+          this.props.onPlaybackProgress(nativeEvent.progress);
+        }}
       />
     );
   }

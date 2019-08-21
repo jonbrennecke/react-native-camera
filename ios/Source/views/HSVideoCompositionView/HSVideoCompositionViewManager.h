@@ -4,5 +4,6 @@
 #import <React/RCTViewManager.h>
 
 @class HSVideoCompositionViewManager;
-@interface HSVideoCompositionViewManager : RCTViewManager
+@interface HSVideoCompositionViewManager
+    : RCTViewManager <HSVideoCompositionViewPlaybackDelegate>
 @end

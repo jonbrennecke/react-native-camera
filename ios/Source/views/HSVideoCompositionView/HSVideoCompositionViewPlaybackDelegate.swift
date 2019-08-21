@@ -1,6 +1,7 @@
 import Foundation
 
 @objc
-public protocol HSVideoCompositionViewPlaybackDelegate: AnyObject {
-  func videoComposition(didUpdateProgress progress: CFTimeInterval)
+internal protocol HSVideoCompositionViewPlaybackDelegate: AnyObject {
+  @objc(videoCompositionView:didUpdateProgress:)
+  func videoComposition(view: HSVideoCompositionView, didUpdateProgress progress: CFTimeInterval)
 }
