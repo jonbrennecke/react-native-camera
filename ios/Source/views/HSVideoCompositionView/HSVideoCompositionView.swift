@@ -8,10 +8,11 @@ class HSVideoCompositionView: UIView {
   private let loadingQueue = DispatchQueue(label: "com.jonbrennecke.HSVideoCompositionView.loadingQueue")
   private let imageView = UIImageView(frame: .zero)
   private let playerLayer = AVPlayerLayer()
-  private var player: AVPlayer?
+  private var player = AVPlayer()
   private var playerItem: AVPlayerItem?
   private var videoAssetRequestID: PHImageRequestID?
   private var shouldPlayWhenReady: Bool = false
+  private var playbackTimeObserverToken: Any?
 
   private var composition: HSVideoComposition? {
     didSet {
@@ -28,6 +29,8 @@ class HSVideoCompositionView: UIView {
       }
     }
   }
+
+  public weak var playbackDelegate: HSVideoCompositionViewPlaybackDelegate?
 
   // MARK: - UIView methods
 
@@ -123,12 +126,12 @@ class HSVideoCompositionView: UIView {
       compositor.aperture = blurAperture
       compositor.previewMode = previewMode
     }
-    player = AVPlayer(playerItem: playerItem)
-    player?.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.old, .new], context: nil)
+    player.replaceCurrentItem(with: playerItem)
+    player.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.old, .new], context: nil)
     DispatchQueue.main.async { [weak self] in
       guard let strongSelf = self else { return }
       strongSelf.playerLayer.player = strongSelf.player
-      strongSelf.player?.play()
+      strongSelf.player.play()
     }
   }
 
@@ -145,12 +148,37 @@ class HSVideoCompositionView: UIView {
     }
   }
 
+  private func addPeriodicTimeObserver() {
+    let timeScale = CMTimeScale(NSEC_PER_SEC)
+    let timeInterval = CMTime(seconds: 1 / 30, preferredTimescale: timeScale)
+    playbackTimeObserverToken = player.addPeriodicTimeObserver(
+      forInterval: timeInterval,
+      queue: .main,
+      using: { [weak self] playbackTime in
+        guard let strongSelf = self, let duration = strongSelf.playerItem?.duration else { return }
+        let playbackTimeSeconds = CMTimeGetSeconds(playbackTime)
+        let durationSeconds = CMTimeGetSeconds(duration)
+        let progress = clamp(playbackTimeSeconds / durationSeconds, min: 0, max: durationSeconds)
+        strongSelf.playbackDelegate?.videoComposition(didUpdateProgress: progress)
+      }
+    )
+  }
+
+  private func removePeriodicTimeObserver() {
+    if let token = playbackTimeObserverToken {
+      player.removeTimeObserver(token)
+      playbackTimeObserverToken = nil
+    }
+  }
+
   private func onReadyToPlay() {
-    player?.seek(to: .zero)
+    player.seek(to: .zero)
+    removePeriodicTimeObserver()
+    addPeriodicTimeObserver()
     if shouldPlayWhenReady {
-      player?.play()
+      player.play()
     } else {
-      player?.pause()
+      player.pause()
     }
   }
 
@@ -237,22 +265,22 @@ class HSVideoCompositionView: UIView {
     hidePreviewImage()
     shouldPlayWhenReady = true
     isReadyToLoad = true
-    player?.play()
+    player.play()
   }
 
   @objc
   public func pause() {
-    player?.pause()
+    player.pause()
   }
 
   @objc
   public func seek(to time: CMTime) {
-    player?.seek(to: time)
+    player.seek(to: time)
   }
 
   @objc(seekToProgress:)
   public func seek(to progress: Double) {
-    if let duration = player?.currentItem?.duration {
+    if let duration = player.currentItem?.duration {
       let durationSeconds = CMTimeGetSeconds(duration)
       let time = CMTimeMakeWithSeconds(durationSeconds * progress, preferredTimescale: 600)
       seek(to: time)

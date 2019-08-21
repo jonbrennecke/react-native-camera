@@ -95,6 +95,9 @@ class StoryComponent extends Component<Props, State> {
           step: 0.1,
         })}
         isReadyToLoad={boolean('Ready to load', false)}
+        onProgress={progress => {
+          console.log(progress);
+        }}
       />
     );
   }
