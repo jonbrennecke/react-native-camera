@@ -5,8 +5,8 @@ import UIKit
 
 class HSMetalEffectView: MTKView, HSDebuggable {
   private lazy var commandQueue: MTLCommandQueue! = {
-    let maxCommandBufferCount = 1
-    guard let commandQueue = device?.makeCommandQueue() else {
+    let maxCommandBufferCount = 10
+    guard let commandQueue = device?.makeCommandQueue(maxCommandBufferCount: maxCommandBufferCount) else {
       fatalError("Failed to create Metal command queue")
     }
     return commandQueue
@@ -17,7 +17,7 @@ class HSMetalEffectView: MTKView, HSDebuggable {
       fatalError("Failed to get Metal device")
     }
     return CIContext(mtlDevice: device, options: [
-      CIContextOption.workingColorSpace: NSNull(),
+      .workingColorSpace: NSNull(),
     ])
   }()
 
@@ -92,11 +92,9 @@ class HSMetalEffectView: MTKView, HSDebuggable {
   private func present(image: CIImage, resizeMode: HSResizeMode) {
     if let commandBuffer = commandQueue.makeCommandBuffer() {
       defer { commandBuffer.commit() }
-      guard let resizedImage = resize(image: image, in: frame.size, resizeMode: resizeMode) else {
-        renderSemaphore.signal()
-        return
-      }
-      if let drawable = (layer as? CAMetalLayer)?.nextDrawable() {
+      let scale = calculateScale(from: image.extent.size, in: frame.size, resizeMode: resizeMode)
+      let scaledImage = image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+      if let drawable = currentDrawable {
         let renderDestination = CIRenderDestination(
           width: Int(drawableSize.width),
           height: Int(drawableSize.height),
@@ -107,15 +105,14 @@ class HSMetalEffectView: MTKView, HSDebuggable {
         }
         let startTime = CFAbsoluteTimeGetCurrent()
         _ = try? context.startTask(toClear: renderDestination)
-        _ = try? context.startTask(toRender: resizedImage, to: renderDestination)
+        _ = try? context.startTask(toRender: scaledImage, to: renderDestination)
 
 //        defer {
         let executionTime = CFAbsoluteTimeGetCurrent() - startTime
         print("\(debugPrefix(describing: #selector(draw(_:)))) \(executionTime)")
 //        }
         commandBuffer.addScheduledHandler { [weak self] _ in
-          guard let strongSelf = self else { return }
-          strongSelf.renderSemaphore.signal()
+          self?.renderSemaphore.signal()
         }
         commandBuffer.present(drawable)
       }
