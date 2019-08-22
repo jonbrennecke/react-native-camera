@@ -53,17 +53,13 @@ class HSCameraManager: NSObject {
 
   internal var captureSession = AVCaptureSession()
 
-  private var clock: CMClock {
-    return captureSession.masterClock ?? CMClockGetHostTimeClock()
-  }
+  private lazy var clock: CMClock = {
+    captureSession.masterClock ?? CMClockGetHostTimeClock()
+  }()
 
   // kCVPixelFormatType_32BGRA is required because of compatability with depth effects, but
   // if depth is disabled, this should be left as the default YpCbCr
-  public var videoPixelFormat: OSType = kCVPixelFormatType_32BGRA {
-    didSet {
-      // TODO: update video output configuration
-    }
-  }
+  public var videoPixelFormat: OSType = kCVPixelFormatType_32BGRA
 
   public var depthPixelFormat: OSType {
     if let activeDepthFormat = videoCaptureDevice?.activeDepthDataFormat {

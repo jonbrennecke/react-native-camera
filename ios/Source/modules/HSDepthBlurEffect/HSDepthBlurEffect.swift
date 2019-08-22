@@ -14,6 +14,22 @@ class HSDepthBlurEffect {
     case portraitBlur
   }
 
+  private lazy var depthBlurEffectFilter: CIFilter? = {
+    guard let filter = CIFilter(name: "CIDepthBlurEffect") else {
+      return nil
+    }
+    filter.setDefaults()
+    return filter
+  }()
+
+  private lazy var edgePreserveUpsampleFilter: CIFilter? = {
+    guard let filter = CIFilter(name: "CIEdgePreserveUpsampleFilter") else {
+      return nil
+    }
+    filter.setDefaults()
+    return filter
+  }()
+
   public func makeEffectImage(
     previewMode: PreviewMode,
     qualityMode _: QualityMode,
@@ -28,14 +44,20 @@ class HSDepthBlurEffect {
     else {
       return nil
     }
-    let upsampledDisparityImage = videoImage
-      .applyingFilter("CIEdgePreserveUpsampleFilter", parameters: [
-        "inputSmallImage": disparityImage,
-      ])
+
+    guard let upsampleFilter = edgePreserveUpsampleFilter else {
+      return nil
+    }
+    upsampleFilter.setValue(videoImage, forKey: kCIInputImageKey)
+    upsampleFilter.setValue(disparityImage, forKey: "inputSmallImage")
+    guard let upsampledDisparityImage = upsampleFilter.outputImage else {
+      return nil
+    }
+
     if case .depth = previewMode {
       return upsampledDisparityImage
     }
-    guard let depthBlurFilter = depthBlurFilter else {
+    guard let depthBlurFilter = depthBlurEffectFilter else {
       return nil
     }
     depthBlurFilter.setValue(0.1, forKey: "inputScaleFactor")
@@ -44,14 +66,6 @@ class HSDepthBlurEffect {
     depthBlurFilter.setValue(upsampledDisparityImage, forKey: kCIInputDisparityImageKey)
     return depthBlurFilter.outputImage
   }
-  
-  private var depthBlurFilter: CIFilter? = {
-    guard let filter = CIFilter(name: "CIDepthBlurEffect") else {
-      return nil
-    }
-    filter.setDefaults()
-    return filter
-  }()
 }
 
 fileprivate func composeDisparityImage(pixelBuffer: HSPixelBuffer) -> CIImage? {
