@@ -35,16 +35,23 @@ class HSDepthBlurEffect {
     if case .depth = previewMode {
       return upsampledDisparityImage
     }
-    guard let depthBlurFilter = depthBlurEffectFilter(
-      scale: 0.1,
-      aperture: aperture
-    ) else {
+    guard let depthBlurFilter = depthBlurFilter else {
       return nil
     }
+    depthBlurFilter.setValue(0.1, forKey: "inputScaleFactor")
+    depthBlurFilter.setValue(aperture, forKey: "inputAperture")
     depthBlurFilter.setValue(videoImage, forKey: kCIInputImageKey)
     depthBlurFilter.setValue(upsampledDisparityImage, forKey: kCIInputDisparityImageKey)
     return depthBlurFilter.outputImage
   }
+  
+  private var depthBlurFilter: CIFilter? = {
+    guard let filter = CIFilter(name: "CIDepthBlurEffect") else {
+      return nil
+    }
+    filter.setDefaults()
+    return filter
+  }()
 }
 
 fileprivate func composeDisparityImage(pixelBuffer: HSPixelBuffer) -> CIImage? {
@@ -127,18 +134,5 @@ fileprivate func areaMinMaxRedFilter(
   filter.setDefaults()
   filter.setValue(inputImage, forKey: kCIInputImageKey)
   filter.setValue(inputExtent ?? inputImage.extent, forKey: kCIInputExtentKey)
-  return filter
-}
-
-fileprivate func depthBlurEffectFilter(scale: Float, aperture: Float) -> CIFilter? {
-  guard let filter = CIFilter(name: "CIDepthBlurEffect") else {
-    return nil
-  }
-  filter.setDefaults()
-  filter.setValue(scale, forKey: "inputScaleFactor")
-  filter.setValue(aperture, forKey: "inputAperture")
-  //    filter.setValue(inputCalibrationData, forKey: "inputCalibrationData")
-  //    filter.setValue(inputAuxDataMetadata, forKey: "inputAuxDataMetadata")
-  //    filter.setValue(inputFocusRect, forKey: "inputFocusRect")
   return filter
 }

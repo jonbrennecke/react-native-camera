@@ -39,6 +39,7 @@ class HSMetalEffectView: MTKView, HSDebuggable {
     preferredFramesPerSecond = 30
     autoResizeDrawable = true
     enableSetNeedsDisplay = false
+    clearsContextBeforeDrawing = true
     drawableSize = frame.size
   }
 
