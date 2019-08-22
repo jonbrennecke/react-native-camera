@@ -4,20 +4,6 @@ import CoreImage
 import HSCameraUtils
 
 class HSDepthBlurEffect {
-  private lazy var context = CIContext(
-    options: [
-      CIContextOption.useSoftwareRenderer: false,
-      CIContextOption.workingColorSpace: NSNull(),
-      CIContextOption.workingFormat: kCVPixelFormatType_16Gray,
-      CIContextOption.outputColorSpace: NSNull(),
-    ]
-  )
-
-  public lazy var faceDetector: CIDetector? = {
-    let options = [CIDetectorAccuracy: CIDetectorAccuracyHigh]
-    return CIDetector(ofType: CIDetectorTypeFace, context: nil, options: options)
-  }()
-
   public enum QualityMode {
     case previewQuality
     case exportQuality
@@ -37,20 +23,17 @@ class HSDepthBlurEffect {
     shouldNormalize: Bool = false
   ) -> CIImage? {
     guard
-      let disparityImage = composeDisparityImage(
-        pixelBuffer: disparityPixelBuffer,
-        context: context,
-        shouldNormalize: shouldNormalize
-      ),
+      let disparityImage = HSImageBuffer(pixelBuffer: disparityPixelBuffer).makeCIImage(),
       let videoImage = HSImageBuffer(pixelBuffer: videoPixelBuffer).makeCIImage()
     else {
       return nil
     }
+    let upsampledDisparityImage = videoImage
+      .applyingFilter("CIEdgePreserveUpsampleFilter", parameters: [
+        "inputSmallImage": disparityImage,
+      ])
     if case .depth = previewMode {
-      return videoImage
-        .applyingFilter("CIEdgePreserveUpsampleFilter", parameters: [
-          "inputSmallImage": disparityImage,
-        ])
+      return upsampledDisparityImage
     }
     guard let depthBlurFilter = depthBlurEffectFilter(
       scale: 0.1,
@@ -58,35 +41,14 @@ class HSDepthBlurEffect {
     ) else {
       return nil
     }
-
-    // TODO: check if videoPixelBuffer.buffer or depthPixelBuffer.buffer are null
-
-    //      let faceDetector = faceDetector,
-    // find face features
-//    let faces = faceDetector.features(in: videoImage)
-//    if let face = faces.first as? CIFaceFeature {
-//      if face.hasRightEyePosition {
-//        depthBlurFilter.setValue(CIVector(cgPoint: face.rightEyePosition), forKey: "inputRightEyePositions")
-//      }
-//      if face.hasLeftEyePosition {
-//        depthBlurFilter.setValue(CIVector(cgPoint: face.leftEyePosition), forKey: "inputLeftEyePositions")
-//      }
-//    }
-
     depthBlurFilter.setValue(videoImage, forKey: kCIInputImageKey)
-    depthBlurFilter.setValue(disparityImage, forKey: kCIInputDisparityImageKey)
+    depthBlurFilter.setValue(upsampledDisparityImage, forKey: kCIInputDisparityImageKey)
     return depthBlurFilter.outputImage
   }
 }
 
-fileprivate func composeDisparityImage(pixelBuffer: HSPixelBuffer, context: CIContext, shouldNormalize: Bool) -> CIImage? {
-  guard let disparityImage = HSImageBuffer(pixelBuffer: pixelBuffer).makeCIImage() else {
-    return nil
-  }
-  if shouldNormalize {
-    return normalize(image: disparityImage, context: context)
-  }
-  return disparityImage
+fileprivate func composeDisparityImage(pixelBuffer: HSPixelBuffer) -> CIImage? {
+  return HSImageBuffer(pixelBuffer: pixelBuffer).makeCIImage()
 }
 
 fileprivate func normalize(image inputImage: CIImage, context: CIContext) -> CIImage? {

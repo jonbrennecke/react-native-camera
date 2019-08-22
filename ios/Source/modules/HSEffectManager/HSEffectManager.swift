@@ -10,7 +10,7 @@ class HSEffectManager: NSObject {
   private let printDebugLog = true
   private lazy var depthBlurEffect = HSDepthBlurEffect()
 
-  public var previewMode: HSEffectPreviewMode = .depth
+  public var previewMode: HSEffectPreviewMode = .portraitMode
 
   internal func makeEffectImage(blurAperture: Float = 0) -> CIImage? {
     guard

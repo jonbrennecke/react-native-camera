@@ -16,9 +16,15 @@ class HSCameraManager: NSObject {
 
   private let isDebugLogEnabled = false
   private var state: State = .none
-  private let cameraOutputQueue = DispatchQueue(label: "com.jonbrennecke.HSCameraManager.cameraOutputQueue")
-  private let cameraSetupQueue = DispatchQueue(label: "com.jonbrennecke.HSCameraManager.cameraSetupQueue")
-  private let outputProcessingQueue = DispatchQueue(label: "com.jonbrennecke.HSCameraManager.outputProcessingQueue")
+  private let cameraOutputQueue = DispatchQueue(
+    label: "com.jonbrennecke.HSCameraManager.cameraOutputQueue", qos: .background
+  )
+  private let cameraSetupQueue = DispatchQueue(
+    label: "com.jonbrennecke.HSCameraManager.cameraSetupQueue", qos: .background
+  )
+  private let outputProcessingQueue = DispatchQueue(
+    label: "com.jonbrennecke.HSCameraManager.outputProcessingQueue", qos: .background
+  )
   private let videoOutput = AVCaptureVideoDataOutput()
   private let videoFileOutput = AVCaptureMovieFileOutput()
   private let depthOutput = AVCaptureDepthDataOutput()

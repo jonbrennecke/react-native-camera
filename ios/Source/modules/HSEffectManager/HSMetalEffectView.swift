@@ -5,7 +5,7 @@ import UIKit
 
 class HSMetalEffectView: MTKView, HSDebuggable {
   private lazy var commandQueue: MTLCommandQueue! = {
-    guard let commandQueue = device?.makeCommandQueue(maxCommandBufferCount: 3) else {
+    guard let commandQueue = device?.makeCommandQueue(maxCommandBufferCount: 10) else {
       fatalError("Failed to create Metal command queue")
     }
     return commandQueue
@@ -15,7 +15,9 @@ class HSMetalEffectView: MTKView, HSDebuggable {
     guard let device = device else {
       fatalError("Failed to get Metal device")
     }
-    return CIContext(mtlDevice: device, options: [CIContextOption.workingColorSpace: NSNull()])
+    return CIContext(mtlDevice: device, options: [
+      CIContextOption.workingColorSpace: NSNull(),
+    ])
   }()
 
   private var imageExtent: CGRect = .zero
