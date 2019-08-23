@@ -51,6 +51,18 @@ class HSCameraView: UIView {
 
   // MARK: - objc interface
 
+  @objc
+  public var isPaused: Bool = false {
+    didSet {
+      switch previewView {
+      case let .effect(view):
+        view.isPaused = isPaused
+      case let .video(view):
+        view.isPaused = isPaused
+      }
+    }
+  }
+
   @objc(focusOnPoint:)
   public func focus(on point: CGPoint) {
     switch previewView {

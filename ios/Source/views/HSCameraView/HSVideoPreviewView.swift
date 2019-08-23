@@ -15,6 +15,17 @@ class HSVideoPreviewView: UIView {
     }
   }
 
+  public var isPaused: Bool {
+    get {
+      return HSCameraManager.shared.captureSession.isRunning
+    }
+    set {
+      newValue
+        ? HSCameraManager.shared.stopPreview()
+        : HSCameraManager.shared.startPreview()
+    }
+  }
+
   override func didMoveToSuperview() {
     super.didMoveToSuperview()
     backgroundColor = .black

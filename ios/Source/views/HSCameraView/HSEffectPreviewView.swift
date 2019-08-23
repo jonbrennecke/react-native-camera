@@ -24,6 +24,15 @@ class HSEffectPreviewView: UIView {
     }
   }
 
+  public var isPaused: Bool {
+    get {
+      return effectView.isPaused
+    }
+    set {
+      effectView.isPaused = newValue
+    }
+  }
+
   override func didMoveToSuperview() {
     super.didMoveToSuperview()
     layer.backgroundColor = UIColor.black.cgColor

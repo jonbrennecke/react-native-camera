@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { storiesOf } from '@storybook/react-native';
-import { withKnobs, select, number } from '@storybook/addon-knobs';
+import { withKnobs, select, number, boolean } from '@storybook/addon-knobs';
 import { SafeAreaView } from 'react-native';
 
 import {
@@ -66,6 +66,7 @@ stories.add('Camera', () => (
             },
             'scaleAspectWidth'
           )}
+          isPaused={boolean('Paused', false)}
           blurAperture={number('Blur aperture', 1.4, {
             range: true,
             min: 1.4,

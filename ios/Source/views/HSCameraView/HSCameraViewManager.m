@@ -25,6 +25,8 @@ RCT_EXPORT_VIEW_PROPERTY(resizeMode, HSResizeMode)
 
 RCT_EXPORT_VIEW_PROPERTY(blurAperture, float)
 
+RCT_EXPORT_VIEW_PROPERTY(isPaused, BOOL)
+
 RCT_EXPORT_METHOD(focusOnPoint
                   : (nonnull NSNumber *)reactTag point
                   : (CGPoint)point) {

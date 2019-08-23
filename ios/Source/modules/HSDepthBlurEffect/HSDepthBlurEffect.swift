@@ -24,7 +24,7 @@ class HSDepthBlurEffect {
     filter.setDefaults()
     return filter
   }()
-  
+
   private lazy var lanczosScaleTransformFilter: CIFilter? = {
     guard let filter = CIFilter(name: "CILanczosScaleTransform") else {
       return nil
@@ -40,7 +40,7 @@ class HSDepthBlurEffect {
     outputSize: CGSize,
     resizeMode: HSResizeMode,
     aperture: Float,
-    shouldNormalize: Bool = false
+    shouldNormalize _: Bool = false
   ) -> CIImage? {
     guard
       let disparityImage = HSImageBuffer(pixelBuffer: disparityPixelBuffer).makeCIImage(),
@@ -48,11 +48,12 @@ class HSDepthBlurEffect {
     else {
       return nil
     }
-    
+
     // downscale the video image
     let scale = scaleForResizing(videoImage.extent.size, to: outputSize, resizeMode: resizeMode)
     let scaledVideoImage = videoImage.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
-    
+
+    //    TODO: if highQualityUpsampling {
 //    guard let lanczosFilter = lanczosScaleTransformFilter else {
 //      return nil
 //    }
@@ -84,21 +85,21 @@ class HSDepthBlurEffect {
     depthBlurFilter.setValue(upsampledDisparityImage, forKey: kCIInputDisparityImageKey)
     return depthBlurFilter.outputImage
   }
-  
+
   public func makeEffectImage(
     previewMode: PreviewMode,
     disparityPixelBuffer: HSPixelBuffer,
     videoPixelBuffer: HSPixelBuffer,
     aperture: Float,
-    shouldNormalize: Bool = false
-    ) -> CIImage? {
+    shouldNormalize _: Bool = false
+  ) -> CIImage? {
     guard
       let disparityImage = HSImageBuffer(pixelBuffer: disparityPixelBuffer).makeCIImage(),
       let videoImage = HSImageBuffer(pixelBuffer: videoPixelBuffer).makeCIImage()
-      else {
-        return nil
+    else {
+      return nil
     }
-    
+
     // upsampel the depth image to match the video image
     guard let upsampleFilter = edgePreserveUpsampleFilter else {
       return nil
@@ -108,7 +109,7 @@ class HSDepthBlurEffect {
     guard let upsampledDisparityImage = upsampleFilter.outputImage else {
       return nil
     }
-    
+
     if case .depth = previewMode {
       return upsampledDisparityImage
     }

@@ -27,6 +27,7 @@ export type CameraProps = {
   previewMode?: CameraPreviewMode,
   resizeMode?: CameraResizeMode,
   blurAperture?: number,
+  isPaused?: boolean,
 };
 
 export class Camera extends Component<CameraProps> {
@@ -46,11 +47,12 @@ export class Camera extends Component<CameraProps> {
     return (
       <NativeCameraView
         ref={this.nativeComponentRef}
+        style={this.props.style}
         cameraPosition={this.props.cameraPosition}
         previewMode={this.props.previewMode}
         resizeMode={this.props.resizeMode}
         blurAperture={this.props.blurAperture}
-        style={this.props.style}
+        isPaused={this.props.isPaused}
       />
     );
   }

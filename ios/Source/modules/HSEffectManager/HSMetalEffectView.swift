@@ -21,7 +21,7 @@ class HSMetalEffectView: MTKView, HSDebuggable {
       .highQualityDownsample: false,
     ])
   }()
-  
+
   override var isPaused: Bool {
     didSet {
       effectManager?.isPaused = isPaused
@@ -82,17 +82,17 @@ class HSMetalEffectView: MTKView, HSDebuggable {
     ) else {
       return
     }
-    
+
     let scale = scaleForResizing(image.extent.size, to: frame.size, resizeMode: resizeMode)
     let scaledImage = image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
-    
+
     imageExtent = scaledImage.extent
     autoreleasepool {
       present(image: scaledImage, resizeMode: resizeMode)
     }
   }
 
-  private func present(image: CIImage, resizeMode: HSResizeMode) {
+  private func present(image: CIImage, resizeMode _: HSResizeMode) {
     _ = renderSemaphore.wait(timeout: DispatchTime.distantFuture)
     if let commandBuffer = commandQueue.makeCommandBuffer() {
       defer { commandBuffer.commit() }
