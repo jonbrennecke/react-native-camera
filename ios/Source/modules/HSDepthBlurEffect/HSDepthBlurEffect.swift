@@ -51,9 +51,10 @@ class HSDepthBlurEffect {
 
     // downscale the video image
     let scale = scaleForResizing(videoImage.extent.size, to: outputSize, resizeMode: resizeMode)
-    let scaledVideoImage = videoImage.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+    let scaledVideoImage = videoImage
+      .transformed(by: CGAffineTransform(scaleX: scale, y: scale))
 
-    //    TODO: if highQualityUpsampling {
+//    TODO: if highQualityUpsampling {
 //    guard let lanczosFilter = lanczosScaleTransformFilter else {
 //      return nil
 //    }
@@ -74,7 +75,9 @@ class HSDepthBlurEffect {
     }
 
     if case .depth = previewMode {
-      return upsampledDisparityImage
+      let yDiff = abs(videoImage.extent.size.height * scale - outputSize.height)
+      let xDiff = abs(videoImage.extent.size.width * scale - outputSize.width)
+      return upsampledDisparityImage.transformed(by: CGAffineTransform(translationX: xDiff, y: yDiff))
     }
     guard let depthBlurFilter = depthBlurEffectFilter else {
       return nil
@@ -83,7 +86,14 @@ class HSDepthBlurEffect {
     depthBlurFilter.setValue(aperture, forKey: "inputAperture")
     depthBlurFilter.setValue(scaledVideoImage, forKey: kCIInputImageKey)
     depthBlurFilter.setValue(upsampledDisparityImage, forKey: kCIInputDisparityImageKey)
-    return depthBlurFilter.outputImage
+    guard let filteredImage = depthBlurFilter.outputImage else {
+      return nil
+    }
+
+    // translate output image back to the origin (at top, left)
+    let yDiff = abs(videoImage.extent.size.height * scale - outputSize.height)
+    let xDiff = abs(videoImage.extent.size.width * scale - outputSize.width)
+    return filteredImage.transformed(by: CGAffineTransform(translationX: xDiff, y: yDiff))
   }
 
   public func makeEffectImage(
