@@ -50,14 +50,17 @@ class HSDepthBlurEffect {
     }
     
     // downscale the video image
-    guard let lanczosFilter = lanczosScaleTransformFilter else {
-      return nil
-    }
-    lanczosFilter.setValue(videoImage, forKey: kCIInputImageKey)
-    lanczosFilter.setValue(
-      scaleForResizing(videoImage.extent.size, to: outputSize, resizeMode: resizeMode), forKey: kCIInputScaleKey
-    )
-    let scaledVideoImage = lanczosFilter.outputImage
+    let scale = scaleForResizing(videoImage.extent.size, to: outputSize, resizeMode: resizeMode)
+    let scaledVideoImage = videoImage.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+    
+//    guard let lanczosFilter = lanczosScaleTransformFilter else {
+//      return nil
+//    }
+//    lanczosFilter.setValue(videoImage, forKey: kCIInputImageKey)
+//    lanczosFilter.setValue(
+//      scaleForResizing(videoImage.extent.size, to: outputSize, resizeMode: resizeMode), forKey: kCIInputScaleKey
+//    )
+//    let scaledVideoImage = lanczosFilter.outputImage
 
     // upsample the depth image to match the video image
     guard let upsampleFilter = edgePreserveUpsampleFilter else {

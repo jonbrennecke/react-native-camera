@@ -18,8 +18,15 @@ class HSMetalEffectView: MTKView, HSDebuggable {
     }
     return CIContext(mtlDevice: device, options: [
       .workingColorSpace: NSNull(),
+      .highQualityDownsample: false,
     ])
   }()
+  
+  override var isPaused: Bool {
+    didSet {
+      effectManager?.isPaused = isPaused
+    }
+  }
 
   private var imageExtent: CGRect = .zero
   private let colorSpace = CGColorSpaceCreateDeviceRGB()
@@ -29,14 +36,7 @@ class HSMetalEffectView: MTKView, HSDebuggable {
   internal var isDebugLogEnabled = false
 
   public var resizeMode: HSResizeMode = .scaleAspectWidth
-  public var blurAperture: Float = 0
-
-  private lazy var pixelBufferPool: CVPixelBufferPool? = {
-    let size = Size<Int>(
-      width: Int(frame.size.width.rounded()), height: Int(frame.size.height.rounded())
-    )
-    return createCVPixelBufferPool(size: size, pixelFormatType: kCVPixelFormatType_32BGRA)
-  }()
+  public var blurAperture: Float = 2.4
 
   public init(effectManager: HSEffectManager) {
     guard let mtlDevice = MTLCreateSystemDefaultDevice() else {
@@ -45,7 +45,7 @@ class HSMetalEffectView: MTKView, HSDebuggable {
     super.init(frame: .zero, device: mtlDevice)
     self.effectManager = effectManager
     framebufferOnly = false
-    preferredFramesPerSecond = 30
+    preferredFramesPerSecond = 24
     colorPixelFormat = .bgra8Unorm
     autoResizeDrawable = true
     enableSetNeedsDisplay = false
@@ -77,37 +77,25 @@ class HSMetalEffectView: MTKView, HSDebuggable {
   private func render() {
     guard let image = effectManager?.makeEffectImage(
       blurAperture: blurAperture,
-      outputSize: frame.size,
+      outputSize: CGSize(width: frame.width * 0.5, height: frame.height * 0.5),
       resizeMode: resizeMode
     ) else {
       return
     }
-    imageExtent = image.extent
+    
+    let scale = scaleForResizing(image.extent.size, to: frame.size, resizeMode: resizeMode)
+    let scaledImage = image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+    
+    imageExtent = scaledImage.extent
     autoreleasepool {
-      present(image: image, resizeMode: resizeMode)
+      present(image: scaledImage, resizeMode: resizeMode)
     }
   }
 
   private func present(image: CIImage, resizeMode: HSResizeMode) {
-//    let scale = calculateScale(from: image.extent.size, in: frame.size, resizeMode: resizeMode)
-//    let scaledImage = image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
-//    guard
-//      let pool = pixelBufferPool,
-//      let pixelBuffer = createPixelBuffer(with: pool)
-//    else {
-//      return
-//    }
-
     _ = renderSemaphore.wait(timeout: DispatchTime.distantFuture)
     if let commandBuffer = commandQueue.makeCommandBuffer() {
       defer { commandBuffer.commit() }
-//      context.render(
-//        scaledImage,
-//        to: pixelBuffer,
-//        bounds: CGRect(origin: .zero, size: drawableSize),
-//        colorSpace: colorSpace
-//      )
-
       if let drawable = currentDrawable {
         let renderDestination = CIRenderDestination(
           width: Int(drawableSize.width),
