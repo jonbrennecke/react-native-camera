@@ -26,17 +26,16 @@ class HSMetalEffectView: MTKView, HSDebuggable {
   private let renderSemaphore = DispatchSemaphore(value: 1)
   private weak var effectManager: HSEffectManager?
 
-  internal var isDebugLogEnabled = true
+  internal var isDebugLogEnabled = false
 
   public var resizeMode: HSResizeMode = .scaleAspectWidth
   public var blurAperture: Float = 0
 
-  private lazy var lanczosScaleTransformFilter: CIFilter? = {
-    guard let filter = CIFilter(name: "CILanczosScaleTransform") else {
-      return nil
-    }
-    filter.setValue(1.0, forKey: kCIInputAspectRatioKey)
-    return filter
+  private lazy var pixelBufferPool: CVPixelBufferPool? = {
+    let size = Size<Int>(
+      width: Int(frame.size.width.rounded()), height: Int(frame.size.height.rounded())
+    )
+    return createCVPixelBufferPool(size: size, pixelFormatType: kCVPixelFormatType_32BGRA)
   }()
 
   public init(effectManager: HSEffectManager) {
@@ -65,24 +64,24 @@ class HSMetalEffectView: MTKView, HSDebuggable {
 
   override func draw(_ rect: CGRect) {
     super.draw(rect)
-//    TODO:
-//    let startTime = CFAbsoluteTimeGetCurrent()
-//    defer {
-//      let executionTime = CFAbsoluteTimeGetCurrent() - startTime
-//      if isDebugLogEnabled {
-//        print("\(debugPrefix(describing: #selector(draw(_:)))) \(executionTime)")
-//      }
-//    }
+    let startTime = CFAbsoluteTimeGetCurrent()
+    defer {
+      let executionTime = CFAbsoluteTimeGetCurrent() - startTime
+      if isDebugLogEnabled {
+        print("\(debugPrefix(describing: #selector(draw(_:)))) \(executionTime)")
+      }
+    }
     render()
   }
 
   private func render() {
-    _ = renderSemaphore.wait(timeout: DispatchTime.distantFuture)
-    guard let image = effectManager?.makeEffectImage(blurAperture: blurAperture) else {
-      renderSemaphore.signal()
+    guard let image = effectManager?.makeEffectImage(
+      blurAperture: blurAperture,
+      outputSize: frame.size,
+      resizeMode: resizeMode
+    ) else {
       return
     }
-
     imageExtent = image.extent
     autoreleasepool {
       present(image: image, resizeMode: resizeMode)
@@ -90,10 +89,25 @@ class HSMetalEffectView: MTKView, HSDebuggable {
   }
 
   private func present(image: CIImage, resizeMode: HSResizeMode) {
+//    let scale = calculateScale(from: image.extent.size, in: frame.size, resizeMode: resizeMode)
+//    let scaledImage = image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+//    guard
+//      let pool = pixelBufferPool,
+//      let pixelBuffer = createPixelBuffer(with: pool)
+//    else {
+//      return
+//    }
+
+    _ = renderSemaphore.wait(timeout: DispatchTime.distantFuture)
     if let commandBuffer = commandQueue.makeCommandBuffer() {
       defer { commandBuffer.commit() }
-      let scale = calculateScale(from: image.extent.size, in: frame.size, resizeMode: resizeMode)
-      let scaledImage = image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+//      context.render(
+//        scaledImage,
+//        to: pixelBuffer,
+//        bounds: CGRect(origin: .zero, size: drawableSize),
+//        colorSpace: colorSpace
+//      )
+
       if let drawable = currentDrawable {
         let renderDestination = CIRenderDestination(
           width: Int(drawableSize.width),
@@ -103,57 +117,24 @@ class HSMetalEffectView: MTKView, HSDebuggable {
         ) { () -> MTLTexture in
           return drawable.texture
         }
-        let startTime = CFAbsoluteTimeGetCurrent()
         _ = try? context.startTask(toClear: renderDestination)
-        _ = try? context.startTask(toRender: scaledImage, to: renderDestination)
-
-//        defer {
-        let executionTime = CFAbsoluteTimeGetCurrent() - startTime
-        print("\(debugPrefix(describing: #selector(draw(_:)))) \(executionTime)")
-//        }
+        _ = try? context.startTask(toRender: image, to: renderDestination)
         commandBuffer.addScheduledHandler { [weak self] _ in
           self?.renderSemaphore.signal()
         }
-        commandBuffer.present(drawable)
+        commandBuffer.present(drawable, afterMinimumDuration: 1 / Double(preferredFramesPerSecond))
       }
     }
   }
 
-  private func resize(image: CIImage, in size: CGSize, resizeMode: HSResizeMode) -> CIImage? {
-    guard let filter = lanczosScaleTransformFilter else {
-      return nil
-    }
-    filter.setValue(image, forKey: kCIInputImageKey)
-    filter.setValue(
-      calculateScale(from: image.extent.size, in: size, resizeMode: resizeMode), forKey: kCIInputScaleKey
-    )
-    return filter.outputImage
-  }
-
   public func captureDevicePointConverted(fromLayerPoint layerPoint: CGPoint) -> CGPoint {
     if let videoSize = HSCameraManager.shared.videoResolution {
-      let scale = calculateScale(from: imageExtent.size, in: frame.size, resizeMode: resizeMode)
+      let scale = scaleForResizing(imageExtent.size, to: frame.size, resizeMode: resizeMode)
       return CGPoint(
         x: (layerPoint.x / scale) / CGFloat(videoSize.width),
         y: (layerPoint.y / scale) / CGFloat(videoSize.height)
       )
     }
     return .zero
-  }
-}
-
-fileprivate func calculateScale(from imageSize: CGSize, in size: CGSize, resizeMode: HSResizeMode) -> CGFloat {
-  let aspectRatio = imageSize.width / imageSize.height
-  let scaleHeight = (size.height * aspectRatio) / size.width
-  let scaleWidth = size.width / imageSize.width
-  switch resizeMode {
-  case .scaleAspectFill:
-    return (imageSize.height * scaleWidth) < size.height
-      ? scaleHeight
-      : scaleWidth
-  case .scaleAspectWidth:
-    return scaleWidth
-  case .scaleAspectHeight:
-    return scaleHeight
   }
 }

@@ -4,11 +4,6 @@ import CoreImage
 import HSCameraUtils
 
 class HSDepthBlurEffect {
-  public enum QualityMode {
-    case previewQuality
-    case exportQuality
-  }
-
   public enum PreviewMode {
     case depth
     case portraitBlur
@@ -29,12 +24,21 @@ class HSDepthBlurEffect {
     filter.setDefaults()
     return filter
   }()
+  
+  private lazy var lanczosScaleTransformFilter: CIFilter? = {
+    guard let filter = CIFilter(name: "CILanczosScaleTransform") else {
+      return nil
+    }
+    filter.setValue(1.0, forKey: kCIInputAspectRatioKey)
+    return filter
+  }()
 
   public func makeEffectImage(
     previewMode: PreviewMode,
-    qualityMode _: QualityMode,
     disparityPixelBuffer: HSPixelBuffer,
     videoPixelBuffer: HSPixelBuffer,
+    outputSize: CGSize,
+    resizeMode: HSResizeMode,
     aperture: Float,
     shouldNormalize: Bool = false
   ) -> CIImage? {
@@ -44,7 +48,55 @@ class HSDepthBlurEffect {
     else {
       return nil
     }
+    
+    // downscale the video image
+    guard let lanczosFilter = lanczosScaleTransformFilter else {
+      return nil
+    }
+    lanczosFilter.setValue(videoImage, forKey: kCIInputImageKey)
+    lanczosFilter.setValue(
+      scaleForResizing(videoImage.extent.size, to: outputSize, resizeMode: resizeMode), forKey: kCIInputScaleKey
+    )
+    let scaledVideoImage = lanczosFilter.outputImage
 
+    // upsample the depth image to match the video image
+    guard let upsampleFilter = edgePreserveUpsampleFilter else {
+      return nil
+    }
+    upsampleFilter.setValue(scaledVideoImage, forKey: kCIInputImageKey)
+    upsampleFilter.setValue(disparityImage, forKey: "inputSmallImage")
+    guard let upsampledDisparityImage = upsampleFilter.outputImage else {
+      return nil
+    }
+
+    if case .depth = previewMode {
+      return upsampledDisparityImage
+    }
+    guard let depthBlurFilter = depthBlurEffectFilter else {
+      return nil
+    }
+    depthBlurFilter.setValue(0.1, forKey: "inputScaleFactor")
+    depthBlurFilter.setValue(aperture, forKey: "inputAperture")
+    depthBlurFilter.setValue(scaledVideoImage, forKey: kCIInputImageKey)
+    depthBlurFilter.setValue(upsampledDisparityImage, forKey: kCIInputDisparityImageKey)
+    return depthBlurFilter.outputImage
+  }
+  
+  public func makeEffectImage(
+    previewMode: PreviewMode,
+    disparityPixelBuffer: HSPixelBuffer,
+    videoPixelBuffer: HSPixelBuffer,
+    aperture: Float,
+    shouldNormalize: Bool = false
+    ) -> CIImage? {
+    guard
+      let disparityImage = HSImageBuffer(pixelBuffer: disparityPixelBuffer).makeCIImage(),
+      let videoImage = HSImageBuffer(pixelBuffer: videoPixelBuffer).makeCIImage()
+      else {
+        return nil
+    }
+    
+    // upsampel the depth image to match the video image
     guard let upsampleFilter = edgePreserveUpsampleFilter else {
       return nil
     }
@@ -53,7 +105,7 @@ class HSDepthBlurEffect {
     guard let upsampledDisparityImage = upsampleFilter.outputImage else {
       return nil
     }
-
+    
     if case .depth = previewMode {
       return upsampledDisparityImage
     }

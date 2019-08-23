@@ -12,7 +12,7 @@ class HSEffectManager: NSObject {
 
   public var previewMode: HSEffectPreviewMode = .portraitMode
 
-  internal func makeEffectImage(blurAperture: Float = 0) -> CIImage? {
+  internal func makeEffectImage(blurAperture: Float = 0, outputSize: CGSize, resizeMode: HSResizeMode) -> CIImage? {
     guard
       let disparityPixelBuffer = disparityPixelBuffer,
       let videoPixelBuffer = videoPixelBuffer
@@ -21,9 +21,10 @@ class HSEffectManager: NSObject {
     }
     return depthBlurEffect.makeEffectImage(
       previewMode: previewMode == .depth ? .depth : .portraitBlur,
-      qualityMode: .previewQuality,
       disparityPixelBuffer: disparityPixelBuffer,
       videoPixelBuffer: videoPixelBuffer,
+      outputSize: outputSize,
+      resizeMode: resizeMode,
       aperture: blurAperture
     )
   }
