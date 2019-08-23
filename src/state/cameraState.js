@@ -5,6 +5,8 @@ import type { RecordOf, RecordInstance } from 'immutable';
 
 export type CameraCaptureStatus = 'started' | 'stopped';
 
+export type PlaybackState = 'playing' | 'paused' | 'waiting';
+
 export type Range = { min: number, max: number };
 
 export type CameraISORange = Range;
@@ -30,6 +32,8 @@ export type CameraStateObject = {
   format: ?CameraFormat,
   depthFormat: ?CameraFormat,
   hasCameraPermissions: boolean,
+  playbackState: PlaybackState,
+  playbackProgress: number,
 };
 
 export type CameraStateRecord = RecordOf<CameraStateObject>;
@@ -64,6 +68,12 @@ export interface ICameraState {
 
   getBlurAperture(): number;
   setBlurAperture(blurAperture: number): ICameraState;
+
+  getPlaybackState(): PlaybackState;
+  setPlaybackState(playbackState: PlaybackState): ICameraState;
+
+  getPlaybackProgress(): number;
+  setPlaybackProgress(progress: number): ICameraState;
 }
 
 // eslint-disable-next-line flowtype/generic-spacing
@@ -149,5 +159,21 @@ export const createCameraState: CameraStateObject => Class<
 
     setBlurAperture(blurAperture: number): ICameraState {
       return this.set('blurAperture', blurAperture);
+    }
+
+    getPlaybackState(): PlaybackState {
+      return this.get('playbackState');
+    }
+
+    setPlaybackState(playbackState: PlaybackState): ICameraState {
+      return this.set('playbackState', playbackState);
+    }
+
+    getPlaybackProgress(): number {
+      return this.get('playbackProgress');
+    }
+
+    setPlaybackProgress(progress: number): ICameraState {
+      return this.set('playbackProgress', progress);
     }
   };

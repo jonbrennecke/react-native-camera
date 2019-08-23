@@ -15,6 +15,7 @@ import type {
   CameraISORange,
   CameraExposureRange,
   CameraFormat,
+  PlaybackState,
 } from './';
 
 type OwnProps = {};
@@ -30,6 +31,8 @@ type StateProps = {
   format: ?CameraFormat,
   depthFormat: ?CameraFormat,
   hasCameraPermissions: boolean,
+  playbackState: PlaybackState,
+  playbackProgress: number,
 };
 
 type DispatchProps = {
@@ -42,6 +45,8 @@ type DispatchProps = {
   loadCameraPermissions: () => any,
   requestCameraPermissions: () => any,
   setBlurAperture: (blurAperture: number) => any,
+  setPlaybackState: (playbackState: PlaybackState) => any,
+  setPlaybackProgress: (playbackProgress: number) => any,
 };
 
 export type CameraStateHOCProps = OwnProps & StateProps & DispatchProps;
@@ -58,6 +63,8 @@ function mapCameraStateToProps(state: ICameraState): $Exact<StateProps> {
     depthFormat: selectors.selectDepthFormat(state),
     blurAperture: selectors.selectBlurAperture(state),
     hasCameraPermissions: selectors.selectHasCameraPermissions(state),
+    playbackState: selectors.selectPlaybackState(state),
+    playbackProgress: selectors.selectPlaybackProgress(state),
   };
 }
 
@@ -81,6 +88,10 @@ function mapCameraDispatchToProps(
       dispatch(actionCreators.requestCameraPermissions()),
     setBlurAperture: (blurAperture: number) =>
       dispatch(actionCreators.setBlurAperture({ blurAperture })),
+    setPlaybackState: (playbackState: PlaybackState) =>
+      dispatch(actionCreators.setPlaybackState({ playbackState })),
+    setPlaybackProgress: (playbackProgress: number) =>
+      dispatch(actionCreators.setPlaybackProgress({ playbackProgress })),
   };
 }
 

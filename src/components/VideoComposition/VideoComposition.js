@@ -9,14 +9,13 @@ import {
 import type { Style } from '../../types';
 
 import type { CameraPreviewMode, CameraResizeMode } from '../Camera';
+import type { PlaybackState } from '../../state';
 
 const NativeVideoCompositionView = requireNativeComponent(
   'HSVideoCompositionView'
 );
 
 const { HSVideoCompositionViewManager } = NativeModules;
-
-export type PlaybackState = 'playing' | 'paused' | 'waiting';
 
 export type VideoCompositionProps = {
   style?: ?Style,

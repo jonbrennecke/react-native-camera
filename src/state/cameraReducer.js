@@ -9,6 +9,7 @@ import type {
   CameraISORange,
   CameraExposureRange,
   CameraFormat,
+  PlaybackState,
 } from './cameraState';
 
 const CameraState = createCameraState({
@@ -22,6 +23,8 @@ const CameraState = createCameraState({
   format: null,
   depthFormat: null,
   hasCameraPermissions: false,
+  playbackState: 'waiting',
+  playbackProgress: 0,
 });
 
 export const initialState = new CameraState();
@@ -122,6 +125,26 @@ const reducers = {
       return state;
     }
     return state.setBlurAperture(payload.blurAperture);
+  },
+
+  setPlaybackState: (
+    state,
+    { payload }: Action<{ playbackState: PlaybackState }>
+  ): ICameraState => {
+    if (!payload) {
+      return state;
+    }
+    return state.setPlaybackState(payload.playbackState);
+  },
+
+  setPlaybackProgress: (
+    state,
+    { payload }: Action<{ playbackProgress: number }>
+  ): ICameraState => {
+    if (!payload) {
+      return state;
+    }
+    return state.setPlaybackProgress(payload.playbackProgress);
   },
 };
 
