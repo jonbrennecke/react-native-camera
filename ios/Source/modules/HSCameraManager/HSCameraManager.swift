@@ -43,7 +43,7 @@ class HSCameraManager: NSObject {
   private lazy var clock: CMClock = {
     captureSession.masterClock ?? CMClockGetHostTimeClock()
   }()
-  
+
   internal var captureSession = AVCaptureSession()
 
   // kCVPixelFormatType_32BGRA is required because of compatability with depth effects, but
@@ -278,7 +278,7 @@ class HSCameraManager: NSObject {
     }
     configureDepthDataConverter()
   }
-  
+
   private func configureDepthDataConverter() {
     guard let size = depthResolution else {
       return
