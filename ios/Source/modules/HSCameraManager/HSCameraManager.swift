@@ -47,7 +47,7 @@ class HSCameraManager: NSObject {
     }
     return HSAVDepthDataToPixelBufferConverter(
       size: size,
-      input: kCVPixelFormatType_DisparityFloat16,
+      input: kCVPixelFormatType_DisparityFloat32,
       output: kCVPixelFormatType_OneComponent8
     )
   }()
@@ -577,7 +577,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
   ) {
     outputProcessingQueue.async { [weak self] in
       guard let strongSelf = self else { return }
-      
+
       _ = strongSelf.outputSemaphore.wait(timeout: .distantFuture)
       defer {
         strongSelf.outputSemaphore.signal()
@@ -628,19 +628,18 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
 //      delegate?.cameraManagerDidDetect(faces: faces)
 //    }
   }
-  
+
   private func record(disparityPixelBuffer: HSPixelBuffer, at presentationTime: CMTime) {
     let frameBuffer = HSVideoFrameBuffer(
       pixelBuffer: disparityPixelBuffer, presentationTime: presentationTime
     )
     assetWriterDepthInput?.append(frameBuffer)
   }
-  
+
   private func record(videoPixelBuffer: HSPixelBuffer, at presentationTime: CMTime) {
     let frameBuffer = HSVideoFrameBuffer(
       pixelBuffer: videoPixelBuffer, presentationTime: presentationTime
     )
     assetWriterVideoInput?.append(frameBuffer)
   }
-  
 }
