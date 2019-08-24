@@ -206,9 +206,6 @@ class HSCameraManager: NSObject {
       captureSession.addOutput(videoOutput)
       if let connection = videoOutput.connection(with: .video) {
         connection.isEnabled = true
-        if connection.isVideoStabilizationSupported {
-          connection.preferredVideoStabilizationMode = .auto
-        }
         if connection.isVideoOrientationSupported {
           connection.videoOrientation = .portrait
         }

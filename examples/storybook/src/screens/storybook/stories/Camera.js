@@ -46,7 +46,7 @@ stories.add('Camera', () => (
               Front: 'front',
               Back: 'back',
             },
-            'front'
+            'back'
           )}
           previewMode={select(
             'Preview mode',
@@ -55,7 +55,7 @@ stories.add('Camera', () => (
               Depth: 'depth',
               'Portrait mode': 'portraitMode',
             },
-            'normal'
+            'depth'
           )}
           resizeMode={select(
             'Resize mode',
