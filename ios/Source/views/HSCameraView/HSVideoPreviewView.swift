@@ -5,12 +5,12 @@ import UIKit
 class HSVideoPreviewView: UIView {
   private lazy var previewLayer: AVCaptureVideoPreviewLayer = {
     let layer = AVCaptureVideoPreviewLayer(session: HSCameraManager.shared.captureSession)
+    layer.videoGravity = .resizeAspect
     return layer
   }()
 
   public var resizeMode: HSResizeMode = .scaleAspectWidth {
     didSet {
-      previewLayer.videoGravity = resizeMode.videoGravity
       layoutSubviews()
     }
   }
@@ -36,11 +36,15 @@ class HSVideoPreviewView: UIView {
 
   override func layoutSubviews() {
     super.layoutSubviews()
-    let resolution = HSCameraManager.shared.videoResolution ?? Size<Int>(width: 480, height: 640)
-    let aspectRatio = CGSize(width: resolution.width, height: resolution.height)
-    let centeredRect = AVMakeRect(aspectRatio: aspectRatio, insideRect: bounds)
-    let rectAtOrigin = CGRect(origin: .zero, size: centeredRect.size)
-    previewLayer.frame = rectAtOrigin
+    guard let resolution = HSCameraManager.shared.videoResolution else {
+      return
+    }
+    let originalSize = CGSize(width: resolution.width, height: resolution.height)
+    let scale = scaleForResizing(originalSize, to: frame.size, resizeMode: resizeMode)
+    previewLayer.frame = CGRect(
+      origin: .zero,
+      size: originalSize.applying(CGAffineTransform(scaleX: scale, y: scale))
+    )
   }
 
   public func focus(on point: CGPoint) {
