@@ -11,7 +11,7 @@ class HSEffectPreviewView: UIView {
       return effectView.resizeMode
     }
     set {
-      effectView.resizeMode = resizeMode
+      effectView.resizeMode = newValue
     }
   }
 

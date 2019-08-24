@@ -82,10 +82,8 @@ class HSMetalEffectView: MTKView, HSDebuggable {
     ) else {
       return
     }
-
     let scale = scaleForResizing(image.extent.size, to: frame.size, resizeMode: resizeMode)
     let scaledImage = image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
-
     imageExtent = scaledImage.extent
     autoreleasepool {
       present(image: scaledImage, resizeMode: resizeMode)

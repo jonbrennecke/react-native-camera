@@ -75,9 +75,9 @@ class HSDepthBlurEffect {
     }
 
     if case .depth = previewMode {
-      let yDiff = abs(videoImage.extent.size.height * scale - outputSize.height)
-      let xDiff = abs(videoImage.extent.size.width * scale - outputSize.width)
-      return upsampledDisparityImage.transformed(by: CGAffineTransform(translationX: xDiff, y: yDiff))
+      let yDiff = videoImage.extent.size.height * scale - outputSize.height
+      let xDiff = videoImage.extent.size.width * scale - outputSize.width
+      return upsampledDisparityImage.transformed(by: CGAffineTransform(translationX: -xDiff * 0.5, y: -yDiff))
     }
     guard let depthBlurFilter = depthBlurEffectFilter else {
       return nil
@@ -91,9 +91,9 @@ class HSDepthBlurEffect {
     }
 
     // translate output image back to the origin (at top, left)
-    let yDiff = abs(videoImage.extent.size.height * scale - outputSize.height)
-    let xDiff = abs(videoImage.extent.size.width * scale - outputSize.width)
-    return filteredImage.transformed(by: CGAffineTransform(translationX: xDiff, y: yDiff))
+    let yDiff = videoImage.extent.size.height * scale - outputSize.height
+    let xDiff = videoImage.extent.size.width * scale - outputSize.width
+    return filteredImage.transformed(by: CGAffineTransform(translationX: -xDiff * 0.5, y: -yDiff))
   }
 
   public func makeEffectImage(
