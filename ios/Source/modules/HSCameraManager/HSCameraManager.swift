@@ -602,7 +602,6 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
             let presentationTime = synchronizedDepthData.timestamp - startTime
             strongSelf.record(disparityPixelBuffer: disparityPixelBuffer, at: presentationTime)
           }
-          print("\(disparityPixelBuffer == nil)")
           if let depthDelegate = strongSelf.depthDelegate, let disparityPixelBuffer = disparityPixelBuffer {
             depthDelegate.cameraManagerDidOutput(disparityPixelBuffer: disparityPixelBuffer)
           }
