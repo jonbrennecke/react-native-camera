@@ -46,7 +46,7 @@ stories.add('Camera', () => (
               Front: 'front',
               Back: 'back',
             },
-            'back'
+            'front'
           )}
           previewMode={select(
             'Preview mode',

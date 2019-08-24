@@ -39,6 +39,7 @@ class HSCameraManager: NSObject {
   private var assetWriter = HSVideoWriter()
   private var assetWriterDepthInput: HSVideoWriterFrameBufferInput?
   private var assetWriterVideoInput: HSVideoWriterFrameBufferInput?
+  private var outputSemaphore = DispatchSemaphore(value: 1)
 
   private lazy var depthDataConverter: HSAVDepthDataToPixelBufferConverter? = {
     guard let size = depthResolution else {
@@ -46,7 +47,7 @@ class HSCameraManager: NSObject {
     }
     return HSAVDepthDataToPixelBufferConverter(
       size: size,
-      input: kCVPixelFormatType_DisparityFloat32,
+      input: kCVPixelFormatType_DisparityFloat16,
       output: kCVPixelFormatType_OneComponent8
     )
   }()
@@ -571,25 +572,16 @@ class HSCameraManager: NSObject {
 
 @available(iOS 11.1, *)
 extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
-  private func record(disparityPixelBuffer: HSPixelBuffer, at presentationTime: CMTime) {
-    let frameBuffer = HSVideoFrameBuffer(
-      pixelBuffer: disparityPixelBuffer, presentationTime: presentationTime
-    )
-    assetWriterDepthInput?.append(frameBuffer)
-  }
-
-  private func record(videoPixelBuffer: HSPixelBuffer, at presentationTime: CMTime) {
-    let frameBuffer = HSVideoFrameBuffer(
-      pixelBuffer: videoPixelBuffer, presentationTime: presentationTime
-    )
-    assetWriterVideoInput?.append(frameBuffer)
-  }
-
   func dataOutputSynchronizer(
     _: AVCaptureDataOutputSynchronizer, didOutput collection: AVCaptureSynchronizedDataCollection
   ) {
     outputProcessingQueue.async { [weak self] in
       guard let strongSelf = self else { return }
+      
+      _ = strongSelf.outputSemaphore.wait(timeout: .distantFuture)
+      defer {
+        strongSelf.outputSemaphore.signal()
+      }
 
       let startTime = CFAbsoluteTimeGetCurrent()
       defer {
@@ -636,4 +628,19 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
 //      delegate?.cameraManagerDidDetect(faces: faces)
 //    }
   }
+  
+  private func record(disparityPixelBuffer: HSPixelBuffer, at presentationTime: CMTime) {
+    let frameBuffer = HSVideoFrameBuffer(
+      pixelBuffer: disparityPixelBuffer, presentationTime: presentationTime
+    )
+    assetWriterDepthInput?.append(frameBuffer)
+  }
+  
+  private func record(videoPixelBuffer: HSPixelBuffer, at presentationTime: CMTime) {
+    let frameBuffer = HSVideoFrameBuffer(
+      pixelBuffer: videoPixelBuffer, presentationTime: presentationTime
+    )
+    assetWriterVideoInput?.append(frameBuffer)
+  }
+  
 }

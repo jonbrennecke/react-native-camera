@@ -138,7 +138,7 @@ fileprivate func composeDisparityImage(pixelBuffer: HSPixelBuffer) -> CIImage? {
   return HSImageBuffer(pixelBuffer: pixelBuffer).makeCIImage()
 }
 
-fileprivate func normalize(image inputImage: CIImage, context: CIContext) -> CIImage? {
+fileprivate func normalize(image inputImage: CIImage, context: CIContext = CIContext()) -> CIImage? {
   guard
     let (min, max) = minMax(image: inputImage, context: context),
     let normalizeFilter = applyNormalizeFilter(inputImage: inputImage, min: min, max: max),
