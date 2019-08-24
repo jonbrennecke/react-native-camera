@@ -29,9 +29,7 @@ class HSCameraManager: NSObject {
   private let videoFileOutput = AVCaptureMovieFileOutput()
   private let depthOutput = AVCaptureDepthDataOutput()
   private let metadataOutput = AVCaptureMetadataOutput()
-  private lazy var outputSynchronizer = AVCaptureDataOutputSynchronizer(
-    dataOutputs: [videoOutput, depthOutput]
-  )
+  private var outputSynchronizer: AVCaptureDataOutputSynchronizer?
   private var videoCaptureDevice: AVCaptureDevice?
   private var videoCaptureDeviceInput: AVCaptureDeviceInput?
   private var audioCaptureDevice: AVCaptureDevice?
@@ -39,24 +37,14 @@ class HSCameraManager: NSObject {
   private var assetWriter = HSVideoWriter()
   private var assetWriterDepthInput: HSVideoWriterFrameBufferInput?
   private var assetWriterVideoInput: HSVideoWriterFrameBufferInput?
+  private var depthDataConverter: HSAVDepthDataToPixelBufferConverter?
   private var outputSemaphore = DispatchSemaphore(value: 1)
-
-  private lazy var depthDataConverter: HSAVDepthDataToPixelBufferConverter? = {
-    guard let size = depthResolution else {
-      return nil
-    }
-    return HSAVDepthDataToPixelBufferConverter(
-      size: size,
-      input: kCVPixelFormatType_DisparityFloat32,
-      output: kCVPixelFormatType_OneComponent8
-    )
-  }()
-
-  internal var captureSession = AVCaptureSession()
 
   private lazy var clock: CMClock = {
     captureSession.masterClock ?? CMClockGetHostTimeClock()
   }()
+  
+  internal var captureSession = AVCaptureSession()
 
   // kCVPixelFormatType_32BGRA is required because of compatability with depth effects, but
   // if depth is disabled, this should be left as the default YpCbCr
@@ -163,7 +151,10 @@ class HSCameraManager: NSObject {
     }
 
     configureActiveFormat()
-    outputSynchronizer.setDelegate(self, queue: cameraOutputQueue)
+    outputSynchronizer = AVCaptureDataOutputSynchronizer(
+      dataOutputs: [videoOutput, depthOutput]
+    )
+    outputSynchronizer?.setDelegate(self, queue: cameraOutputQueue)
     return .success
   }
 
@@ -264,8 +255,6 @@ class HSCameraManager: NSObject {
       let depthFormats = supportedDepthFormats.filter { format in
         return
           CMFormatDescriptionGetMediaSubType(format.formatDescription) == kCVPixelFormatType_DepthFloat16
-        //        TODO: use depth if the front camera is active, disparity otherwise
-//          || CMFormatDescriptionGetMediaSubType(format.formatDescription) == kCVPixelFormatType_DisparityFloat16
       }
 
       let highestResolutionDepthFormat = depthFormats.max { a, b in
@@ -287,6 +276,18 @@ class HSCameraManager: NSObject {
 
       videoCaptureDevice.unlockForConfiguration()
     }
+    configureDepthDataConverter()
+  }
+  
+  private func configureDepthDataConverter() {
+    guard let size = depthResolution else {
+      return
+    }
+    depthDataConverter = HSAVDepthDataToPixelBufferConverter(
+      size: size,
+      input: kCVPixelFormatType_DisparityFloat32,
+      output: kCVPixelFormatType_OneComponent8
+    )
   }
 
   public var position: AVCaptureDevice.Position = .front {
@@ -294,15 +295,15 @@ class HSCameraManager: NSObject {
       guard position != oldValue else {
         return
       }
-      cameraSetupQueue.sync { [weak self] in
+      cameraSetupQueue.async { [weak self] in
         guard let strongSelf = self else { return }
         let isRunning = strongSelf.captureSession.isRunning
         if isRunning {
           strongSelf.captureSession.stopRunning()
         }
         strongSelf.captureSession.beginConfiguration()
-        captureSession.inputs.forEach { captureSession.removeInput($0) }
-        captureSession.outputs.forEach { captureSession.removeOutput($0) }
+        strongSelf.captureSession.inputs.forEach { strongSelf.captureSession.removeInput($0) }
+        strongSelf.captureSession.outputs.forEach { strongSelf.captureSession.removeOutput($0) }
         if case .failure = strongSelf.attemptToSetupCameraCaptureSession() {
           print("Failed to set up camera capture session")
         }
@@ -601,6 +602,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
             let presentationTime = synchronizedDepthData.timestamp - startTime
             strongSelf.record(disparityPixelBuffer: disparityPixelBuffer, at: presentationTime)
           }
+          print("\(disparityPixelBuffer == nil)")
           if let depthDelegate = strongSelf.depthDelegate, let disparityPixelBuffer = disparityPixelBuffer {
             depthDelegate.cameraManagerDidOutput(disparityPixelBuffer: disparityPixelBuffer)
           }
@@ -620,13 +622,6 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
         }
       }
     }
-
-    // send detected faces to delegate method
-//    if let synchronizedMetadata = collection.synchronizedData(for: metadataOutput) as? AVCaptureSynchronizedMetadataObjectData {
-//      let metadataObjects = synchronizedMetadata.metadataObjects
-//      let faces = metadataObjects.map { $0 as? AVMetadataFaceObject }.compactMap { $0 }
-//      delegate?.cameraManagerDidDetect(faces: faces)
-//    }
   }
 
   private func record(disparityPixelBuffer: HSPixelBuffer, at presentationTime: CMTime) {
