@@ -36,14 +36,18 @@ class HSVideoPreviewView: UIView {
 
   override func layoutSubviews() {
     super.layoutSubviews()
-    guard let resolution = HSCameraManager.shared.videoResolution else {
+    guard let videoResolution = HSCameraManager.shared.videoResolution else {
       return
     }
-    let originalSize = CGSize(width: resolution.width, height: resolution.height)
-    let scale = scaleForResizing(originalSize, to: frame.size, resizeMode: resizeMode)
+    resize(videoResolution: videoResolution)
+  }
+
+  internal func resize(videoResolution: Size<Int>) {
+    let size = CGSize(width: videoResolution.width, height: videoResolution.height)
+    let scale = scaleForResizing(size, to: frame.size, resizeMode: resizeMode)
     previewLayer.frame = CGRect(
       origin: .zero,
-      size: originalSize.applying(CGAffineTransform(scaleX: scale, y: scale))
+      size: size.applying(CGAffineTransform(scaleX: scale, y: scale))
     )
   }
 

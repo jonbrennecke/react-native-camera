@@ -45,6 +45,8 @@ class HSCameraManager: NSObject {
   }()
 
   internal var captureSession = AVCaptureSession()
+  internal var depthDataObservers = HSObserverCollection<HSCameraDepthDataObserver>()
+  internal var resolutionObservers = HSObserverCollection<HSCameraResolutionObserver>()
 
   // kCVPixelFormatType_32BGRA is required because of compatability with depth effects, but
   // if depth is disabled, this should be left as the default YpCbCr
@@ -89,8 +91,23 @@ class HSCameraManager: NSObject {
 
   @objc
   public weak var delegate: HSCameraManagerDelegate?
-  public weak var depthDelegate: HSCameraManagerDepthDataDelegate?
-  public weak var playbackDelegate: HSCameraManagerPlaybackDelegate?
+
+  private func notifyResolutionObservers() {
+    guard
+      let videoResolution = videoResolution,
+      let depthResolution = depthResolution
+    else {
+      return
+    }
+    resolutionObservers.forEach { observer in
+      if !observer.isPaused {
+        observer.cameraManagerDidChangeResolution(
+          videoResolution: videoResolution,
+          depthResolution: depthResolution
+        )
+      }
+    }
+  }
 
   private func setupAssetWriter(to outputURL: URL) -> HSCameraSetupResult {
     assetWriter = HSVideoWriter()
@@ -489,7 +506,7 @@ class HSCameraManager: NSObject {
       if case .authorized = AVCaptureDevice.authorizationStatus(for: .video) {
         guard strongSelf.captureSession.isRunning else {
           strongSelf.captureSession.startRunning()
-          strongSelf.playbackDelegate?.cameraManagerDidBeginPreview()
+          strongSelf.notifyResolutionObservers()
           return
         }
         return
@@ -504,7 +521,6 @@ class HSCameraManager: NSObject {
       guard strongSelf.captureSession.isRunning else {
         return
       }
-      strongSelf.playbackDelegate?.cameraManagerDidEndPreview()
       strongSelf.captureSession.stopRunning()
     }
   }
@@ -530,7 +546,7 @@ class HSCameraManager: NSObject {
           return
         }
         strongSelf.state = .recording(toURL: outputURL, startTime: startTime)
-        strongSelf.playbackDelegate?.cameraManagerDidBeginCapture()
+        strongSelf.notifyResolutionObservers()
         completionHandler(nil, true)
       } catch {
         completionHandler(error, false)
@@ -560,7 +576,6 @@ class HSCameraManager: NSObject {
         strongSelf.assetWriter.stopRecording(at: endTime) { url in
           PHPhotoLibrary.shared().performChanges({
             PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
-            strongSelf.playbackDelegate?.cameraManagerDidEndCapture()
             completionHandler(true)
           })
         }
@@ -594,6 +609,8 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
 
       let orientation: CGImagePropertyOrientation = activeCaptureDevicePosition(session: strongSelf.captureSession) == .some(.front)
         ? .leftMirrored : .right
+
+      // output depth data
       if let synchronizedDepthData = collection.synchronizedData(for: strongSelf.depthOutput) as? AVCaptureSynchronizedDepthData {
         if !synchronizedDepthData.depthDataWasDropped {
           let depthData = synchronizedDepthData.depthData.applyingExifOrientation(orientation)
@@ -602,12 +619,15 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
             let presentationTime = synchronizedDepthData.timestamp - startTime
             strongSelf.record(disparityPixelBuffer: disparityPixelBuffer, at: presentationTime)
           }
-          if let depthDelegate = strongSelf.depthDelegate, let disparityPixelBuffer = disparityPixelBuffer {
-            depthDelegate.cameraManagerDidOutput(disparityPixelBuffer: disparityPixelBuffer)
+          if let disparityPixelBuffer = disparityPixelBuffer {
+            strongSelf.depthDataObservers.forEach {
+              $0.cameraManagerDidOutput(disparityPixelBuffer: disparityPixelBuffer)
+            }
           }
         }
       }
 
+      // output video data
       if let synchronizedVideoData = collection.synchronizedData(for: strongSelf.videoOutput) as? AVCaptureSynchronizedSampleBufferData {
         if !synchronizedVideoData.sampleBufferWasDropped {
           let videoPixelBuffer = HSPixelBuffer(sampleBuffer: synchronizedVideoData.sampleBuffer)
@@ -615,8 +635,10 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
             let presentationTime = synchronizedVideoData.timestamp - startTime
             strongSelf.record(videoPixelBuffer: videoPixelBuffer, at: presentationTime)
           }
-          if let depthDelegate = strongSelf.depthDelegate, let videoPixelBuffer = videoPixelBuffer {
-            depthDelegate.cameraManagerDidOutput(videoPixelBuffer: videoPixelBuffer)
+          if let videoPixelBuffer = videoPixelBuffer {
+            strongSelf.depthDataObservers.forEach {
+              $0.cameraManagerDidOutput(videoPixelBuffer: videoPixelBuffer)
+            }
           }
         }
       }

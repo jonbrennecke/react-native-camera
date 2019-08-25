@@ -4,3 +4,4 @@ import './CameraCapture';
 import './CameraFormatList';
 import './VideoComposition';
 import './VideoCompositionEdit';
+import './MultiCamera';

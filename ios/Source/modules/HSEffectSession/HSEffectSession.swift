@@ -6,8 +6,9 @@ import UIKit
 
 @available(iOS 11.0, *)
 @objc
-class HSEffectManager: NSObject {
-  private let printDebugLog = true
+class HSEffectSession: NSObject {
+  private var depthDataObserver: HSCameraDepthDataObserver?
+
   private lazy var depthBlurEffect = HSDepthBlurEffect()
 
   public var previewMode: HSEffectPreviewMode = .portraitMode
@@ -31,30 +32,34 @@ class HSEffectManager: NSObject {
 
   override init() {
     super.init()
-    HSCameraManager.shared.depthDelegate = self
+    let observer = HSCameraDepthDataObserver(delegate: self)
+    HSCameraManager.shared.depthDataObservers.addObserver(observer)
+    depthDataObserver = observer
   }
 
-  public var isPaused: Bool = false {
-    didSet {
-      if isPaused {
-        HSCameraManager.shared.depthDelegate = nil
-      } else {
-        HSCameraManager.shared.depthDelegate = self
-      }
+  deinit {
+    if let observer = depthDataObserver {
+      HSCameraManager.shared.depthDataObservers.removeObserver(observer)
+    }
+  }
+
+  public var isPaused: Bool {
+    get {
+      return depthDataObserver?.isPaused ?? false
+    }
+    set {
+      depthDataObserver?.isPaused = newValue
     }
   }
 
   // MARK: - Objective-C interface
-
-  @objc(sharedInstance)
-  public static let shared = HSEffectManager()
 
   public var disparityPixelBuffer: HSPixelBuffer?
 
   public var videoPixelBuffer: HSPixelBuffer?
 }
 
-extension HSEffectManager: HSCameraManagerDepthDataDelegate {
+extension HSEffectSession: HSCameraManagerDepthDataDelegate {
   func cameraManagerDidOutput(disparityPixelBuffer: HSPixelBuffer) {
     self.disparityPixelBuffer = disparityPixelBuffer
   }

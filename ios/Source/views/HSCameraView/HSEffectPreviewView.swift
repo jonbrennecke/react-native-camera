@@ -3,8 +3,10 @@ import UIKit
 
 class HSEffectPreviewView: UIView {
   private lazy var effectView: HSMetalEffectView = {
-    HSMetalEffectView(effectManager: HSEffectManager.shared)
+    HSMetalEffectView(effectSession: effectSession)
   }()
+
+  internal lazy var effectSession = HSEffectSession()
 
   public var resizeMode: HSResizeMode {
     get {

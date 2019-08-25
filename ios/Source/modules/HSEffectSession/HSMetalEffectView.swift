@@ -24,26 +24,26 @@ class HSMetalEffectView: MTKView, HSDebuggable {
 
   override var isPaused: Bool {
     didSet {
-      effectManager?.isPaused = isPaused
+      effectSession?.isPaused = isPaused
     }
   }
 
   private var imageExtent: CGRect = .zero
   private let colorSpace = CGColorSpaceCreateDeviceRGB()
   private let renderSemaphore = DispatchSemaphore(value: 1)
-  private weak var effectManager: HSEffectManager?
+  private weak var effectSession: HSEffectSession?
 
   internal var isDebugLogEnabled = false
 
   public var resizeMode: HSResizeMode = .scaleAspectWidth
   public var blurAperture: Float = 2.4
 
-  public init(effectManager: HSEffectManager) {
+  public init(effectSession: HSEffectSession) {
     guard let mtlDevice = MTLCreateSystemDefaultDevice() else {
       fatalError("Failed to create Metal device")
     }
     super.init(frame: .zero, device: mtlDevice)
-    self.effectManager = effectManager
+    self.effectSession = effectSession
     framebufferOnly = false
     preferredFramesPerSecond = 24
     colorPixelFormat = .bgra8Unorm
@@ -75,7 +75,7 @@ class HSMetalEffectView: MTKView, HSDebuggable {
   }
 
   private func render() {
-    guard let image = effectManager?.makeEffectImage(
+    guard let image = effectSession?.makeEffectImage(
       blurAperture: blurAperture,
       outputSize: CGSize(width: frame.width * 0.5, height: frame.height * 0.5),
       resizeMode: resizeMode

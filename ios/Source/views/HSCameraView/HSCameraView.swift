@@ -1,4 +1,5 @@
 import AVFoundation
+import HSCameraUtils
 import UIKit
 
 @available(iOS 11.1, *)
@@ -8,6 +9,8 @@ class HSCameraView: UIView {
     case effect(HSEffectPreviewView)
     case video(HSVideoPreviewView)
   }
+
+  private var resolutionObserver: HSCameraResolutionObserver?
 
   private var previewView: PreviewView = .video(HSVideoPreviewView()) {
     didSet {
@@ -26,12 +29,19 @@ class HSCameraView: UIView {
 
   init() {
     super.init(frame: .zero)
-    previewMode = .portraitMode
-    HSCameraManager.shared.playbackDelegate = self
+    let observer = HSCameraResolutionObserver(delegate: self)
+    HSCameraManager.shared.resolutionObservers.addObserver(observer)
+    resolutionObserver = observer
   }
 
   required init?(coder _: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+
+  deinit {
+    if let observer = resolutionObserver {
+      HSCameraManager.shared.resolutionObservers.removeObserver(observer)
+    }
   }
 
   override func didMoveToSuperview() {
@@ -44,8 +54,10 @@ class HSCameraView: UIView {
     switch previewView {
     case let .effect(view):
       view.frame = bounds
+      view.layoutSubviews()
     case let .video(view):
       view.frame = bounds
+      view.layoutSubviews()
     }
   }
 
@@ -84,21 +96,15 @@ class HSCameraView: UIView {
   }
 
   @objc
-  public var previewMode: HSEffectPreviewMode {
-    get {
-      return HSEffectManager.shared.previewMode
-    }
-    set {
-      switch newValue {
-      case .depth, .portraitMode:
-        HSEffectManager.shared.isPaused = true
-        previewView = .effect(HSEffectPreviewView())
-        HSEffectManager.shared.isPaused = false
-      case .normal:
-        HSEffectManager.shared.isPaused = true
-        previewView = .video(HSVideoPreviewView())
-      }
-      HSEffectManager.shared.previewMode = newValue
+  public func setPreviewMode(_ previewMode: HSEffectPreviewMode) {
+    switch previewMode {
+    case .depth, .portraitMode:
+      // TODO: don't recreate the preview view if we already have one
+      let view = HSEffectPreviewView()
+      view.effectSession.previewMode = previewMode
+      previewView = .effect(view)
+    default:
+      previewView = .video(HSVideoPreviewView())
     }
   }
 
@@ -120,7 +126,7 @@ class HSCameraView: UIView {
       if case let .effect(view) = previewView {
         return view.blurAperture
       }
-      return 0
+      return 2.4
     }
     set {
       if case let .effect(view) = previewView {
@@ -130,22 +136,15 @@ class HSCameraView: UIView {
   }
 }
 
-extension HSCameraView: HSCameraManagerPlaybackDelegate {
-  func cameraManagerDidBeginCapture() {}
-
-  func cameraManagerDidEndCapture() {}
-
-  func cameraManagerDidBeginPreview() {
+extension HSCameraView: HSCameraManagerResolutionDelegate {
+  func cameraManagerDidChangeResolution(videoResolution: Size<Int>, depthResolution _: Size<Int>) {
     DispatchQueue.main.async { [weak self] in
       guard let strongSelf = self else { return }
-      switch strongSelf.previewView {
-      case let .effect(view):
-        view.layoutSubviews()
-      case let .video(view):
-        view.layoutSubviews()
+      strongSelf.layoutSubviews()
+      if case let .video(view) = strongSelf.previewView {
+        view.frame = strongSelf.bounds
+        view.resize(videoResolution: videoResolution)
       }
     }
   }
-
-  func cameraManagerDidEndPreview() {}
 }
