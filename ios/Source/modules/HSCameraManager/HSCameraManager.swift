@@ -159,10 +159,6 @@ class HSCameraManager: NSObject {
       return .failure
     }
 
-    if case .failure = setupMetadataOutput() {
-      return .failure
-    }
-
     if case .failure = setupDepthOutput() {
       return .failure
     }
@@ -175,7 +171,8 @@ class HSCameraManager: NSObject {
     return .success
   }
 
-  private func setupMetadataOutput() -> HSCameraSetupResult {
+  // TODO: unused, but should be configurable
+  private func setupFaceTrackingMetadataOutput() -> HSCameraSetupResult {
     captureSession.removeOutput(metadataOutput)
     if captureSession.canAddOutput(metadataOutput) {
       captureSession.addOutput(metadataOutput)
@@ -539,7 +536,7 @@ class HSCameraManager: NSObject {
           completionHandler(nil, false)
           return
         }
-        strongSelf.setupMetadata()
+        strongSelf.setupAssetWriterMetadataItems()
         let startTime = CMClockGetTime(strongSelf.clock)
         guard case .success = strongSelf.assetWriter.startRecording(at: startTime) else {
           completionHandler(nil, false)
@@ -554,7 +551,7 @@ class HSCameraManager: NSObject {
     }
   }
 
-  private func setupMetadata() {
+  private func setupAssetWriterMetadataItems() {
     let item = AVMutableMetadataItem()
     item.keySpace = AVMetadataKeySpace.quickTimeUserData
     item.key = AVMetadataKey.quickTimeUserDataKeyInformation as NSString
