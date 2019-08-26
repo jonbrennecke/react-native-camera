@@ -9,8 +9,7 @@ import {
 } from 'react-native';
 import { autobind } from 'core-decorators';
 
-import { Units } from '../../constants';
-
+import type { Element } from 'react';
 import type { Style } from '../../types/react';
 
 type FocusPoint = { x: number, y: number };
@@ -18,6 +17,11 @@ type FocusPoint = { x: number, y: number };
 type Props = {
   style?: ?Style,
   onRequestFocus: FocusPoint => void,
+  renderFocusArea: (
+    focusPosition: Animated.ValueXY,
+    touchAnim: Animated.Value,
+    focusPoint: FocusPoint
+  ) => Element<*>,
 };
 
 type State = {
@@ -26,33 +30,6 @@ type State = {
 
 const styles = {
   container: {},
-  focusArea: ({ x, y }: FocusPoint, anim: Animated.Value) => ({
-    height: 100,
-    width: 100,
-    borderWidth: 1,
-    borderColor: '#fff',
-    borderRadius: Units.small,
-    shadowRadius: 3,
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowColor: '#fff',
-    shadowOpacity: 1,
-    backgroundColor: 'transparent',
-    position: 'absolute',
-    top: y - 50,
-    left: x - 50,
-    opacity: anim,
-    transform: [
-      {
-        scale: anim.interpolate({
-          inputRange: [0, 1],
-          outputRange: [0.75, 1],
-        }),
-      },
-    ],
-  }),
 };
 
 // $FlowFixMe
@@ -61,7 +38,8 @@ export class CameraFocusArea extends Component<Props, State> {
   state = {
     focusPoint: { x: 0, y: 0 },
   };
-  anim: Animated.Value = new Animated.Value(0);
+  positionAnim = new Animated.ValueXY();
+  touchAnim = new Animated.Value(0);
   touchableRef = React.createRef();
 
   isValidTouch(event: any): boolean {
@@ -81,29 +59,35 @@ export class CameraFocusArea extends Component<Props, State> {
       y: locationY,
     };
     this.setState({ focusPoint }, () => {
-      this.animateFocusIn();
+      this.animateTouchIn(focusPoint);
       this.props.onRequestFocus(focusPoint);
     });
   }
 
   touchableOnPressOut() {
-    this.animateFocusOut();
+    this.animateTouchOut();
   }
 
-  animateFocusIn() {
-    Animated.timing(this.anim, {
+  animateTouchIn(focusPoint: FocusPoint) {
+    Animated.timing(this.positionAnim, {
+      toValue: focusPoint,
+      easing: Easing.linear,
+      duration: 100,
+      useNativeDriver: true,
+    }).start();
+    Animated.timing(this.touchAnim, {
       toValue: 1,
-      duration: 600,
-      easing: Easing.bounce,
+      duration: 300,
+      easing: Easing.inOut(Easing.quad),
       useNativeDriver: true,
     }).start();
   }
 
-  animateFocusOut() {
-    Animated.timing(this.anim, {
+  animateTouchOut() {
+    Animated.timing(this.touchAnim, {
       toValue: 0,
-      duration: 600,
-      easing: Easing.bounce,
+      duration: 300,
+      easing: Easing.inOut(Easing.quad),
       useNativeDriver: true,
     }).start();
   }
@@ -116,9 +100,11 @@ export class CameraFocusArea extends Component<Props, State> {
         onPressOut={this.touchableOnPressOut}
       >
         <View style={[styles.container, this.props.style]}>
-          <Animated.View
-            style={styles.focusArea(this.state.focusPoint, this.anim)}
-          />
+          {this.props.renderFocusArea(
+            this.positionAnim,
+            this.touchAnim,
+            this.state.focusPoint
+          )}
         </View>
       </TouchableWithoutFeedback>
     );
