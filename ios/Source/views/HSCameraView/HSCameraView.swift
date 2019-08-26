@@ -102,6 +102,7 @@ class HSCameraView: UIView {
       // TODO: don't recreate the preview view if we already have one
       let view = HSEffectPreviewView()
       view.effectSession.previewMode = previewMode
+      view.blurAperture = blurAperture
       previewView = .effect(view)
     default:
       previewView = .video(HSVideoPreviewView())
@@ -121,16 +122,10 @@ class HSCameraView: UIView {
   }
 
   @objc
-  public var blurAperture: Float {
-    get {
+  public var blurAperture: Float = 2.4 {
+    didSet {
       if case let .effect(view) = previewView {
-        return view.blurAperture
-      }
-      return 2.4
-    }
-    set {
-      if case let .effect(view) = previewView {
-        view.blurAperture = newValue
+        view.blurAperture = blurAperture
       }
     }
   }
