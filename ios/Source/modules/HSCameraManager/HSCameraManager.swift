@@ -28,7 +28,6 @@ class HSCameraManager: NSObject {
   private let videoOutput = AVCaptureVideoDataOutput()
   private let videoFileOutput = AVCaptureMovieFileOutput()
   private let depthOutput = AVCaptureDepthDataOutput()
-  private let metadataOutput = AVCaptureMetadataOutput()
   private var outputSynchronizer: AVCaptureDataOutputSynchronizer?
   private var videoCaptureDevice: AVCaptureDevice?
   private var videoCaptureDeviceInput: AVCaptureDeviceInput?
@@ -168,18 +167,6 @@ class HSCameraManager: NSObject {
       dataOutputs: [videoOutput, depthOutput]
     )
     outputSynchronizer?.setDelegate(self, queue: cameraOutputQueue)
-    return .success
-  }
-
-  // TODO: unused, but should be configurable
-  private func setupFaceTrackingMetadataOutput() -> HSCameraSetupResult {
-    captureSession.removeOutput(metadataOutput)
-    if captureSession.canAddOutput(metadataOutput) {
-      captureSession.addOutput(metadataOutput)
-      metadataOutput.metadataObjectTypes = [.face]
-    } else {
-      return .failure
-    }
     return .success
   }
 
