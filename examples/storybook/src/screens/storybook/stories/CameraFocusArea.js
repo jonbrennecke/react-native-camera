@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import React, { createRef } from 'react';
 import { storiesOf } from '@storybook/react-native';
 import { withKnobs } from '@storybook/addon-knobs';
 import { SafeAreaView, StyleSheet, Animated } from 'react-native';
@@ -12,7 +12,7 @@ import {
   startCameraPreview,
 } from '@jonbrennecke/react-native-camera';
 
-import { StorybookAsyncWrapper } from '../utils';
+import { StorybookStateWrapper } from '../utils';
 
 const styles = {
   flex: {
@@ -40,7 +40,7 @@ const styles = {
   }),
 };
 
-const loadAsync = async () => {
+const loadAsync = async (): Promise<void> => {
   try {
     await requestCameraPermissions();
     startCameraPreview();
@@ -54,18 +54,25 @@ const stories = storiesOf('Camera', module);
 stories.addDecorator(withKnobs);
 stories.add('Camera Focus Area', () => (
   <SafeAreaView style={styles.flex}>
-    <StorybookAsyncWrapper
-      loadAsync={loadAsync}
-      render={() => (
+    <StorybookStateWrapper
+      onMount={loadAsync}
+      initialState={{ cameraRef: createRef() }}
+      render={getState => (
         <>
           <Camera
             style={styles.camera}
+            ref={getState().cameraRef}
             cameraPosition="front"
             previewMode="normal"
           />
           <CameraFocusArea
             style={styles.focusArea}
-            onRequestFocus={noop}
+            onRequestFocus={focusPoint => {
+              const { cameraRef } = getState();
+              if (cameraRef && cameraRef.current) {
+                cameraRef.current.focusOnPoint(focusPoint);
+              }
+            }}
             renderFocusArea={(positionAnim, touchAnim) => (
               <Animated.View style={styles.focus(positionAnim, touchAnim)} />
             )}
