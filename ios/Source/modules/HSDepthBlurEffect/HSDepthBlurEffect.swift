@@ -124,6 +124,19 @@ class HSDepthBlurEffect {
     filter.setValue(inputImage, forKey: kCIInputImageKey)
     return filter
   }
+  
+  private var pixelBufferPool: CVPixelBufferPool?
+    
+  private func createPool(size: Size<Int>) -> CVPixelBufferPool? {
+    guard let pool = pixelBufferPool else {
+      pixelBufferPool = createCVPixelBufferPool(
+        size: size,
+        pixelFormatType: kCVPixelFormatType_32BGRA
+      )
+      return pixelBufferPool
+    }
+    return pool
+  }
 
   // MARK: - public interface
 
@@ -131,35 +144,46 @@ class HSDepthBlurEffect {
     previewMode: PreviewMode,
     disparityPixelBuffer: HSPixelBuffer,
     videoPixelBuffer: HSPixelBuffer,
-    outputSize: CGSize,
-    resizeMode: HSResizeMode,
+    calibrationData: AVCameraCalibrationData?,
+//    outputSize: Size<Int>,
+//    resizeMode: HSResizeMode,
+    scale: Float,
     aperture: Float
   ) -> CIImage? {
-    guard
-      let disparityImage = HSImageBuffer(pixelBuffer: disparityPixelBuffer).makeCIImage(),
-      let videoImage = HSImageBuffer(pixelBuffer: videoPixelBuffer).makeCIImage()
+    let scale = scaleForResizing(videoPixelBuffer.size.cgSize(), to: outputSize.cgSize(), resizeMode: resizeMode)
+    let scaledSize = Size<Int>(
+      width: Int((CGFloat(videoPixelBuffer.size.width) * scale).rounded()),
+      height: Int((CGFloat(videoPixelBuffer.size.height) * scale).rounded())
+    )
+    guard let pool = createPool(size: scaledSize) else {
+      return nil // TODO
+    }
+    guard let videoImage = HSImageBuffer(pixelBuffer: videoPixelBuffer)
+      .resize(to: scaledSize, pixelBufferPool: pool)?
+      .makeCIImage()
     else {
       return nil
     }
-
-    // downscale the video image
-    let scale = scaleForResizing(videoImage.extent.size, to: outputSize, resizeMode: resizeMode)
-    let scaledVideoImage = videoImage
-      .transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+    
+    guard
+      let disparityImage = HSImageBuffer(pixelBuffer: disparityPixelBuffer).makeCIImage()
+    else {
+      return nil
+    }
 
     // upsample the depth image to match the size of the video image
     guard let upsampleFilter = edgePreserveUpsampleFilter else {
       return nil
     }
-    upsampleFilter.setValue(scaledVideoImage, forKey: kCIInputImageKey)
+    upsampleFilter.setValue(videoImage, forKey: kCIInputImageKey)
     upsampleFilter.setValue(disparityImage, forKey: "inputSmallImage")
     guard let upsampledDisparityImage = upsampleFilter.outputImage else {
       return nil
     }
-
+    
     if case .depth = previewMode {
-      let yDiff = videoImage.extent.size.height * scale - outputSize.height
-      let xDiff = videoImage.extent.size.width * scale - outputSize.width
+      let yDiff = CGFloat(scaledSize.height - outputSize.height)
+      let xDiff = CGFloat(scaledSize.width - outputSize.width)
       return upsampledDisparityImage.transformed(by: CGAffineTransform(translationX: -xDiff * 0.5, y: -yDiff))
     }
     guard let depthBlurFilter = depthBlurEffectFilter else {
@@ -167,16 +191,18 @@ class HSDepthBlurEffect {
     }
     depthBlurFilter.setValue(0.1, forKey: "inputScaleFactor")
     depthBlurFilter.setValue(aperture, forKey: "inputAperture")
-    depthBlurFilter.setValue(scaledVideoImage, forKey: kCIInputImageKey)
+    depthBlurFilter.setValue(videoImage, forKey: kCIInputImageKey)
     depthBlurFilter.setValue(upsampledDisparityImage, forKey: kCIInputDisparityImageKey)
+    depthBlurFilter.setValue(calibrationData, forKey: "inputCalibrationData")
     guard let filteredImage = depthBlurFilter.outputImage else {
       return nil
     }
 
     // translate output image back to the origin (at top, left)
-    let yDiff = videoImage.extent.size.height * scale - outputSize.height
-    let xDiff = videoImage.extent.size.width * scale - outputSize.width
-    return filteredImage.transformed(by: CGAffineTransform(translationX: -xDiff * 0.5, y: -yDiff))
+    let yDiff = CGFloat(scaledSize.height - outputSize.height)
+    let xDiff = CGFloat(scaledSize.width - outputSize.width)
+    return filteredImage
+      .transformed(by: CGAffineTransform(translationX: -xDiff * 0.5, y: -yDiff))
   }
 
   public func makeEffectImage(

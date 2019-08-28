@@ -77,20 +77,22 @@ class HSMetalEffectView: MTKView, HSDebuggable {
   private func render() {
     guard let image = effectSession?.makeEffectImage(
       blurAperture: blurAperture,
-      outputSize: CGSize(width: frame.width * 0.5, height: frame.height * 0.5),
+      outputSize: frame.size.integerSize(),
+//      CGSize(width: frame.width * 0.5, height: frame.height * 0.5),
       resizeMode: resizeMode
     ) else {
       return
     }
-    let scale = scaleForResizing(image.extent.size, to: frame.size, resizeMode: resizeMode)
-    let scaledImage = image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+//    let scale = scaleForResizing(image.extent.size, to: frame.size, resizeMode: resizeMode)
+//    let scaledImage = image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+    let scaledImage = image
     imageExtent = scaledImage.extent
     autoreleasepool {
-      present(image: scaledImage, resizeMode: resizeMode)
+      present(image: scaledImage)
     }
   }
 
-  private func present(image: CIImage, resizeMode _: HSResizeMode) {
+  private func present(image: CIImage) {
     _ = renderSemaphore.wait(timeout: DispatchTime.distantFuture)
     if let commandBuffer = commandQueue.makeCommandBuffer() {
       defer { commandBuffer.commit() }

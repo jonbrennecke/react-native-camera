@@ -605,7 +605,10 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
           }
           if let disparityPixelBuffer = disparityPixelBuffer {
             strongSelf.depthDataObservers.forEach {
-              $0.cameraManagerDidOutput(disparityPixelBuffer: disparityPixelBuffer)
+              $0.cameraManagerDidOutput(
+                disparityPixelBuffer: disparityPixelBuffer,
+                calibrationData: depthData.cameraCalibrationData
+              )
             }
           }
         }
