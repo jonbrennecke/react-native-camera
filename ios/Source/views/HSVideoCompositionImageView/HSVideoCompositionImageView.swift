@@ -7,15 +7,29 @@ class HSVideoCompositionImageView: UIImageView {
     label: "com.jonbrennecke.HSVideoCompositionView.loadingQueue",
     qos: .background
   )
+  
+  private var assetURL: URL?
 
   @objc
-  public var resizeMode: HSResizeMode = .scaleAspectWidth
+  public var resizeMode: HSResizeMode = .scaleAspectWidth {
+    didSet {
+      reloadImage()
+    }
+  }
 
   @objc
-  public var blurAperture: Float = 2.4
+  public var blurAperture: Float = 2.4 {
+    didSet {
+      reloadImage()
+    }
+  }
 
   @objc
-  public var previewMode: HSEffectPreviewMode = .portraitMode
+  public var previewMode: HSEffectPreviewMode = .portraitMode {
+    didSet {
+      reloadImage()
+    }
+  }
 
   @objc(generateImageByResourceName:extension:completionHandler:)
   public func generateImage(
@@ -27,6 +41,7 @@ class HSVideoCompositionImageView: UIImageView {
         completionHandler?()
         return
       }
+      strongSelf.assetURL = url
       let asset = AVAsset(url: url)
       strongSelf.generateImage(withAsset: asset) { [weak self] image in
         guard let strongSelf = self else { return }
@@ -55,7 +70,10 @@ class HSVideoCompositionImageView: UIImageView {
     }
   }
 
-  private func generateImage(withComposition composition: HSVideoComposition, _ completionHandler: @escaping (CGImage?) -> Void) {
+  private func generateImage(
+    withComposition composition: HSVideoComposition,
+    _ completionHandler: @escaping (CGImage?) -> Void
+  ) {
     loadingQueue.async { [weak self] in
       guard let strongSelf = self else { return }
       guard let (avComposition, avVideoComposition) = composition.makeAVComposition() else {
@@ -77,6 +95,18 @@ class HSVideoCompositionImageView: UIImageView {
       ) { [weak self] _, image, _, _, _ in
         guard self != nil else { return }
         completionHandler(image)
+      }
+    }
+  }
+  
+  private func reloadImage() {
+    if let url = assetURL {
+      let asset = AVAsset(url: url)
+      generateImage(withAsset: asset) { [weak self] image in
+        guard let strongSelf = self else { return }
+        if let cgImage = image {
+          strongSelf.setImage(cgImage)
+        }
       }
     }
   }
