@@ -7,7 +7,7 @@ class HSVideoCompositionImageView: UIImageView {
     label: "com.jonbrennecke.HSVideoCompositionView.loadingQueue",
     qos: .background
   )
-  
+
   private var assetURL: URL?
   private var assetImageGenerator: AVAssetImageGenerator?
 
@@ -31,7 +31,7 @@ class HSVideoCompositionImageView: UIImageView {
       reloadImage()
     }
   }
-  
+
   @objc
   public var progress: Float = 0 {
     didSet {
@@ -107,16 +107,16 @@ class HSVideoCompositionImageView: UIImageView {
       }
     }
   }
-  
+
   private func reloadImage() {
-    regenerateImage() { [weak self] image in
+    regenerateImage { [weak self] image in
       guard let strongSelf = self else { return }
       if let cgImage = image {
         strongSelf.setImage(cgImage)
       }
     }
   }
-  
+
   private func regenerateImage(_ completionHandler: ((CGImage?) -> Void)?) {
     loadingQueue.async { [weak self] in
       guard let strongSelf = self else { return }
@@ -139,7 +139,7 @@ class HSVideoCompositionImageView: UIImageView {
       }
     }
   }
-  
+
   private func reloadImageFromURL() {
     if let url = assetURL {
       let asset = AVAsset(url: url)
