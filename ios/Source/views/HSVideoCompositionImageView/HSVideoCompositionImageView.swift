@@ -124,6 +124,7 @@ class HSVideoCompositionImageView: UIImageView {
         completionHandler?(nil)
         return
       }
+      imageGenerator.cancelAllCGImageGeneration()
       if let compositor = imageGenerator.customVideoCompositor as? HSVideoCompositor {
         compositor.aperture = strongSelf.blurAperture
         compositor.previewMode = strongSelf.previewMode
