@@ -13,22 +13,32 @@ class HSEffectSession: NSObject {
 
   public var previewMode: HSEffectPreviewMode = .portraitMode
 
-  internal func makeEffectImage(blurAperture: Float = 0, outputSize: Size<Int>, resizeMode: HSResizeMode) -> CIImage? {
+  internal func makeEffectImage(blurAperture: Float = 0, size: CGSize, resizeMode: HSResizeMode) -> CIImage? {
     guard
       let disparityPixelBuffer = disparityPixelBuffer,
       let videoPixelBuffer = videoPixelBuffer
     else {
       return nil
     }
-    return depthBlurEffect.makeEffectImage(
+    let scale = Float(scaleForResizing(videoPixelBuffer.size.cgSize(), to: size, resizeMode: resizeMode))
+    guard let effectImage = depthBlurEffect.makeEffectImage(
       previewMode: previewMode == .depth ? .depth : .portraitBlur,
       disparityPixelBuffer: disparityPixelBuffer,
       videoPixelBuffer: videoPixelBuffer,
       calibrationData: calibrationData,
-      outputSize: outputSize,
-      resizeMode: resizeMode,
+      scale: scale,
       aperture: blurAperture
+    ) else {
+      return nil
+    }
+    let scaledSize = Size<Int>(
+      width: Int((Float(videoPixelBuffer.size.width) * scale).rounded()),
+      height: Int((Float(videoPixelBuffer.size.height) * scale).rounded())
     )
+    let yDiff = CGFloat(scaledSize.height) - CGFloat(size.height)
+    let xDiff = CGFloat(scaledSize.width) - CGFloat(size.width)
+    return effectImage
+      .transformed(by: CGAffineTransform(translationX: -xDiff * 0.5, y: -yDiff))
   }
 
   override init() {
@@ -56,7 +66,7 @@ class HSEffectSession: NSObject {
   // MARK: - Objective-C interface
 
   public var disparityPixelBuffer: HSPixelBuffer?
-  
+
   public var calibrationData: AVCameraCalibrationData?
 
   public var videoPixelBuffer: HSPixelBuffer?

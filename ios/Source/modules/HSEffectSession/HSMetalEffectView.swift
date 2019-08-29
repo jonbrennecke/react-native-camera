@@ -77,18 +77,14 @@ class HSMetalEffectView: MTKView, HSDebuggable {
   private func render() {
     guard let image = effectSession?.makeEffectImage(
       blurAperture: blurAperture,
-      outputSize: frame.size.integerSize(),
-//      CGSize(width: frame.width * 0.5, height: frame.height * 0.5),
+      size: frame.size,
       resizeMode: resizeMode
     ) else {
       return
     }
-//    let scale = scaleForResizing(image.extent.size, to: frame.size, resizeMode: resizeMode)
-//    let scaledImage = image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
-    let scaledImage = image
-    imageExtent = scaledImage.extent
+    imageExtent = image.extent
     autoreleasepool {
-      present(image: scaledImage)
+      present(image: image)
     }
   }
 

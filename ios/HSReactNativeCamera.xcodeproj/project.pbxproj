@@ -47,6 +47,7 @@
 		FC904B9022EFDB280010AD4F /* Size+FromDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC904B8F22EFDB280010AD4F /* Size+FromDictionary.swift */; };
 		FC904B9222EFDBB20010AD4F /* HSMinMaxInterval+FromDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC904B9122EFDBB20010AD4F /* HSMinMaxInterval+FromDictionary.swift */; };
 		FC914B8822E8F3A9001691F7 /* HSExportManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC914B8722E8F3A9001691F7 /* HSExportManager.swift */; };
+		FC9BE21A231739BC000F517E /* HSImageBufferResizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC9BE219231739BC000F517E /* HSImageBufferResizer.swift */; };
 		FCA6525822E8F63C0000620C /* HSVideoComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCA6525722E8F63C0000620C /* HSVideoComposition.swift */; };
 		FCADFE2922E1521B00E3C76A /* HSVideoCompositor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCADFE2822E1521B00E3C76A /* HSVideoCompositor.swift */; };
 		FCBFAF0822CBE27300A0AC11 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBFAF0722CBE27300A0AC11 /* Result.swift */; };
@@ -156,6 +157,7 @@
 		FC904B8F22EFDB280010AD4F /* Size+FromDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Size+FromDictionary.swift"; sourceTree = "<group>"; };
 		FC904B9122EFDBB20010AD4F /* HSMinMaxInterval+FromDictionary.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = "HSMinMaxInterval+FromDictionary.swift"; sourceTree = "<group>"; tabWidth = 2; };
 		FC914B8722E8F3A9001691F7 /* HSExportManager.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSExportManager.swift; sourceTree = "<group>"; tabWidth = 2; };
+		FC9BE219231739BC000F517E /* HSImageBufferResizer.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSImageBufferResizer.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FCA4D43C22E8A9EB00E6FF32 /* libHSReactNativeMedia.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libHSReactNativeMedia.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FCA6525722E8F63C0000620C /* HSVideoComposition.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSVideoComposition.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FCADFE2822E1521B00E3C76A /* HSVideoCompositor.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSVideoCompositor.swift; sourceTree = "<group>"; tabWidth = 2; };
@@ -246,6 +248,7 @@
 			isa = PBXGroup;
 			children = (
 				FC31DAB322E6279700D1FADD /* HSDepthBlurEffect.swift */,
+				FC9BE219231739BC000F517E /* HSImageBufferResizer.swift */,
 			);
 			path = HSDepthBlurEffect;
 			sourceTree = "<group>";
@@ -567,6 +570,7 @@
 				FCF822AA22E9137500474CF8 /* HSVideoCompositionExportTask.swift in Sources */,
 				FC6FFB57230B4EAC005FB226 /* HSDebuggable.swift in Sources */,
 				FC299674230DEF370006366F /* HSVideoPlaybackState.swift in Sources */,
+				FC9BE21A231739BC000F517E /* HSImageBufferResizer.swift in Sources */,
 				FCADFE2922E1521B00E3C76A /* HSVideoCompositor.swift in Sources */,
 				FC914B8822E8F3A9001691F7 /* HSExportManager.swift in Sources */,
 				FC7EFBF022FA560D0002B254 /* HSEffectPreviewMode+RCTConvert.m in Sources */,
