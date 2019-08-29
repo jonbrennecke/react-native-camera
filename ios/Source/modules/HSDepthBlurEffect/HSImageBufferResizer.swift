@@ -3,24 +3,13 @@ import Accelerate
 import HSCameraUtils
 
 class HSImageBufferResizer {
-  private let size: Size<Int>
   private let isGrayscale: Bool
   private let bufferInfo: HSBufferInfo
   
   private var destinationDataPointer: UnsafeMutableRawPointer
-  private var temporaryBufferDataPointer: UnsafeMutableRawPointer?
   private var pixelBufferPool: CVPixelBufferPool?
   
-  private func createPool(size: Size<Int>) -> CVPixelBufferPool? {
-    guard let pool = pixelBufferPool else {
-      pixelBufferPool = createCVPixelBufferPool(
-        size: size,
-        pixelFormatType: kCVPixelFormatType_32BGRA
-      )
-      return pixelBufferPool
-    }
-    return pool
-  }
+  public let size: Size<Int>
   
   public init?(
     size: Size<Int>,
@@ -43,7 +32,6 @@ class HSImageBufferResizer {
   
   deinit {
     free(destinationDataPointer)
-    free(temporaryBufferDataPointer)
   }
   
   public func resize(
@@ -67,24 +55,11 @@ class HSImageBufferResizer {
         return nil
       }
     } else {
-      let resizeFlags = vImage_Flags(kvImageNoAllocate | kvImageHighQualityResampling)
-      
-      // create a temporary buffer
-      if temporaryBufferDataPointer == nil {
-        let tmpBufferFlags = vImage_Flags(kvImageGetTempBufferSize)
-        let tmpBufferSize = Int(vImageScale_ARGB8888(&sourceBuffer, &destinationImageBuffer, nil, tmpBufferFlags))
-        if tmpBufferSize > 0 {
-          guard let tmpBuffer = malloc(tmpBufferSize) else {
-            return nil
-          }
-          temporaryBufferDataPointer = tmpBuffer
-        }
-      }
-      
+      let resizeFlags = vImage_Flags(kvImageHighQualityResampling)
       let error = vImageScale_ARGB8888(
         &sourceBuffer,
         &destinationImageBuffer,
-        temporaryBufferDataPointer,
+        nil,
         resizeFlags
       )
       if error != kvImageNoError {
@@ -132,5 +107,16 @@ class HSImageBufferResizer {
       return nil
     }
     return HSImageBuffer(cvPixelBuffer: destinationPixelBuffer)
+  }
+  
+  private func createPool(size: Size<Int>) -> CVPixelBufferPool? {
+    guard let pool = pixelBufferPool else {
+      pixelBufferPool = createCVPixelBufferPool(
+        size: size,
+        pixelFormatType: kCVPixelFormatType_32BGRA
+      )
+      return pixelBufferPool
+    }
+    return pool
   }
 }

@@ -141,7 +141,7 @@ class HSDepthBlurEffect {
   private var imageBufferResizer: HSImageBufferResizer?
   
   private func createImageBufferResizer(size: Size<Int>) -> HSImageBufferResizer? {
-    guard let resizer = imageBufferResizer else {
+    guard let resizer = imageBufferResizer, size == resizer.size else {
       imageBufferResizer = HSImageBufferResizer(
         size: size,
         bufferInfo: HSBufferInfo(pixelFormatType: kCVPixelFormatType_32BGRA)
@@ -176,13 +176,11 @@ class HSDepthBlurEffect {
     else {
       return nil
     }
-    
     upsampleFilter.setValue(videoImage, forKey: kCIInputImageKey)
     upsampleFilter.setValue(disparityImage, forKey: "inputSmallImage")
     guard let upsampledDisparityImage = upsampleFilter.outputImage else {
       return nil
     }
-    
     if case .depth = previewMode {
       return upsampledDisparityImage
     }
