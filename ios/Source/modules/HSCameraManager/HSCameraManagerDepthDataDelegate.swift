@@ -6,4 +6,5 @@ protocol HSCameraManagerDepthDataDelegate: AnyObject {
   var isPaused: Bool { get set }
   func cameraManagerDidOutput(disparityPixelBuffer: HSPixelBuffer, calibrationData: AVCameraCalibrationData?)
   func cameraManagerDidOutput(videoPixelBuffer: HSPixelBuffer)
+  func cameraManagerDidFocus(on focusPoint: CGPoint)
 }

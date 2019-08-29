@@ -16,6 +16,12 @@ class HSCameraDepthDataObserver: HSObserver {
   }
 
   func cameraManagerDidOutput(videoPixelBuffer: HSPixelBuffer) {
-    delegate?.cameraManagerDidOutput(videoPixelBuffer: videoPixelBuffer)
+    delegate?.cameraManagerDidOutput(
+      videoPixelBuffer: videoPixelBuffer
+    )
+  }
+  
+  func cameraManagerDidFocus(on focusPoint: CGPoint) {
+    delegate?.cameraManagerDidFocus(on: focusPoint)
   }
 }

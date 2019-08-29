@@ -624,9 +624,17 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
           }
           if let videoPixelBuffer = videoPixelBuffer {
             strongSelf.depthDataObservers.forEach {
-              $0.cameraManagerDidOutput(videoPixelBuffer: videoPixelBuffer)
+              $0.cameraManagerDidOutput(
+                videoPixelBuffer: videoPixelBuffer
+              )
             }
           }
+        }
+      }
+      
+      if let focusPoint = strongSelf.videoCaptureDevice?.focusPointOfInterest {
+        strongSelf.depthDataObservers.forEach {
+          $0.cameraManagerDidFocus(on: focusPoint)
         }
       }
     }

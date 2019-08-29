@@ -26,7 +26,7 @@ class HSEffectSession: NSObject {
         previewMode: previewMode == .depth ? .depth : .portraitBlur,
         disparityPixelBuffer: disparityPixelBuffer,
         videoPixelBuffer: videoPixelBuffer,
-        calibrationData: nil,
+        calibrationData: calibrationData,
         scale: scale,
         aperture: blurAperture
       ) else {
@@ -72,6 +72,8 @@ class HSEffectSession: NSObject {
   public var calibrationData: AVCameraCalibrationData?
 
   public var videoPixelBuffer: HSPixelBuffer?
+  
+  public var focusPoint: CGPoint?
 }
 
 extension HSEffectSession: HSCameraManagerDepthDataDelegate {
@@ -82,5 +84,9 @@ extension HSEffectSession: HSCameraManagerDepthDataDelegate {
 
   func cameraManagerDidOutput(videoPixelBuffer: HSPixelBuffer) {
     self.videoPixelBuffer = videoPixelBuffer
+  }
+  
+  func cameraManagerDidFocus(on focusPoint: CGPoint) {
+    self.focusPoint = focusPoint
   }
 }
