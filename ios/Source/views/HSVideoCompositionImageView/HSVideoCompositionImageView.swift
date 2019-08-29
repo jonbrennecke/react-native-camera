@@ -9,6 +9,7 @@ class HSVideoCompositionImageView: UIImageView {
   )
   
   private var assetURL: URL?
+  private var assetImageGenerator: AVAssetImageGenerator?
 
   @objc
   public var resizeMode: HSResizeMode = .scaleAspectWidth {
@@ -88,6 +89,7 @@ class HSVideoCompositionImageView: UIImageView {
         return
       }
       let imageGenerator = AVAssetImageGenerator(asset: avComposition)
+      strongSelf.assetImageGenerator = imageGenerator
       imageGenerator.videoComposition = avVideoComposition
       if let compositor = imageGenerator.customVideoCompositor as? HSVideoCompositor {
         compositor.depthTrackID = composition.depthTrackID
@@ -95,7 +97,7 @@ class HSVideoCompositionImageView: UIImageView {
         compositor.aperture = strongSelf.blurAperture
         compositor.previewMode = strongSelf.previewMode
       }
-      let durationSeconds = CMTimeGetSeconds(avComposition.duration)
+      let durationSeconds = CMTimeGetSeconds(imageGenerator.asset.duration)
       let time = CMTimeMakeWithSeconds(durationSeconds * Double(strongSelf.progress), preferredTimescale: 600)
       imageGenerator.generateCGImagesAsynchronously(
         forTimes: [NSValue(time: time)]
@@ -107,6 +109,37 @@ class HSVideoCompositionImageView: UIImageView {
   }
   
   private func reloadImage() {
+    regenerateImage() { [weak self] image in
+      guard let strongSelf = self else { return }
+      if let cgImage = image {
+        strongSelf.setImage(cgImage)
+      }
+    }
+  }
+  
+  private func regenerateImage(_ completionHandler: ((CGImage?) -> Void)?) {
+    loadingQueue.async { [weak self] in
+      guard let strongSelf = self else { return }
+      guard let imageGenerator = strongSelf.assetImageGenerator else {
+        completionHandler?(nil)
+        return
+      }
+      if let compositor = imageGenerator.customVideoCompositor as? HSVideoCompositor {
+        compositor.aperture = strongSelf.blurAperture
+        compositor.previewMode = strongSelf.previewMode
+      }
+      let durationSeconds = CMTimeGetSeconds(imageGenerator.asset.duration)
+      let time = CMTimeMakeWithSeconds(durationSeconds * Double(strongSelf.progress), preferredTimescale: 600)
+      imageGenerator.generateCGImagesAsynchronously(
+        forTimes: [NSValue(time: time)]
+      ) { [weak self] _, image, _, _, _ in
+        guard self != nil else { return }
+        completionHandler?(image)
+      }
+    }
+  }
+  
+  private func reloadImageFromURL() {
     if let url = assetURL {
       let asset = AVAsset(url: url)
       generateImage(withAsset: asset) { [weak self] image in
