@@ -166,11 +166,6 @@ class HSDepthBlurEffect {
       height: Int((Float(videoPixelBuffer.size.height) * scale).rounded())
     )
     let videoImageBuffer = HSImageBuffer(pixelBuffer: videoPixelBuffer)
-//    guard
-//      let pool = createPool(size: scaledSize),
-//      let videoImage = videoImageBuffer
-//        .resize(to: scaledSize, pixelBufferPool: pool)?
-//        .makeCIImage(),
     guard
       let resizer = createImageBufferResizer(size: scaledSize),
       let videoImage = resizer
@@ -181,22 +176,24 @@ class HSDepthBlurEffect {
     else {
       return nil
     }
+    
     upsampleFilter.setValue(videoImage, forKey: kCIInputImageKey)
     upsampleFilter.setValue(disparityImage, forKey: "inputSmallImage")
     guard let upsampledDisparityImage = upsampleFilter.outputImage else {
       return nil
     }
+    
     if case .depth = previewMode {
       return upsampledDisparityImage
     }
     guard let depthBlurFilter = depthBlurEffectFilter else {
       return nil
     }
-    depthBlurFilter.setValue(1, forKey: "inputScaleFactor")
+    depthBlurFilter.setValue(0.05, forKey: "inputScaleFactor") // TODO: use inputScaleFactor: 1 for final export
     depthBlurFilter.setValue(aperture, forKey: "inputAperture")
     depthBlurFilter.setValue(videoImage, forKey: kCIInputImageKey)
     depthBlurFilter.setValue(upsampledDisparityImage, forKey: kCIInputDisparityImageKey)
-//    depthBlurFilter.setValue(calibrationData, forKey: "inputCalibrationData")
+    depthBlurFilter.setValue(calibrationData, forKey: "inputCalibrationData")
     return depthBlurFilter.outputImage
   }
 

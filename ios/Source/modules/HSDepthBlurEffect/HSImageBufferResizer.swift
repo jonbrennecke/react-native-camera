@@ -59,14 +59,15 @@ class HSImageBufferResizer {
     )
     
     // scale
-    
-    let resizeFlags = vImage_Flags(kvImageHighQualityResampling)
+
     if isGrayscale {
+      let resizeFlags = vImage_Flags(kvImageNoAllocate)
       let error = vImageScale_Planar8(&sourceBuffer, &destinationImageBuffer, nil, resizeFlags)
       if error != kvImageNoError {
         return nil
       }
     } else {
+      let resizeFlags = vImage_Flags(kvImageNoAllocate | kvImageHighQualityResampling)
       
       // create a temporary buffer
       if temporaryBufferDataPointer == nil {

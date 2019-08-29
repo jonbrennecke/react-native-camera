@@ -26,7 +26,7 @@ class HSEffectSession: NSObject {
         previewMode: previewMode == .depth ? .depth : .portraitBlur,
         disparityPixelBuffer: disparityPixelBuffer,
         videoPixelBuffer: videoPixelBuffer,
-        calibrationData: calibrationData,
+        calibrationData: nil,
         scale: scale,
         aperture: blurAperture
       ) else {

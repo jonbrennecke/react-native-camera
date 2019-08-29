@@ -75,13 +75,14 @@ class HSMetalEffectView: MTKView, HSDebuggable {
   }
 
   private func render() {
+    _ = renderSemaphore.wait(timeout: DispatchTime.distantFuture)
     autoreleasepool {
-//      _ = renderSemaphore.wait(timeout: DispatchTime.distantFuture)
       guard let image = effectSession?.makeEffectImage(
         blurAperture: blurAperture,
         size: frame.size,
         resizeMode: resizeMode
       ) else {
+        renderSemaphore.signal()
         return
       }
       imageExtent = image.extent
@@ -90,27 +91,24 @@ class HSMetalEffectView: MTKView, HSDebuggable {
   }
 
   private func present(image: CIImage) {
-//    _ = renderSemaphore.wait(timeout: DispatchTime.distantFuture)
     if let commandBuffer = commandQueue.makeCommandBuffer() {
       defer { commandBuffer.commit() }
       if let drawable = currentDrawable {
-        let renderDestination = CIRenderDestination(
-          width: Int(drawableSize.width),
-          height: Int(drawableSize.height),
-          pixelFormat: colorPixelFormat,
-          commandBuffer: commandBuffer
-        ) { () -> MTLTexture in
-          return drawable.texture
-        }
-        _ = try? context.startTask(toClear: renderDestination)
-        _ = try? context.startTask(toRender: image, to: renderDestination)
+        context.render(
+          image,
+          to: drawable.texture,
+          commandBuffer: commandBuffer,
+          bounds: image.extent,
+          colorSpace: colorSpace
+        )
         commandBuffer.addScheduledHandler { [weak self] _ in
           self?.renderSemaphore.signal()
         }
-        commandBuffer.present(drawable)
-//        commandBuffer.present(drawable, afterMinimumDuration: 1 / Double(preferredFramesPerSecond))
+        commandBuffer.present(drawable, afterMinimumDuration: 1 / Double(preferredFramesPerSecond))
+        return
       }
     }
+    renderSemaphore.signal()
   }
 
   public func captureDevicePointConverted(fromLayerPoint layerPoint: CGPoint) -> CGPoint {
