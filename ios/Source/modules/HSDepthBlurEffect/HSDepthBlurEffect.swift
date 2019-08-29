@@ -124,9 +124,9 @@ class HSDepthBlurEffect {
     filter.setValue(inputImage, forKey: kCIInputImageKey)
     return filter
   }
-  
+
   private var imageBufferResizer: HSImageBufferResizer?
-  
+
   private func createImageBufferResizer(size: Size<Int>) -> HSImageBufferResizer? {
     guard let resizer = imageBufferResizer, size == resizer.size else {
       imageBufferResizer = HSImageBufferResizer(
@@ -137,7 +137,7 @@ class HSDepthBlurEffect {
     }
     return resizer
   }
-  
+
   // MARK: - public interface
 
   public func makeEffectImage(
@@ -156,8 +156,8 @@ class HSDepthBlurEffect {
     guard
       let resizer = createImageBufferResizer(size: scaledSize),
       let videoImage = resizer
-        .resize(imageBuffer: videoImageBuffer)?
-        .makeCIImage(),
+      .resize(imageBuffer: videoImageBuffer)?
+      .makeCIImage(),
       let disparityImage = HSImageBuffer(pixelBuffer: disparityPixelBuffer).makeCIImage()
     else {
       return nil
@@ -178,12 +178,8 @@ class HSDepthBlurEffect {
     depthBlurFilter.setValue(videoImage, forKey: kCIInputImageKey)
     depthBlurFilter.setValue(disparityImage, forKey: kCIInputDisparityImageKey)
     depthBlurFilter.setValue(calibrationData, forKey: "inputCalibrationData")
-//    CGRect(origin: <#T##CGPoint#>, size: CGSize(width: 0.5, height: 0.5))
 //    depthBlurFilter.setValue(CIVector(cgRect: CGRect.zero), forKey: "inputFocusRect")
     return depthBlurFilter.outputImage
-    
-    
-    
   }
 
   public func makeEffectImage(

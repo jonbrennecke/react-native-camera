@@ -631,7 +631,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
           }
         }
       }
-      
+
       if let focusPoint = strongSelf.videoCaptureDevice?.focusPointOfInterest {
         strongSelf.depthDataObservers.forEach {
           $0.cameraManagerDidFocus(on: focusPoint)

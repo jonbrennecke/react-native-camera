@@ -1,16 +1,16 @@
-import Foundation
 import Accelerate
+import Foundation
 import HSCameraUtils
 
 class HSImageBufferResizer {
   private let isGrayscale: Bool
   private let bufferInfo: HSBufferInfo
-  
+
   private var destinationDataPointer: UnsafeMutableRawPointer
   private var pixelBufferPool: CVPixelBufferPool?
-  
+
   public let size: Size<Int>
-  
+
   public init?(
     size: Size<Int>,
     bufferInfo: HSBufferInfo,
@@ -23,17 +23,17 @@ class HSImageBufferResizer {
     self.size = size
     self.isGrayscale = isGrayscale
     self.bufferInfo = bufferInfo
-    self.destinationDataPointer = data
+    destinationDataPointer = data
     guard let pool = createPool(size: size) else {
       return nil
     }
-    self.pixelBufferPool = pool
+    pixelBufferPool = pool
   }
-  
+
   deinit {
     free(destinationDataPointer)
   }
-  
+
   public func resize(
     imageBuffer: HSImageBuffer
   ) -> HSImageBuffer? {
@@ -45,7 +45,7 @@ class HSImageBufferResizer {
       width: vImagePixelCount(size.width),
       rowBytes: destBytesPerRow
     )
-    
+
     // scale
 
     if isGrayscale {
@@ -66,16 +66,16 @@ class HSImageBufferResizer {
         return nil
       }
     }
-    
+
     guard
       let pool = pixelBufferPool,
       let destinationPixelBuffer = createPixelBuffer(with: pool)
     else {
       return nil
     }
-    
+
     // save vImageBuffer to CVPixelBuffer
-    
+
     var cgImageFormat = vImage_CGImageFormat(
       bitsPerComponent: UInt32(bufferInfo.bitsPerComponent),
       bitsPerPixel: UInt32(bufferInfo.bitsPerPixel),
@@ -85,15 +85,15 @@ class HSImageBufferResizer {
       decode: nil,
       renderingIntent: .defaultIntent
     )
-    
+
     guard let cvImageFormat = vImageCVImageFormat_CreateWithCVPixelBuffer(
-        destinationPixelBuffer
-      )?.takeRetainedValue()
+      destinationPixelBuffer
+    )?.takeRetainedValue()
     else {
       return nil
     }
     vImageCVImageFormat_SetColorSpace(cvImageFormat, bufferInfo.colorSpace)
-    
+
     let copyError = vImageBuffer_CopyToCVPixelBuffer(
       &destinationImageBuffer,
       &cgImageFormat,
@@ -102,13 +102,13 @@ class HSImageBufferResizer {
       nil,
       vImage_Flags(kvImageNoFlags)
     )
-    
+
     if copyError != kvImageNoError {
       return nil
     }
     return HSImageBuffer(cvPixelBuffer: destinationPixelBuffer)
   }
-  
+
   private func createPool(size: Size<Int>) -> CVPixelBufferPool? {
     guard let pool = pixelBufferPool else {
       pixelBufferPool = createCVPixelBufferPool(
