@@ -28,7 +28,7 @@ class HSVideoComposition: NSObject {
   }
 
   @objc(compositionByLoadingAsset:withCompletionHandler:)
-  public static func composition(ByLoading asset: AVAsset, _ completionHandler: @escaping (HSVideoComposition?) -> Void) {
+  public static func composition(byLoading asset: AVAsset, _ completionHandler: @escaping (HSVideoComposition?) -> Void) {
     asset.loadValuesAsynchronously(forKeys: ["tracks", "metadata"]) {
       guard
         let depthTrack = asset.tracks.first(where: { isGrayscaleVideoTrack($0) }),

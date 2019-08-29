@@ -5,5 +5,6 @@ export * from './CameraFocusArea';
 export * from './CameraFormatList';
 export * from './VideoComposition';
 export * from './VideoCompositionEdit';
+export * from './VideoCompositionImage';
 export * from './buttons';
 export * from './CaptureButton';

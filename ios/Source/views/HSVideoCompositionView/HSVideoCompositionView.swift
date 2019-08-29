@@ -5,7 +5,10 @@ import UIKit
 
 @objc
 class HSVideoCompositionView: UIView {
-  private let loadingQueue = DispatchQueue(label: "com.jonbrennecke.HSVideoCompositionView.loadingQueue")
+  private let loadingQueue = DispatchQueue(
+    label: "com.jonbrennecke.HSVideoCompositionView.loadingQueue",
+    qos: .background
+  )
   private let imageView = UIImageView(frame: .zero)
   private let playerLayer = AVPlayerLayer()
   private var player = AVPlayer()
@@ -105,7 +108,7 @@ class HSVideoCompositionView: UIView {
   }
 
   private func loadComposition(with asset: AVAsset) {
-    HSVideoComposition.composition(ByLoading: asset) { [weak self] composition in
+    HSVideoComposition.composition(byLoading: asset) { [weak self] composition in
       self?.composition = composition
       self?.loadPreviewImage()
     }
