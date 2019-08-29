@@ -67,7 +67,7 @@ stories.add('Camera', () => (
             'scaleAspectWidth'
           )}
           isPaused={boolean('Paused', false)}
-          blurAperture={number('Blur aperture', 1.4, {
+          blurAperture={number('Blur aperture', 3, {
             range: true,
             min: 1.4,
             max: 20,

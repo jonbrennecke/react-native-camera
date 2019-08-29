@@ -75,21 +75,22 @@ class HSMetalEffectView: MTKView, HSDebuggable {
   }
 
   private func render() {
-    guard let image = effectSession?.makeEffectImage(
-      blurAperture: blurAperture,
-      size: frame.size,
-      resizeMode: resizeMode
-    ) else {
-      return
-    }
-    imageExtent = image.extent
     autoreleasepool {
+//      _ = renderSemaphore.wait(timeout: DispatchTime.distantFuture)
+      guard let image = effectSession?.makeEffectImage(
+        blurAperture: blurAperture,
+        size: frame.size,
+        resizeMode: resizeMode
+      ) else {
+        return
+      }
+      imageExtent = image.extent
       present(image: image)
     }
   }
 
   private func present(image: CIImage) {
-    _ = renderSemaphore.wait(timeout: DispatchTime.distantFuture)
+//    _ = renderSemaphore.wait(timeout: DispatchTime.distantFuture)
     if let commandBuffer = commandQueue.makeCommandBuffer() {
       defer { commandBuffer.commit() }
       if let drawable = currentDrawable {
@@ -106,7 +107,8 @@ class HSMetalEffectView: MTKView, HSDebuggable {
         commandBuffer.addScheduledHandler { [weak self] _ in
           self?.renderSemaphore.signal()
         }
-        commandBuffer.present(drawable, afterMinimumDuration: 1 / Double(preferredFramesPerSecond))
+        commandBuffer.present(drawable)
+//        commandBuffer.present(drawable, afterMinimumDuration: 1 / Double(preferredFramesPerSecond))
       }
     }
   }

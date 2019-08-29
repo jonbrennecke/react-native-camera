@@ -14,31 +14,33 @@ class HSEffectSession: NSObject {
   public var previewMode: HSEffectPreviewMode = .portraitMode
 
   internal func makeEffectImage(blurAperture: Float = 0, size: CGSize, resizeMode: HSResizeMode) -> CIImage? {
-    guard
-      let disparityPixelBuffer = disparityPixelBuffer,
-      let videoPixelBuffer = videoPixelBuffer
-    else {
-      return nil
+    return autoreleasepool {
+      guard
+        let disparityPixelBuffer = disparityPixelBuffer,
+        let videoPixelBuffer = videoPixelBuffer
+      else {
+        return nil
+      }
+      let scale = Float(scaleForResizing(videoPixelBuffer.size.cgSize(), to: size, resizeMode: resizeMode))
+      guard let effectImage = depthBlurEffect.makeEffectImage(
+        previewMode: previewMode == .depth ? .depth : .portraitBlur,
+        disparityPixelBuffer: disparityPixelBuffer,
+        videoPixelBuffer: videoPixelBuffer,
+        calibrationData: calibrationData,
+        scale: scale,
+        aperture: blurAperture
+      ) else {
+        return nil
+      }
+      let scaledSize = Size<Int>(
+        width: Int((Float(videoPixelBuffer.size.width) * scale).rounded()),
+        height: Int((Float(videoPixelBuffer.size.height) * scale).rounded())
+      )
+      let yDiff = CGFloat(scaledSize.height) - CGFloat(size.height)
+      let xDiff = CGFloat(scaledSize.width) - CGFloat(size.width)
+      return effectImage
+        .transformed(by: CGAffineTransform(translationX: -xDiff * 0.5, y: -yDiff))
     }
-    let scale = Float(scaleForResizing(videoPixelBuffer.size.cgSize(), to: size, resizeMode: resizeMode))
-    guard let effectImage = depthBlurEffect.makeEffectImage(
-      previewMode: previewMode == .depth ? .depth : .portraitBlur,
-      disparityPixelBuffer: disparityPixelBuffer,
-      videoPixelBuffer: videoPixelBuffer,
-      calibrationData: calibrationData,
-      scale: scale,
-      aperture: blurAperture
-    ) else {
-      return nil
-    }
-    let scaledSize = Size<Int>(
-      width: Int((Float(videoPixelBuffer.size.width) * scale).rounded()),
-      height: Int((Float(videoPixelBuffer.size.height) * scale).rounded())
-    )
-    let yDiff = CGFloat(scaledSize.height) - CGFloat(size.height)
-    let xDiff = CGFloat(scaledSize.width) - CGFloat(size.width)
-    return effectImage
-      .transformed(by: CGAffineTransform(translationX: -xDiff * 0.5, y: -yDiff))
   }
 
   override init() {

@@ -125,8 +125,20 @@ class HSDepthBlurEffect {
     return filter
   }
   
-  private var imageBufferResizer: HSImageBufferResizer?
+  private var pixelBufferPool: CVPixelBufferPool?
   
+  private func createPool(size: Size<Int>) -> CVPixelBufferPool? {
+    guard let pool = pixelBufferPool else {
+      pixelBufferPool = createCVPixelBufferPool(
+        size: size,
+        pixelFormatType: kCVPixelFormatType_32BGRA
+      )
+      return pixelBufferPool
+    }
+    return pool
+  }
+  
+  private var imageBufferResizer: HSImageBufferResizer?
   
   private func createImageBufferResizer(size: Size<Int>) -> HSImageBufferResizer? {
     guard let resizer = imageBufferResizer else {
@@ -153,10 +165,16 @@ class HSDepthBlurEffect {
       width: Int((Float(videoPixelBuffer.size.width) * scale).rounded()),
       height: Int((Float(videoPixelBuffer.size.height) * scale).rounded())
     )
+    let videoImageBuffer = HSImageBuffer(pixelBuffer: videoPixelBuffer)
+//    guard
+//      let pool = createPool(size: scaledSize),
+//      let videoImage = videoImageBuffer
+//        .resize(to: scaledSize, pixelBufferPool: pool)?
+//        .makeCIImage(),
     guard
       let resizer = createImageBufferResizer(size: scaledSize),
       let videoImage = resizer
-        .resize(imageBuffer: HSImageBuffer(pixelBuffer: videoPixelBuffer))?
+        .resize(imageBuffer: videoImageBuffer)?
         .makeCIImage(),
       let disparityImage = HSImageBuffer(pixelBuffer: disparityPixelBuffer).makeCIImage(),
       let upsampleFilter = edgePreserveUpsampleFilter
@@ -196,7 +214,7 @@ class HSDepthBlurEffect {
       return nil
     }
 
-    // upsampel the depth image to match the video image
+    // upsample the depth image to match the video image
     guard let upsampleFilter = edgePreserveUpsampleFilter else {
       return nil
     }
@@ -219,20 +237,3 @@ class HSDepthBlurEffect {
     return depthBlurFilter.outputImage
   }
 }
-
-// fileprivate func minMaxFast(image inputImage: CIImage, context: CIContext = CIContext()) -> (min: Float, max: Float)? {
-//  guard
-//    let minMaxFilter = areaMinMaxRedFilter(inputImage: inputImage),
-//    let areaMinMaxImage = minMaxFilter.outputImage
-//  else {
-//    return nil
-//  }
-//  var pixels = [UInt8](repeating: 0, count: 4)
-//  context.render(areaMinMaxImage,
-//                 toBitmap: &pixels,
-//                 rowBytes: 4,
-//                 bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
-//                 format: CIFormat.RGBA8,
-//                 colorSpace: nil)
-//  return (min: Float(pixels[0]) / 255, max: Float(pixels[1]) / 255)
-// }
