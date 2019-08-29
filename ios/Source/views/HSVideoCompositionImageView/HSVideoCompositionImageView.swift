@@ -8,7 +8,6 @@ class HSVideoCompositionImageView: UIImageView {
     qos: .background
   )
 
-  private var assetURL: URL?
   private var assetImageGenerator: AVAssetImageGenerator?
 
   @objc
@@ -43,15 +42,16 @@ class HSVideoCompositionImageView: UIImageView {
   public func generateImage(
     byResourceName name: String, extension ext: String, _ completionHandler: (() -> Void)?
   ) {
+    let size = frame.size
     loadingQueue.async { [weak self] in
       guard let strongSelf = self else { return }
-      guard let url = Bundle.main.url(forResource: name, withExtension: ext) else {
+      guard let path = Bundle.main.path(forResource: name, ofType: ext) else {
         completionHandler?()
         return
       }
-      strongSelf.assetURL = url
+      let url = URL(fileURLWithPath: path)
       let asset = AVAsset(url: url)
-      strongSelf.generateImage(withAsset: asset) { [weak self] image in
+      strongSelf.generateImage(withAsset: asset, size: size) { [weak self] image in
         guard let strongSelf = self else { return }
         if let cgImage = image {
           strongSelf.setImage(cgImage)
@@ -61,7 +61,7 @@ class HSVideoCompositionImageView: UIImageView {
     }
   }
 
-  private func generateImage(withAsset asset: AVAsset, _ completionHandler: @escaping (CGImage?) -> Void) {
+  private func generateImage(withAsset asset: AVAsset, size: CGSize, _ completionHandler: @escaping (CGImage?) -> Void) {
     loadingQueue.async { [weak self] in
       guard self != nil else { return }
       HSVideoComposition.composition(byLoading: asset) { [weak self] composition in
@@ -70,7 +70,7 @@ class HSVideoCompositionImageView: UIImageView {
           completionHandler(nil)
           return
         }
-        strongSelf.generateImage(withComposition: composition) { [weak self] image in
+        strongSelf.generateImage(withComposition: composition, size: size) { [weak self] image in
           guard self != nil else { return }
           completionHandler(image)
         }
@@ -80,6 +80,7 @@ class HSVideoCompositionImageView: UIImageView {
 
   private func generateImage(
     withComposition composition: HSVideoComposition,
+    size: CGSize,
     _ completionHandler: @escaping (CGImage?) -> Void
   ) {
     loadingQueue.async { [weak self] in
@@ -91,6 +92,10 @@ class HSVideoCompositionImageView: UIImageView {
       let imageGenerator = AVAssetImageGenerator(asset: avComposition)
       strongSelf.assetImageGenerator = imageGenerator
       imageGenerator.videoComposition = avVideoComposition
+      imageGenerator.requestedTimeToleranceAfter = .zero
+      imageGenerator.requestedTimeToleranceBefore = .zero
+      imageGenerator.appliesPreferredTrackTransform = true
+      imageGenerator.maximumSize = size
       if let compositor = imageGenerator.customVideoCompositor as? HSVideoCompositor {
         compositor.depthTrackID = composition.depthTrackID
         compositor.videoTrackID = composition.videoTrackID
@@ -109,7 +114,7 @@ class HSVideoCompositionImageView: UIImageView {
   }
 
   private func reloadImage() {
-    regenerateImage { [weak self] image in
+    regenerateImage(size: frame.size) { [weak self] image in
       guard let strongSelf = self else { return }
       if let cgImage = image {
         strongSelf.setImage(cgImage)
@@ -117,7 +122,7 @@ class HSVideoCompositionImageView: UIImageView {
     }
   }
 
-  private func regenerateImage(_ completionHandler: ((CGImage?) -> Void)?) {
+  private func regenerateImage(size: CGSize, _ completionHandler: ((CGImage?) -> Void)?) {
     loadingQueue.async { [weak self] in
       guard let strongSelf = self else { return }
       guard let imageGenerator = strongSelf.assetImageGenerator else {
@@ -125,6 +130,10 @@ class HSVideoCompositionImageView: UIImageView {
         return
       }
       imageGenerator.cancelAllCGImageGeneration()
+      imageGenerator.requestedTimeToleranceAfter = .zero
+      imageGenerator.requestedTimeToleranceBefore = .zero
+      imageGenerator.appliesPreferredTrackTransform = true
+      imageGenerator.maximumSize = size
       if let compositor = imageGenerator.customVideoCompositor as? HSVideoCompositor {
         compositor.aperture = strongSelf.blurAperture
         compositor.previewMode = strongSelf.previewMode
@@ -136,18 +145,6 @@ class HSVideoCompositionImageView: UIImageView {
       ) { [weak self] _, image, _, _, _ in
         guard self != nil else { return }
         completionHandler?(image)
-      }
-    }
-  }
-
-  private func reloadImageFromURL() {
-    if let url = assetURL {
-      let asset = AVAsset(url: url)
-      generateImage(withAsset: asset) { [weak self] image in
-        guard let strongSelf = self else { return }
-        if let cgImage = image {
-          strongSelf.setImage(cgImage)
-        }
       }
     }
   }
