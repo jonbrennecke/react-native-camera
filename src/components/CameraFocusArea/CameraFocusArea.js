@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
   View,
   TouchableWithoutFeedback,
@@ -34,7 +34,7 @@ const styles = {
 
 // $FlowFixMe
 @autobind
-export class CameraFocusArea extends Component<Props, State> {
+export class CameraFocusArea extends PureComponent<Props, State> {
   state = {
     focusPoint: { x: 0, y: 0 },
   };

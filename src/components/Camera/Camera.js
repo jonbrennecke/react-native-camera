@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
   requireNativeComponent,
   findNodeHandle,
@@ -30,7 +30,7 @@ export type CameraProps = {
   isPaused?: boolean,
 };
 
-export class Camera extends Component<CameraProps> {
+export class Camera extends PureComponent<CameraProps> {
   nativeComponentRef = React.createRef();
 
   focusOnPoint(point: { x: number, y: number }) {

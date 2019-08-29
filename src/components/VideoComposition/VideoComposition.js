@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
   requireNativeComponent,
   findNodeHandle,
@@ -28,7 +28,7 @@ export type VideoCompositionProps = {
   onPlaybackStateChange?: (playbackState: PlaybackState) => void,
 };
 
-export class VideoComposition extends Component<VideoCompositionProps> {
+export class VideoComposition extends PureComponent<VideoCompositionProps> {
   nativeComponentRef = React.createRef();
 
   play() {
