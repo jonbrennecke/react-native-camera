@@ -46,6 +46,12 @@ stories.add('Video Composition Image', () => (
         max: 20,
         step: 0.1,
       })}
+      progress={number('Progress', 0, {
+        range: true,
+        min: 0,
+        max: 1,
+        step: 0.01,
+      })}
     />
   </SafeAreaView>
 ));

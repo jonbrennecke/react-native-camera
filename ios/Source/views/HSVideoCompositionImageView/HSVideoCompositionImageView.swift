@@ -30,6 +30,13 @@ class HSVideoCompositionImageView: UIImageView {
       reloadImage()
     }
   }
+  
+  @objc
+  public var progress: Float = 0 {
+    didSet {
+      reloadImage()
+    }
+  }
 
   @objc(generateImageByResourceName:extension:completionHandler:)
   public func generateImage(
@@ -89,7 +96,7 @@ class HSVideoCompositionImageView: UIImageView {
         compositor.previewMode = strongSelf.previewMode
       }
       let durationSeconds = CMTimeGetSeconds(avComposition.duration)
-      let time = CMTimeMakeWithSeconds(durationSeconds * 0.5, preferredTimescale: 600)
+      let time = CMTimeMakeWithSeconds(durationSeconds * Double(strongSelf.progress), preferredTimescale: 600)
       imageGenerator.generateCGImagesAsynchronously(
         forTimes: [NSValue(time: time)]
       ) { [weak self] _, image, _, _, _ in

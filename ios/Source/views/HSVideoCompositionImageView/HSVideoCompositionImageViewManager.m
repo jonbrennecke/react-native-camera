@@ -15,6 +15,8 @@ RCT_EXPORT_VIEW_PROPERTY(resizeMode, HSResizeMode)
 
 RCT_EXPORT_VIEW_PROPERTY(blurAperture, float)
 
+RCT_EXPORT_VIEW_PROPERTY(progress, float)
+
 RCT_CUSTOM_VIEW_PROPERTY(resourceNameWithExt, NSString*, HSVideoCompositionImageView) {
   NSString* resourceNameWithExt = [RCTConvert NSString:json];
   if (!resourceNameWithExt) {

@@ -16,6 +16,7 @@ export type VideoCompositionImageProps = {
   previewMode?: CameraPreviewMode,
   resizeMode?: CameraResizeMode,
   blurAperture?: number,
+  progress?: number,
 };
 
 export const VideoCompositionImage: SFC<VideoCompositionImageProps> = ({
@@ -23,7 +24,8 @@ export const VideoCompositionImage: SFC<VideoCompositionImageProps> = ({
   resourceNameWithExt,
   previewMode,
   resizeMode,
-  blurAperture
+  blurAperture,
+  progress
 }: VideoCompositionImageProps) => (
   <NativeVideoCompositionImageView
     style={style}
@@ -31,5 +33,6 @@ export const VideoCompositionImage: SFC<VideoCompositionImageProps> = ({
     previewMode={previewMode}
     resizeMode={resizeMode}
     blurAperture={blurAperture}
+    progress={progress}
   />
 );
