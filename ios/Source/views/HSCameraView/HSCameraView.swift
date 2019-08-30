@@ -91,7 +91,7 @@ class HSCameraView: UIView {
       return HSCameraManager.shared.position
     }
     set {
-      HSCameraManager.shared.position = newValue
+      HSCameraManager.shared.setPosition(newValue)
     }
   }
 

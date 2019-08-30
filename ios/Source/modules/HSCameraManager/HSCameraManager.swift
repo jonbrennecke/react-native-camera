@@ -251,33 +251,26 @@ class HSCameraManager: NSObject {
       return
     }
     if case .some = try? videoCaptureDevice.lockForConfiguration() {
-      let supportedDepthFormats = videoCaptureDevice.activeFormat.supportedDepthDataFormats
-
-      let depthFormats = supportedDepthFormats.filter { format in
+      defer {
+        videoCaptureDevice.unlockForConfiguration()
+        configureDepthDataConverter()
+      }
+      let searchDescriptor = HSCameraFormatSearchDescriptor(
+        depthPixelFormatTypeRule: .any,
+        depthDimensionsRule: .greaterThanOrEqualTo(Size<Int>(width: 640, height: 360)),
+        videoDimensionsRule: .greaterThanOrEqualTo(Size<Int>(width: 1280, height: 720)),
+        frameRateRule: .greaterThanOrEqualTo(20),
+        sortRule: .maximizeFrameRate,
+        depthFormatSortRule: .maximizeDimensions
+      )
+      guard let searchResult = searchDescriptor.search(formats: videoCaptureDevice.formats) else {
         return
-          CMFormatDescriptionGetMediaSubType(format.formatDescription) == kCVPixelFormatType_DepthFloat16
       }
-
-      let highestResolutionDepthFormat = depthFormats.max { a, b in
-        CMVideoFormatDescriptionGetDimensions(a.formatDescription).width < CMVideoFormatDescriptionGetDimensions(b.formatDescription).width
-      }
-
-      if let format = highestResolutionDepthFormat {
-        videoCaptureDevice.activeDepthDataFormat = format
-        let maxFrameRateRange = format.videoSupportedFrameRateRanges.max { $0.maxFrameRate < $1.maxFrameRate }
-        let depthFrameDuration = CMTimeMake(
-          value: 1,
-          timescale: CMTimeScale(maxFrameRateRange?.maxFrameRate ?? DEFAULT_DEPTH_CAPTURE_FRAMES_PER_SECOND)
-        )
-        videoCaptureDevice.activeDepthDataMinFrameDuration = depthFrameDuration
-      }
-
-      let zoomFactor = videoCaptureDevice.activeFormat.videoMinZoomFactorForDepthDataDelivery
-      videoCaptureDevice.videoZoomFactor = zoomFactor
-
-      videoCaptureDevice.unlockForConfiguration()
+      videoCaptureDevice.activeFormat = searchResult.format
+      videoCaptureDevice.activeDepthDataFormat = searchResult.depthDataFormat
+      videoCaptureDevice.videoZoomFactor = searchResult.format.videoMinZoomFactorForDepthDataDelivery
+//      videoCaptureDevice.activeDepthDataMinFrameDuration
     }
-    configureDepthDataConverter()
   }
 
   private func configureDepthDataConverter() {
@@ -291,28 +284,26 @@ class HSCameraManager: NSObject {
     )
   }
 
-  public var position: AVCaptureDevice.Position = .front {
-    didSet {
-      guard position != oldValue else {
-        return
+  private(set) var position: AVCaptureDevice.Position = .front
+  
+  public func setPosition(_ position: AVCaptureDevice.Position) {
+    cameraSetupQueue.async { [weak self] in
+      guard let strongSelf = self else { return }
+      strongSelf.position = position
+//      let isRunning = strongSelf.captureSession.isRunning
+//      if isRunning {
+//        strongSelf.captureSession.stopRunning()
+//      }
+      strongSelf.captureSession.beginConfiguration()
+      strongSelf.captureSession.inputs.forEach { strongSelf.captureSession.removeInput($0) }
+      strongSelf.captureSession.outputs.forEach { strongSelf.captureSession.removeOutput($0) }
+      if case .failure = strongSelf.attemptToSetupCameraCaptureSession() {
+        print("Failed to set up camera capture session")
       }
-      cameraSetupQueue.async { [weak self] in
-        guard let strongSelf = self else { return }
-        let isRunning = strongSelf.captureSession.isRunning
-        if isRunning {
-          strongSelf.captureSession.stopRunning()
-        }
-        strongSelf.captureSession.beginConfiguration()
-        strongSelf.captureSession.inputs.forEach { strongSelf.captureSession.removeInput($0) }
-        strongSelf.captureSession.outputs.forEach { strongSelf.captureSession.removeOutput($0) }
-        if case .failure = strongSelf.attemptToSetupCameraCaptureSession() {
-          print("Failed to set up camera capture session")
-        }
-        strongSelf.captureSession.commitConfiguration()
-        if isRunning {
-          strongSelf.captureSession.startRunning()
-        }
-      }
+      strongSelf.captureSession.commitConfiguration()
+//      if isRunning {
+//        strongSelf.captureSession.startRunning()
+//      }
     }
   }
 
