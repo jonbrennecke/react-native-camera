@@ -23,7 +23,8 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
   public var depthTrackID: CMPersistentTrackID = kCMPersistentTrackID_Invalid
   public var videoTrackID: CMPersistentTrackID = kCMPersistentTrackID_Invalid
   public var previewMode: HSEffectPreviewMode = .portraitMode
-  public var aperture: Float = 0 // TODO: rename to blurAperture
+  public var blurAperture: Float = 0
+  public var qualityFactor: Float = 0.1
 
   // MARK: - AVVideoCompositing implementation
 
@@ -91,8 +92,8 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
           disparityPixelBuffer: HSPixelBuffer(pixelBuffer: disparityCVPixelBuffer),
           videoPixelBuffer: HSPixelBuffer(pixelBuffer: videoCVPixelBuffer),
           calibrationData: nil,
-          blurAperture: aperture,
-          qualityFactor: 0.1
+          blurAperture: blurAperture,
+          qualityFactor: qualityFactor
         ),
         let outputPixelBuffer = renderContext?.newPixelBuffer()
       else {

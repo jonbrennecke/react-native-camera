@@ -66,7 +66,7 @@ class HSVideoCompositionView: UIView {
       if let compositor = imageGenerator.customVideoCompositor as? HSVideoCompositor {
         compositor.depthTrackID = composition.depthTrackID
         compositor.videoTrackID = composition.videoTrackID
-        compositor.aperture = strongSelf.blurAperture
+        compositor.blurAperture = strongSelf.blurAperture
         compositor.previewMode = strongSelf.previewMode
       }
       let durationSeconds = CMTimeGetSeconds(avComposition.duration)
@@ -127,7 +127,7 @@ class HSVideoCompositionView: UIView {
     if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
       compositor.depthTrackID = composition.depthTrackID
       compositor.videoTrackID = composition.videoTrackID
-      compositor.aperture = blurAperture
+      compositor.blurAperture = blurAperture
       compositor.previewMode = previewMode
     }
     player.replaceCurrentItem(with: playerItem)
@@ -227,7 +227,7 @@ class HSVideoCompositionView: UIView {
       if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
         compositor.depthTrackID = composition.depthTrackID
         compositor.videoTrackID = composition.videoTrackID
-        compositor.aperture = blurAperture
+        compositor.blurAperture = blurAperture
         compositor.previewMode = previewMode
       }
       loadPreviewImage()
@@ -247,7 +247,7 @@ class HSVideoCompositionView: UIView {
       if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
         compositor.depthTrackID = composition.depthTrackID
         compositor.videoTrackID = composition.videoTrackID
-        compositor.aperture = blurAperture
+        compositor.blurAperture = blurAperture
         compositor.previewMode = previewMode
       }
       loadPreviewImage()

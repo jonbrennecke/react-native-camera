@@ -99,7 +99,7 @@ class HSVideoCompositionImageView: UIImageView {
       if let compositor = imageGenerator.customVideoCompositor as? HSVideoCompositor {
         compositor.depthTrackID = composition.depthTrackID
         compositor.videoTrackID = composition.videoTrackID
-        compositor.aperture = strongSelf.blurAperture
+        compositor.blurAperture = strongSelf.blurAperture
         compositor.previewMode = strongSelf.previewMode
       }
       let durationSeconds = CMTimeGetSeconds(imageGenerator.asset.duration)
@@ -138,7 +138,7 @@ class HSVideoCompositionImageView: UIImageView {
       imageGenerator.appliesPreferredTrackTransform = true
       imageGenerator.maximumSize = size
       if let compositor = imageGenerator.customVideoCompositor as? HSVideoCompositor {
-        compositor.aperture = strongSelf.blurAperture
+        compositor.blurAperture = strongSelf.blurAperture
         compositor.previewMode = strongSelf.previewMode
       }
       let durationSeconds = CMTimeGetSeconds(imageGenerator.asset.duration)
