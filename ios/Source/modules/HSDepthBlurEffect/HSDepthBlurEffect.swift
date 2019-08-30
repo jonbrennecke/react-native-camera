@@ -182,7 +182,7 @@ class HSDepthBlurEffect {
 //    depthBlurFilter.setValue(CIVector(cgRect: CGRect.zero), forKey: "inputFocusRect")
     return depthBlurFilter.outputImage
   }
-  
+
   public func makeEffectImageWithoutScaling(
     previewMode: PreviewMode,
     disparityPixelBuffer: HSPixelBuffer,
@@ -190,7 +190,7 @@ class HSDepthBlurEffect {
     calibrationData _: AVCameraCalibrationData?,
     blurAperture: Float,
     qualityFactor: Float = 0.1
-    ) -> CIImage? {
+  ) -> CIImage? {
     guard
       let videoImage = HSImageBuffer(pixelBuffer: videoPixelBuffer).makeCIImage(),
       let disparityImage = HSImageBuffer(pixelBuffer: disparityPixelBuffer).makeCIImage()

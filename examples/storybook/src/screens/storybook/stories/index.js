@@ -6,3 +6,4 @@ import './VideoCompositionEdit';
 import './VideoCompositionImage';
 import './MultiCamera';
 import './CameraFocusArea';
+import './VolumeButton';

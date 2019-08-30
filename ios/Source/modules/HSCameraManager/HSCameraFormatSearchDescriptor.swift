@@ -5,7 +5,7 @@ public struct HSCameraFormatSearchDescriptor {
   internal enum PixelFormatTypeRule {
     case any
     case oneOf([OSType])
-    
+
     fileprivate func matches(format: AVCaptureDevice.Format) -> Bool {
       switch self {
       case .any:
@@ -16,13 +16,13 @@ public struct HSCameraFormatSearchDescriptor {
       }
     }
   }
-  
+
   internal enum DimensionsRule {
     case any
     case equalTo(Size<Int>)
     case greaterThanOrEqualTo(Size<Int>)
-    
-    fileprivate func matches(format: AVCaptureDevice.Format) ->  Bool {
+
+    fileprivate func matches(format: AVCaptureDevice.Format) -> Bool {
       switch self {
       case .any:
         return true
@@ -35,12 +35,12 @@ public struct HSCameraFormatSearchDescriptor {
       }
     }
   }
-  
+
   internal enum FrameRateRule {
     case any
     case greaterThanOrEqualTo(Double)
-    
-    fileprivate func matches(format: AVCaptureDevice.Format) ->  Bool {
+
+    fileprivate func matches(format: AVCaptureDevice.Format) -> Bool {
       switch self {
       case .any:
         return true
@@ -56,12 +56,12 @@ public struct HSCameraFormatSearchDescriptor {
       }
     }
   }
-  
+
   internal enum SortRule {
     case maximizeFrameRate
     case maximizeDimensions
-    
-    fileprivate func sort(formats: [AVCaptureDevice.Format]) ->  [AVCaptureDevice.Format] {
+
+    fileprivate func sort(formats: [AVCaptureDevice.Format]) -> [AVCaptureDevice.Format] {
       return formats.sorted { a, b in
         switch self {
         case .maximizeFrameRate:
@@ -78,14 +78,14 @@ public struct HSCameraFormatSearchDescriptor {
       }
     }
   }
-  
+
   internal let depthPixelFormatTypeRule: PixelFormatTypeRule
   internal let depthDimensionsRule: DimensionsRule
   internal let videoDimensionsRule: DimensionsRule
   internal let frameRateRule: FrameRateRule
   internal let sortRule: SortRule
   internal let depthFormatSortRule: SortRule
-  
+
   internal func search(formats: [AVCaptureDevice.Format]) -> SearchResult? {
     let filteredFormats = formats
       .filter { format in
@@ -94,7 +94,7 @@ public struct HSCameraFormatSearchDescriptor {
       }
       .filter { format in
         return format.supportedDepthDataFormats.contains { depthFormat in
-          return depthPixelFormatTypeRule.matches(format: depthFormat)
+          depthPixelFormatTypeRule.matches(format: depthFormat)
             && depthDimensionsRule.matches(format: format)
         }
       }
@@ -113,7 +113,7 @@ public struct HSCameraFormatSearchDescriptor {
     }
     return SearchResult(format: format, depthDataFormat: depthFormat)
   }
-  
+
   internal struct SearchResult {
     let format: AVCaptureDevice.Format
     let depthDataFormat: AVCaptureDevice.Format
