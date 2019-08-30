@@ -144,9 +144,10 @@ class HSDepthBlurEffect {
     previewMode: PreviewMode,
     disparityPixelBuffer: HSPixelBuffer,
     videoPixelBuffer: HSPixelBuffer,
-    calibrationData: AVCameraCalibrationData?,
-    scale: Float,
-    aperture: Float
+    calibrationData _: AVCameraCalibrationData?,
+    blurAperture: Float,
+    scale: Float = 1,
+    qualityFactor: Float = 0.1
   ) -> CIImage? {
     let scaledSize = Size<Int>(
       width: Int((Float(videoPixelBuffer.size.width) * scale).rounded()),
@@ -173,49 +174,46 @@ class HSDepthBlurEffect {
     guard let depthBlurFilter = depthBlurEffectFilter else {
       return nil
     }
-    depthBlurFilter.setValue(0.1, forKey: "inputScaleFactor") // TODO: use inputScaleFactor: 1 for final export
-    depthBlurFilter.setValue(aperture, forKey: "inputAperture")
+    depthBlurFilter.setValue(qualityFactor, forKey: "inputScaleFactor")
+    depthBlurFilter.setValue(blurAperture, forKey: "inputAperture")
     depthBlurFilter.setValue(videoImage, forKey: kCIInputImageKey)
     depthBlurFilter.setValue(disparityImage, forKey: kCIInputDisparityImageKey)
 //    depthBlurFilter.setValue(calibrationData, forKey: "inputCalibrationData")
 //    depthBlurFilter.setValue(CIVector(cgRect: CGRect.zero), forKey: "inputFocusRect")
     return depthBlurFilter.outputImage
   }
-
-  public func makeEffectImage(
+  
+  public func makeEffectImageWithoutScaling(
     previewMode: PreviewMode,
     disparityPixelBuffer: HSPixelBuffer,
     videoPixelBuffer: HSPixelBuffer,
-    aperture: Float,
-    shouldNormalize _: Bool = false
-  ) -> CIImage? {
+    calibrationData _: AVCameraCalibrationData?,
+    blurAperture: Float,
+    qualityFactor: Float = 0.1
+    ) -> CIImage? {
     guard
-      let disparityImage = HSImageBuffer(pixelBuffer: disparityPixelBuffer).makeCIImage(),
-      let videoImage = HSImageBuffer(pixelBuffer: videoPixelBuffer).makeCIImage()
+      let videoImage = HSImageBuffer(pixelBuffer: videoPixelBuffer).makeCIImage(),
+      let disparityImage = HSImageBuffer(pixelBuffer: disparityPixelBuffer).makeCIImage()
     else {
       return nil
     }
-
-    // upsample the depth image to match the video image
-    guard let upsampleFilter = edgePreserveUpsampleFilter else {
-      return nil
-    }
-    upsampleFilter.setValue(videoImage, forKey: kCIInputImageKey)
-    upsampleFilter.setValue(disparityImage, forKey: "inputSmallImage")
-    guard let upsampledDisparityImage = upsampleFilter.outputImage else {
-      return nil
-    }
-
     if case .depth = previewMode {
-      return upsampledDisparityImage
+      guard let upsampleFilter = edgePreserveUpsampleFilter else {
+        return nil
+      }
+      upsampleFilter.setValue(videoImage, forKey: kCIInputImageKey)
+      upsampleFilter.setValue(disparityImage, forKey: "inputSmallImage")
+      return upsampleFilter.outputImage
     }
     guard let depthBlurFilter = depthBlurEffectFilter else {
       return nil
     }
-    depthBlurFilter.setValue(0.1, forKey: "inputScaleFactor")
-    depthBlurFilter.setValue(aperture, forKey: "inputAperture")
+    depthBlurFilter.setValue(qualityFactor, forKey: "inputScaleFactor")
+    depthBlurFilter.setValue(blurAperture, forKey: "inputAperture")
     depthBlurFilter.setValue(videoImage, forKey: kCIInputImageKey)
-    depthBlurFilter.setValue(upsampledDisparityImage, forKey: kCIInputDisparityImageKey)
+    depthBlurFilter.setValue(disparityImage, forKey: kCIInputDisparityImageKey)
+    //    depthBlurFilter.setValue(calibrationData, forKey: "inputCalibrationData")
+    //    depthBlurFilter.setValue(CIVector(cgRect: CGRect.zero), forKey: "inputFocusRect")
     return depthBlurFilter.outputImage
   }
 }

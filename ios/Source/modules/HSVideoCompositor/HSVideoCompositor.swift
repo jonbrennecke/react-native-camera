@@ -80,26 +80,28 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
         return request.sourceFrame(byTrackID: videoTrackID)
       }
       guard
-        let videoTrackPixelBuffer = request.sourceFrame(byTrackID: videoTrackID),
-        let depthTrackPixelBuffer = request.sourceFrame(byTrackID: depthTrackID)
+        let videoCVPixelBuffer = request.sourceFrame(byTrackID: videoTrackID),
+        let disparityCVPixelBuffer = request.sourceFrame(byTrackID: depthTrackID)
       else {
         return nil
       }
       guard
-        let depthBlurImage = depthBlurEffect.makeEffectImage(
+        let effectImage = depthBlurEffect.makeEffectImageWithoutScaling(
           previewMode: previewMode == .depth ? .depth : .portraitBlur,
-          disparityPixelBuffer: HSPixelBuffer(pixelBuffer: depthTrackPixelBuffer),
-          videoPixelBuffer: HSPixelBuffer(pixelBuffer: videoTrackPixelBuffer),
-          aperture: aperture
+          disparityPixelBuffer: HSPixelBuffer(pixelBuffer: disparityCVPixelBuffer),
+          videoPixelBuffer: HSPixelBuffer(pixelBuffer: videoCVPixelBuffer),
+          calibrationData: nil,
+          blurAperture: aperture,
+          qualityFactor: 0.1
         ),
         let outputPixelBuffer = renderContext?.newPixelBuffer()
       else {
         return nil
       }
       context.render(
-        depthBlurImage,
+        effectImage,
         to: outputPixelBuffer,
-        bounds: depthBlurImage.extent,
+        bounds: effectImage.extent,
         colorSpace: nil
       )
       return outputPixelBuffer

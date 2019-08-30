@@ -13,7 +13,7 @@ class HSEffectSession: NSObject {
 
   public var previewMode: HSEffectPreviewMode = .portraitMode
 
-  internal func makeEffectImage(blurAperture: Float = 0, size: CGSize, resizeMode: HSResizeMode) -> CIImage? {
+  internal func makeEffectImage(blurAperture: Float = 2.5, size: CGSize, resizeMode: HSResizeMode) -> CIImage? {
     return autoreleasepool {
       guard
         let disparityPixelBuffer = disparityPixelBuffer,
@@ -27,8 +27,9 @@ class HSEffectSession: NSObject {
         disparityPixelBuffer: disparityPixelBuffer,
         videoPixelBuffer: videoPixelBuffer,
         calibrationData: calibrationData,
+        blurAperture: blurAperture,
         scale: scale,
-        aperture: blurAperture
+        qualityFactor: 0.1
       ) else {
         return nil
       }

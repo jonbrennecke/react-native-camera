@@ -114,11 +114,14 @@ class HSVideoCompositionImageView: UIImageView {
   }
 
   private func reloadImage() {
+    let startTime = CFAbsoluteTimeGetCurrent()
     regenerateImage(size: frame.size) { [weak self] image in
       guard let strongSelf = self else { return }
       if let cgImage = image {
         strongSelf.setImage(cgImage)
       }
+      let executionTime = CFAbsoluteTimeGetCurrent() - startTime
+      print("reloadImage: \(executionTime)")
     }
   }
 
