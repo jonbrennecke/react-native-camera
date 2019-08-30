@@ -1,9 +1,8 @@
 // @flow
 import React, { createRef } from 'react';
 import { storiesOf } from '@storybook/react-native';
-import { withKnobs } from '@storybook/addon-knobs';
+import { withKnobs, select } from '@storybook/addon-knobs';
 import { SafeAreaView, StyleSheet, Animated } from 'react-native';
-import noop from 'lodash/noop';
 
 import {
   Camera,
@@ -63,7 +62,15 @@ stories.add('Camera Focus Area', () => (
             style={styles.camera}
             ref={getState().cameraRef}
             cameraPosition="front"
-            previewMode="normal"
+            previewMode={select(
+              'Preview mode',
+              {
+                Normal: 'normal',
+                Depth: 'depth',
+                'Portrait mode': 'portraitMode',
+              },
+              'portraitMode'
+            )}
           />
           <CameraFocusArea
             style={styles.focusArea}

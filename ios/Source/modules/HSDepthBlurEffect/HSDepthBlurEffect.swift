@@ -177,7 +177,7 @@ class HSDepthBlurEffect {
     depthBlurFilter.setValue(aperture, forKey: "inputAperture")
     depthBlurFilter.setValue(videoImage, forKey: kCIInputImageKey)
     depthBlurFilter.setValue(disparityImage, forKey: kCIInputDisparityImageKey)
-    depthBlurFilter.setValue(calibrationData, forKey: "inputCalibrationData")
+//    depthBlurFilter.setValue(calibrationData, forKey: "inputCalibrationData")
 //    depthBlurFilter.setValue(CIVector(cgRect: CGRect.zero), forKey: "inputFocusRect")
     return depthBlurFilter.outputImage
   }
