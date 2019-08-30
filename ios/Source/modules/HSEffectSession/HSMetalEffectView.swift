@@ -52,6 +52,7 @@ class HSMetalEffectView: MTKView, HSDebuggable {
     drawableSize = frame.size
     contentScaleFactor = UIScreen.main.scale
     autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    clearsContextBeforeDrawing = true
   }
 
   required init(coder _: NSCoder) {

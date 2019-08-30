@@ -103,6 +103,7 @@ class HSCameraView: UIView {
       let view = HSEffectPreviewView()
       view.effectSession.previewMode = previewMode
       view.blurAperture = blurAperture
+      view.resizeMode = resizeMode
       previewView = .effect(view)
     default:
       previewView = .video(HSVideoPreviewView())

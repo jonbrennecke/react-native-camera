@@ -51,13 +51,7 @@ class HSCameraManager: NSObject {
   // if depth is disabled, this should be left as the default YpCbCr
   public var videoPixelFormat: OSType = kCVPixelFormatType_32BGRA
 
-  public var depthPixelFormat: OSType {
-    if let activeDepthFormat = videoCaptureDevice?.activeDepthDataFormat {
-      return CMFormatDescriptionGetMediaSubType(activeDepthFormat.formatDescription)
-    }
-    // TODO: if front camera, capture depth by default. Otherwise capture disparity
-    return kCVPixelFormatType_DisparityFloat16
-  }
+  public var depthPixelFormat: OSType = kCVPixelFormatType_DisparityFloat16
 
   public var videoResolution: Size<Int>? {
     guard let format = videoCaptureDevice?.activeFormat else {
@@ -256,9 +250,13 @@ class HSCameraManager: NSObject {
         configureDepthDataConverter()
       }
       let searchDescriptor = HSCameraFormatSearchDescriptor(
-        depthPixelFormatTypeRule: .any,
-        depthDimensionsRule: .greaterThanOrEqualTo(Size<Int>(width: 640, height: 360)),
-        videoDimensionsRule: .greaterThanOrEqualTo(Size<Int>(width: 1280, height: 720)),
+        depthPixelFormatTypeRule: .oneOf([depthPixelFormat]),
+        depthDimensionsRule: position == .front
+          ? .greaterThanOrEqualTo(Size<Int>(width: 640, height: 360))
+          : .any,
+        videoDimensionsRule: position == .front
+          ? .equalTo(Size<Int>(width: 1280, height: 720))
+          : .equalTo(Size<Int>(width: 640, height: 480)),
         frameRateRule: .greaterThanOrEqualTo(20),
         sortRule: .maximizeFrameRate,
         depthFormatSortRule: .maximizeDimensions
@@ -269,7 +267,6 @@ class HSCameraManager: NSObject {
       videoCaptureDevice.activeFormat = searchResult.format
       videoCaptureDevice.activeDepthDataFormat = searchResult.depthDataFormat
       videoCaptureDevice.videoZoomFactor = searchResult.format.videoMinZoomFactorForDepthDataDelivery
-//      videoCaptureDevice.activeDepthDataMinFrameDuration
     }
   }
 
@@ -279,7 +276,7 @@ class HSCameraManager: NSObject {
     }
     depthDataConverter = HSAVDepthDataToPixelBufferConverter(
       size: size,
-      input: kCVPixelFormatType_DisparityFloat32,
+      input: depthPixelFormat,
       output: kCVPixelFormatType_OneComponent8
     )
   }
@@ -290,10 +287,6 @@ class HSCameraManager: NSObject {
     cameraSetupQueue.async { [weak self] in
       guard let strongSelf = self else { return }
       strongSelf.position = position
-//      let isRunning = strongSelf.captureSession.isRunning
-//      if isRunning {
-//        strongSelf.captureSession.stopRunning()
-//      }
       strongSelf.captureSession.beginConfiguration()
       strongSelf.captureSession.inputs.forEach { strongSelf.captureSession.removeInput($0) }
       strongSelf.captureSession.outputs.forEach { strongSelf.captureSession.removeOutput($0) }
@@ -301,9 +294,6 @@ class HSCameraManager: NSObject {
         print("Failed to set up camera capture session")
       }
       strongSelf.captureSession.commitConfiguration()
-//      if isRunning {
-//        strongSelf.captureSession.startRunning()
-//      }
     }
   }
 
