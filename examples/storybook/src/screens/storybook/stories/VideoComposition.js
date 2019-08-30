@@ -1,7 +1,13 @@
 // @flow
 import React, { Component, createRef } from 'react';
 import { storiesOf } from '@storybook/react-native';
-import { withKnobs, number, select, button, boolean } from '@storybook/addon-knobs';
+import {
+  withKnobs,
+  number,
+  select,
+  button,
+  boolean,
+} from '@storybook/addon-knobs';
 import { SafeAreaView } from 'react-native';
 
 import {

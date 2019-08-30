@@ -29,13 +29,13 @@ const styles = {
     backgroundColor: 'red',
     transform: [
       {
-        translateX: position.x
+        translateX: position.x,
       },
       {
-        translateY: position.y
-      }
+        translateY: position.y,
+      },
     ],
-    opacity: touch
+    opacity: touch,
   }),
 };
 
