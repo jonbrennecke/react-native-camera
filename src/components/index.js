@@ -6,5 +6,6 @@ export * from './CameraFormatList';
 export * from './VideoComposition';
 export * from './VideoCompositionEdit';
 export * from './VideoCompositionImage';
+export * from './HiddenVolume';
 export * from './buttons';
 export * from './CaptureButton';

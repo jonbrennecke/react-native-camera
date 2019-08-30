@@ -40,6 +40,8 @@
 		FC6CB7512319885B00310C3D /* HSVolumeButtonObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC6CB7502319885B00310C3D /* HSVolumeButtonObserver.swift */; };
 		FC6CB75D23198B7400310C3D /* HSVolumeButtonObserverBridgeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = FC6CB75C23198B7400310C3D /* HSVolumeButtonObserverBridgeModule.m */; };
 		FC6CB76023198C3B00310C3D /* HSVolumeButtonObserverDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC6CB75F23198C3B00310C3D /* HSVolumeButtonObserverDelegate.swift */; };
+		FC6CB7622319937700310C3D /* HSHiddenVolumeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC6CB7612319937700310C3D /* HSHiddenVolumeView.swift */; };
+		FC6CB7652319957A00310C3D /* HSHiddenVolumeViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FC6CB7642319957A00310C3D /* HSHiddenVolumeViewManager.m */; };
 		FC6FFB54230670D2005FB226 /* HSCameraManagerResolutionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC6FFB53230670D2005FB226 /* HSCameraManagerResolutionDelegate.swift */; };
 		FC6FFB57230B4EAC005FB226 /* HSDebuggable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC6FFB56230B4EAC005FB226 /* HSDebuggable.swift */; };
 		FC7EFBE622FA11A10002B254 /* AVCaptureDevicePosition+RCTConvert.m in Sources */ = {isa = PBXBuildFile; fileRef = FC7EFBE522FA11A10002B254 /* AVCaptureDevicePosition+RCTConvert.m */; };
@@ -140,6 +142,9 @@
 		FC6CB75C23198B7400310C3D /* HSVolumeButtonObserverBridgeModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HSVolumeButtonObserverBridgeModule.m; sourceTree = "<group>"; };
 		FC6CB75E23198B8300310C3D /* HSVolumeButtonObserverBridgeModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSVolumeButtonObserverBridgeModule.h; sourceTree = "<group>"; };
 		FC6CB75F23198C3B00310C3D /* HSVolumeButtonObserverDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSVolumeButtonObserverDelegate.swift; sourceTree = "<group>"; };
+		FC6CB7612319937700310C3D /* HSHiddenVolumeView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSHiddenVolumeView.swift; sourceTree = "<group>"; tabWidth = 2; };
+		FC6CB7642319957A00310C3D /* HSHiddenVolumeViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HSHiddenVolumeViewManager.m; sourceTree = "<group>"; };
+		FC6CB7662319958600310C3D /* HSHiddenVolumeViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSHiddenVolumeViewManager.h; sourceTree = "<group>"; };
 		FC6FFB53230670D2005FB226 /* HSCameraManagerResolutionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSCameraManagerResolutionDelegate.swift; sourceTree = "<group>"; };
 		FC6FFB56230B4EAC005FB226 /* HSDebuggable.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSDebuggable.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC71B6C622CAB23A003EA230 /* HSCameraUtils.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HSCameraUtils.xcodeproj; path = "../../../../backflip-camera-utils/HSCameraUtils.xcodeproj"; sourceTree = "<group>"; };
@@ -306,6 +311,16 @@
 			path = HSVolumeButtonObserver;
 			sourceTree = "<group>";
 		};
+		FC6CB7632319956D00310C3D /* HSHiddenVolumeView */ = {
+			isa = PBXGroup;
+			children = (
+				FC6CB7612319937700310C3D /* HSHiddenVolumeView.swift */,
+				FC6CB7642319957A00310C3D /* HSHiddenVolumeViewManager.m */,
+				FC6CB7662319958600310C3D /* HSHiddenVolumeViewManager.h */,
+			);
+			path = HSHiddenVolumeView;
+			sourceTree = "<group>";
+		};
 		FC71B6C522CAB236003EA230 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
@@ -329,6 +344,7 @@
 				FC03B64D22DFF1F900E283B3 /* HSVideoCompositionView */,
 				FC845E1C22B98F2100522016 /* HSCameraView */,
 				FC30F18A23182798004B165F /* HSVideoCompositionImageView */,
+				FC6CB7632319956D00310C3D /* HSHiddenVolumeView */,
 			);
 			path = views;
 			sourceTree = "<group>";
@@ -579,6 +595,7 @@
 				FCFE0F4B23122B7F00765907 /* WeakReference.swift in Sources */,
 				FCBFAF0822CBE27300A0AC11 /* Result.swift in Sources */,
 				FC6155A322FCA57600BF446D /* HSMetalEffectView.swift in Sources */,
+				FC6CB7652319957A00310C3D /* HSHiddenVolumeViewManager.m in Sources */,
 				FC552C9922E9320C00775729 /* fileUtils.swift in Sources */,
 				FC664EE722CAD98D00FD8AE7 /* HSCameraManagerDepthDataDelegate.swift in Sources */,
 				FCEF518522E8F50400672D6A /* HSExportManagerDelegate.swift in Sources */,
@@ -590,6 +607,7 @@
 				FC2FB8F022CBCEA5007CE0AF /* HSSegmentationModelLoader.swift in Sources */,
 				FC03B62D22DFD6C700E283B3 /* HSPortraitMask.swift in Sources */,
 				FC552CA022E9390900775729 /* HSVideoCompositionExportManagerDelegate.swift in Sources */,
+				FC6CB7622319937700310C3D /* HSHiddenVolumeView.swift in Sources */,
 				FC299672230DE8310006366F /* HSVideoCompositionBridgeView.swift in Sources */,
 				FC7EFBE622FA11A10002B254 /* AVCaptureDevicePosition+RCTConvert.m in Sources */,
 				FC664EEE22CAD9A500FD8AE7 /* HSCameraViewManager.m in Sources */,

@@ -2,9 +2,9 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react-native';
 import { withKnobs } from '@storybook/addon-knobs';
-import { SafeAreaView, View } from 'react-native';
+import { SafeAreaView } from 'react-native';
 
-import { addVolumeButtonListener } from '@jonbrennecke/react-native-camera';
+import { HiddenVolume, addVolumeButtonListener } from '@jonbrennecke/react-native-camera';
 
 import { StorybookAsyncWrapper } from '../utils';
 
@@ -33,7 +33,7 @@ stories.add('Volume Button Events', () => (
   <SafeAreaView style={styles.flex}>
     <StorybookAsyncWrapper
       loadAsync={loadAsync}
-      render={() => <View/>}
+      render={() => <HiddenVolume/>}
     />
   </SafeAreaView>
 ));
