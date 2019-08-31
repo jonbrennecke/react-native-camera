@@ -51,7 +51,7 @@ class HSCameraManager: NSObject {
   // if depth is disabled, this should be left as the default YpCbCr
   public var videoPixelFormat: OSType = kCVPixelFormatType_32BGRA
 
-  public var depthPixelFormat: OSType = kCVPixelFormatType_DisparityFloat16
+  public var depthPixelFormat: OSType = kCVPixelFormatType_DisparityFloat32
 
   public var videoResolution: Size<Int>? {
     guard let format = videoCaptureDevice?.activeFormat else {
