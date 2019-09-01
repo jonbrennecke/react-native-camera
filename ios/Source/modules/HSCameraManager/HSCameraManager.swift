@@ -548,7 +548,7 @@ class HSCameraManager: NSObject {
               completionHandler(true, url)
             })
           } else {
-            completionHandler(true, nil)
+            completionHandler(true, url)
           }
         }
       } else {
