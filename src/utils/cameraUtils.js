@@ -31,7 +31,7 @@ export const stopCameraCapture = async ({
   saveToCameraRoll,
 }: {
   saveToCameraRoll: boolean,
-}): Promise<void> => {
+}): Promise<{ url: ?string }> => {
   return await CameraManager.stopCameraCaptureAsync(saveToCameraRoll);
 };
 

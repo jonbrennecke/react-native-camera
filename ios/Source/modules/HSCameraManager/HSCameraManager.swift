@@ -530,7 +530,10 @@ class HSCameraManager: NSObject {
   }
 
   @objc(stopCaptureAndSaveToCameraRoll:completionHandler:)
-  public func stopCapture(andSaveToCameraRoll _: Bool, _ completionHandler: @escaping (Bool) -> Void) {
+  public func stopCapture(
+    andSaveToCameraRoll saveToCameraRoll: Bool,
+    _ completionHandler: @escaping (Bool, URL?) -> Void
+  ) {
     cameraSetupQueue.async { [weak self] in
       guard let strongSelf = self else { return }
       if case let .recording(_, startTime) = strongSelf.state {
@@ -539,13 +542,17 @@ class HSCameraManager: NSObject {
         let endTime = CMClockGetTime(strongSelf.clock)
         strongSelf.state = .stopped(startTime: startTime, endTime: endTime)
         strongSelf.assetWriter.stopRecording(at: endTime) { url in
-          PHPhotoLibrary.shared().performChanges({
-            PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
-            completionHandler(true)
-          })
+          if saveToCameraRoll {
+            PHPhotoLibrary.shared().performChanges({
+              PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
+              completionHandler(true, url)
+            })
+          } else {
+            completionHandler(true, nil)
+          }
         }
       } else {
-        completionHandler(false)
+        completionHandler(false, nil)
       }
     }
   }

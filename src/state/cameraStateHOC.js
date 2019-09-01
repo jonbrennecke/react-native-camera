@@ -33,6 +33,7 @@ type StateProps = {
   hasCameraPermissions: boolean,
   playbackState: PlaybackState,
   playbackProgress: number,
+  lastCapturedVideoURL: ?string,
 };
 
 type DispatchProps = {
@@ -65,6 +66,7 @@ function mapCameraStateToProps(state: ICameraState): $Exact<StateProps> {
     hasCameraPermissions: selectors.selectHasCameraPermissions(state),
     playbackState: selectors.selectPlaybackState(state),
     playbackProgress: selectors.selectPlaybackProgress(state),
+    lastCapturedVideoURL: selectors.selectLastCapturedVideoURL(state)
   };
 }
 

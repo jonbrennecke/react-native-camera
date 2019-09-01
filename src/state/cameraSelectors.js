@@ -36,3 +36,6 @@ export const selectPlaybackState = (state: ICameraState) =>
 
 export const selectPlaybackProgress = (state: ICameraState) =>
   state.getPlaybackProgress();
+
+export const selectLastCapturedVideoURL = (state: ICameraState) =>
+  state.getLastCapturedVideoURL();

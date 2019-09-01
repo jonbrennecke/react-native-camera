@@ -17,8 +17,9 @@ export const actionCreators = {
     saveToCameraRoll = false,
   }: {
     saveToCameraRoll: boolean,
-  }) => async (dispatch: Dispatch<*>) => {
-    await cameraUtils.stopCameraCapture({ saveToCameraRoll });
+  }) => async (dispatch: Dispatch<any>) => {
+    const { url } = await cameraUtils.stopCameraCapture({ saveToCameraRoll });
+    url && dispatch(actionCreators.setLastCapturedVideoURL({ url }));
     dispatch(actionCreators.setCaptureStatus({ captureStatus: 'stopped' }));
   },
 

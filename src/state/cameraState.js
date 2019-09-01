@@ -23,6 +23,7 @@ export type CameraFormat = {
 
 export type CameraStateObject = {
   captureStatus: CameraCaptureStatus,
+  lastCapturedVideoURL: ?string,
   supportedISORange: CameraISORange,
   supportedExposureRange: CameraExposureRange,
   supportedFormats: CameraFormat[],
@@ -74,6 +75,9 @@ export interface ICameraState {
 
   getPlaybackProgress(): number;
   setPlaybackProgress(progress: number): ICameraState;
+
+  getLastCapturedVideoURL(): ?string;
+  setLastCapturedVideoURL(url: ?string): ICameraState;
 }
 
 // eslint-disable-next-line flowtype/generic-spacing
@@ -175,5 +179,13 @@ export const createCameraState: CameraStateObject => Class<
 
     setPlaybackProgress(progress: number): ICameraState {
       return this.set('playbackProgress', progress);
+    }
+
+    getLastCapturedVideoURL(): ?string {
+      return this.get('lastCapturedVideoURL');
+    }
+
+    setLastCapturedVideoURL(url: ?string): ICameraState {
+      return this.set('lastCapturedVideoURL', url);
     }
   };

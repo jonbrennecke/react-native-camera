@@ -25,6 +25,7 @@ const CameraState = createCameraState({
   hasCameraPermissions: false,
   playbackState: 'waiting',
   playbackProgress: 0,
+  lastCapturedVideoURL: null,
 });
 
 export const initialState = new CameraState();
@@ -38,6 +39,16 @@ const reducers = {
       return state;
     }
     return state.setCaptureStatus(payload.captureStatus);
+  },
+
+  setLastCapturedVideoURL: (
+    state,
+    { payload }: Action<{ url: ?string }>
+  ): ICameraState => {
+    if (!payload) {
+      return state;
+    }
+    return state.setLastCapturedVideoURL(payload.url);
   },
 
   setSupportedISORange: (
