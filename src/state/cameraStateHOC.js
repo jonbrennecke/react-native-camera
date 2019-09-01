@@ -66,7 +66,7 @@ function mapCameraStateToProps(state: ICameraState): $Exact<StateProps> {
     hasCameraPermissions: selectors.selectHasCameraPermissions(state),
     playbackState: selectors.selectPlaybackState(state),
     playbackProgress: selectors.selectPlaybackProgress(state),
-    lastCapturedVideoURL: selectors.selectLastCapturedVideoURL(state)
+    lastCapturedVideoURL: selectors.selectLastCapturedVideoURL(state),
   };
 }
 
