@@ -23,21 +23,20 @@ export const stopCameraPreview = () => {
   CameraManager.stopCameraPreview();
 };
 
-export const startCameraCapture = async () => {
-  return await CameraManager.startCameraCaptureAsync();
+export const startCameraCapture = async ({
+  metadata = {},
+}: {
+  metadata?: { [key: string]: any },
+}) => {
+  return await CameraManager.startCameraCaptureAsync(metadata);
 };
 
 export const stopCameraCapture = async ({
   saveToCameraRoll,
-  metadata,
 }: {
   saveToCameraRoll: boolean,
-  metadata?: { [key: string]: any },
 }): Promise<{ url: ?string }> => {
-  return await CameraManager.stopCameraCaptureAsync(
-    saveToCameraRoll,
-    metadata || {}
-  );
+  return await CameraManager.stopCameraCaptureAsync(saveToCameraRoll);
 };
 
 export const getSupportedISORange = async (): Promise<{

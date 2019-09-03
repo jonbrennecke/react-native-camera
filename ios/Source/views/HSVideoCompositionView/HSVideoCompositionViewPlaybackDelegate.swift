@@ -7,4 +7,7 @@ internal protocol HSVideoCompositionViewPlaybackDelegate: AnyObject {
 
   @objc(videoCompositionView:didChangePlaybackState:)
   func videoComposition(view: HSVideoCompositionView, didChangePlaybackState playbackState: HSVideoPlaybackState)
+
+  @objc(videoCompositionView:didLoadMetadata:)
+  func videoComposition(view: HSVideoCompositionView, didLoadMetadata metadata: [String: Any])
 }

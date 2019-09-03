@@ -109,6 +109,10 @@ class StoryComponent extends Component<Props, State> {
           // eslint-disable-next-line no-console
           console.log(`playback state: ${playbackState}`);
         }}
+        onMetadataLoaded={metadata => {
+          // eslint-disable-next-line no-console
+          console.log('metadata', metadata);
+        }}
       />
     );
   }

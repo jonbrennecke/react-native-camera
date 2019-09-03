@@ -7,4 +7,7 @@ class HSVideoCompositionBridgeView: HSVideoCompositionView {
 
   @objc
   public var onPlaybackStateChange: RCTDirectEventBlock?
+
+  @objc
+  public var onMetadataLoaded: RCTDirectEventBlock?
 }

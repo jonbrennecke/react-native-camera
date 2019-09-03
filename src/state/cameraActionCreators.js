@@ -8,21 +8,20 @@ import type { CameraFormat } from './cameraState';
 export const actionCreators = {
   ...identityActionCreators,
 
-  startCapture: () => async (dispatch: Dispatch<*>) => {
-    await cameraUtils.startCameraCapture();
+  startCapture: ({ metadata }: { metadata?: { [key: string]: any } }) => async (
+    dispatch: Dispatch<*>
+  ) => {
+    await cameraUtils.startCameraCapture({ metadata });
     dispatch(actionCreators.setCaptureStatus({ captureStatus: 'started' }));
   },
 
   stopCapture: ({
     saveToCameraRoll = false,
-    metadata,
   }: {
     saveToCameraRoll: boolean,
-    metadata?: { [key: string]: any },
   }) => async (dispatch: Dispatch<any>) => {
     const { url } = await cameraUtils.stopCameraCapture({
       saveToCameraRoll,
-      metadata,
     });
     url && dispatch(actionCreators.setLastCapturedVideoURL({ url }));
     dispatch(actionCreators.setCaptureStatus({ captureStatus: 'stopped' }));

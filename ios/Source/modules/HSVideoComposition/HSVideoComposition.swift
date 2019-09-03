@@ -3,28 +3,20 @@ import AVFoundation
 @objc
 class HSVideoComposition: NSObject {
   private let asset: AVAsset
-
   internal let videoTrackID: CMPersistentTrackID
   internal let depthTrackID: CMPersistentTrackID
+  internal let metadata: [String: Any]
 
-  @objc
-  public init(asset: AVAsset, videoTrackID: CMPersistentTrackID, depthTrackID: CMPersistentTrackID) {
+  public init(
+    asset: AVAsset,
+    videoTrackID: CMPersistentTrackID,
+    depthTrackID: CMPersistentTrackID,
+    metadata: [String: Any]
+  ) {
     self.asset = asset
     self.videoTrackID = videoTrackID
     self.depthTrackID = depthTrackID
-  }
-
-  private static func parse(metadata: [AVMetadataItem]) -> Float? {
-    let keySpace = AVMetadataKeySpace.quickTimeUserData
-    let key = AVMetadataKey.quickTimeUserDataKeyInformation
-    let items = AVMetadataItem.metadataItems(from: metadata, withKey: key, keySpace: keySpace)
-    if let str = items.first?.value as? String {
-      let formatter = NumberFormatter()
-      formatter.numberStyle = .decimal
-      let aperture = formatter.number(from: str)
-      return aperture?.floatValue
-    }
-    return nil
+    self.metadata = metadata
   }
 
   @objc(compositionByLoadingAsset:withCompletionHandler:)
@@ -37,10 +29,12 @@ class HSVideoComposition: NSObject {
         completionHandler(nil)
         return
       }
+      let metadata = parseMetadata(asset.metadata)
       let composition = HSVideoComposition(
         asset: asset,
         videoTrackID: videoTrack.trackID,
-        depthTrackID: depthTrack.trackID
+        depthTrackID: depthTrack.trackID,
+        metadata: metadata ?? [:]
       )
       completionHandler(composition)
     }
@@ -79,6 +73,23 @@ class HSVideoComposition: NSObject {
     videoComposition.instructions = [instruction]
     videoComposition.customVideoCompositorClass = HSVideoCompositor.self
     return (composition, videoComposition)
+  }
+
+  // MARK: - private utility functions
+
+  private static func parseMetadata(_ metadata: [AVMetadataItem]) -> [String: Any]? {
+    let keySpace = AVMetadataKeySpace.quickTimeUserData
+    let key = AVMetadataKey.quickTimeUserDataKeyInformation
+    let items = AVMetadataItem.metadataItems(from: metadata, withKey: key, keySpace: keySpace)
+    if
+      let jsonString = items.first?.value as? String,
+      let jsonData = jsonString.data(using: .ascii),
+      let jsonDict = try? JSONSerialization.jsonObject(
+        with: jsonData, options: JSONSerialization.ReadingOptions()
+      ) as? [String: Any] {
+      return jsonDict
+    }
+    return nil
   }
 }
 

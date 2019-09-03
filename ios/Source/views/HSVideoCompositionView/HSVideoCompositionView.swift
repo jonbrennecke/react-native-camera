@@ -16,6 +16,7 @@ class HSVideoCompositionView: UIView {
   private var videoAssetRequestID: PHImageRequestID?
   private var shouldPlayWhenReady: Bool = false
   private var playbackTimeObserverToken: Any?
+  private var blurAperture: Float = 2.4
 
   private var composition: HSVideoComposition? {
     didSet {
@@ -109,8 +110,12 @@ class HSVideoCompositionView: UIView {
 
   private func loadComposition(with asset: AVAsset) {
     HSVideoComposition.composition(byLoading: asset) { [weak self] composition in
-      self?.composition = composition
-      self?.loadPreviewImage()
+      guard let strongSelf = self else { return }
+      strongSelf.composition = composition
+      if let metadata = composition?.metadata {
+        strongSelf.playbackDelegate?.videoComposition(view: strongSelf, didLoadMetadata: metadata)
+      }
+      strongSelf.loadPreviewImage()
     }
   }
 
@@ -215,23 +220,22 @@ class HSVideoCompositionView: UIView {
   }
 
   @objc
-  public var blurAperture: Float = 1.4 {
-    didSet {
-      guard
-        let composition = composition,
-        let (_, avVideoComposition) = composition.makeAVComposition()
-      else {
-        return
-      }
-      playerItem?.videoComposition = avVideoComposition
-      if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
-        compositor.depthTrackID = composition.depthTrackID
-        compositor.videoTrackID = composition.videoTrackID
-        compositor.blurAperture = blurAperture
-        compositor.previewMode = previewMode
-      }
-      loadPreviewImage()
+  public func setBlurAperture(_ blurAperture: Float) {
+    self.blurAperture = blurAperture
+    guard
+      let composition = composition,
+      let (_, avVideoComposition) = composition.makeAVComposition()
+    else {
+      return
     }
+    playerItem?.videoComposition = avVideoComposition
+    if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
+      compositor.depthTrackID = composition.depthTrackID
+      compositor.videoTrackID = composition.videoTrackID
+      compositor.blurAperture = blurAperture
+      compositor.previewMode = previewMode
+    }
+    loadPreviewImage()
   }
 
   @objc

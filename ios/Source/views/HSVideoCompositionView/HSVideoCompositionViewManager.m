@@ -35,6 +35,8 @@ RCT_EXPORT_VIEW_PROPERTY(onPlaybackProgress, RCTDirectEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(onPlaybackStateChange, RCTDirectEventBlock)
 
+RCT_EXPORT_VIEW_PROPERTY(onMetadataLoaded, RCTDirectEventBlock)
+
 RCT_EXPORT_METHOD(play : (nonnull NSNumber *)reactTag) {
   [self.bridge.uiManager addUIBlock:^(
                              RCTUIManager *uiManager,
@@ -131,6 +133,18 @@ RCT_EXPORT_METHOD(seekToProgress
     };
     NSString *playbackStateKey = [conversionDict objectForKey:@(playbackState)];
     bridgeView.onPlaybackStateChange(@{@"playbackState" : playbackStateKey});
+  }
+}
+
+- (void)videoCompositionView:(HSVideoCompositionView *_Nonnull)view
+             didLoadMetadata:(NSDictionary<NSString *, id> *_Nonnull)metadata {
+  if (![view isKindOfClass:[HSVideoCompositionBridgeView class]]) {
+    return;
+  }
+  HSVideoCompositionBridgeView *bridgeView =
+      (HSVideoCompositionBridgeView *)view;
+  if (bridgeView.onMetadataLoaded) {
+    bridgeView.onMetadataLoaded(@{@"metadata" : metadata});
   }
 }
 

@@ -490,8 +490,11 @@ class HSCameraManager: NSObject {
     }
   }
 
-  @objc
-  public func startCapture(completionHandler: @escaping (Error?, Bool) -> Void) {
+  @objc(startCaptureWithMetadata:completionHandler:)
+  public func startCapture(
+    withMetadata metadata: [String: Any]?,
+    completionHandler: @escaping (Error?, Bool) -> Void
+  ) {
     cameraSetupQueue.async { [weak self] in
       guard let strongSelf = self else { return }
       guard strongSelf.videoCaptureDevice != nil else {
@@ -503,6 +506,9 @@ class HSCameraManager: NSObject {
         guard case .success = strongSelf.setupAssetWriter(to: outputURL) else {
           completionHandler(nil, false)
           return
+        }
+        if let metadata = metadata {
+          strongSelf.writeMetadata(metadata)
         }
         let startTime = CMClockGetTime(strongSelf.clock)
         guard case .success = strongSelf.assetWriter.startRecording(at: startTime) else {
@@ -518,16 +524,14 @@ class HSCameraManager: NSObject {
     }
   }
 
-  @objc(stopCaptureAndSaveToCameraRoll:customMetadata:completionHandler:)
+  @objc(stopCaptureAndSaveToCameraRoll:completionHandler:)
   public func stopCapture(
     andSaveToCameraRoll saveToCameraRoll: Bool,
-    customMetadata metadata: [String: Any],
     _ completionHandler: @escaping (Bool, URL?) -> Void
   ) {
     cameraSetupQueue.async { [weak self] in
       guard let strongSelf = self else { return }
       if case let .recording(_, startTime) = strongSelf.state {
-        strongSelf.writeMetadata(metadata)
         strongSelf.assetWriterVideoInput?.finish()
         strongSelf.assetWriterDepthInput?.finish()
         let endTime = CMClockGetTime(strongSelf.clock)

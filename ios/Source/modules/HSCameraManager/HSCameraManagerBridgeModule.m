@@ -126,24 +126,25 @@ RCT_EXPORT_METHOD(stopCameraPreview) {
   [cameraManager stopPreview];
 }
 
-RCT_EXPORT_METHOD(startCameraCapture : (RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(startCameraCapture
+                  : (NSDictionary *)metadata
+                  : (RCTResponseSenderBlock)callback) {
   [HSCameraManager.sharedInstance
-      startCaptureWithCompletionHandler:^(NSError *error, BOOL success) {
-        if (error != nil) {
-          callback(@[ error, @(NO) ]);
-          return;
-        }
-        callback(@[ [NSNull null], @(YES) ]);
-      }];
+      startCaptureWithMetadata:metadata
+             completionHandler:^(NSError *error, BOOL success) {
+               if (error != nil) {
+                 callback(@[ error, @(NO) ]);
+                 return;
+               }
+               callback(@[ [NSNull null], @(YES) ]);
+             }];
 }
 
 RCT_EXPORT_METHOD(stopCameraCapture
-                  : (BOOL)saveToCameraRoll metadata
-                  : (NSDictionary *)metadata callback
+                  : (BOOL)saveToCameraRoll callback
                   : (RCTResponseSenderBlock)callback) {
   [HSCameraManager.sharedInstance
       stopCaptureAndSaveToCameraRoll:saveToCameraRoll
-                      customMetadata:metadata
                    completionHandler:^(BOOL success, NSURL *_Nullable url) {
                      if (!success) {
                        NSString *description = @"Failed to stop camera capture";
