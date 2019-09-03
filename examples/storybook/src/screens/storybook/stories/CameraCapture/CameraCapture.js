@@ -49,6 +49,14 @@ const Component = CameraStateContainer(
         console.error(error);
       }
     };
+    const stop = () => {
+      stopCapture({
+        saveToCameraRoll: true,
+        metadata: {
+          blurAperture: 10,
+        }
+      });
+    };
     return (
       <StorybookStateWrapper
         initialState={initialState}
@@ -63,7 +71,7 @@ const Component = CameraStateContainer(
             />
             <Button
               title={captureStatus === 'started' ? 'Stop' : 'Start'}
-              onPress={() => captureStatus === 'started' ? stopCapture({ saveToCameraRoll: false }) : startCapture()}
+              onPress={() => captureStatus === 'started' ? stop() : startCapture()}
             />
           </>
         )}

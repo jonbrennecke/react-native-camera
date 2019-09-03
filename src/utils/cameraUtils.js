@@ -29,10 +29,15 @@ export const startCameraCapture = async () => {
 
 export const stopCameraCapture = async ({
   saveToCameraRoll,
+  metadata,
 }: {
   saveToCameraRoll: boolean,
+  metadata?: { [key: string]: any },
 }): Promise<{ url: ?string }> => {
-  return await CameraManager.stopCameraCaptureAsync(saveToCameraRoll);
+  return await CameraManager.stopCameraCaptureAsync(
+    saveToCameraRoll,
+    metadata || {}
+  );
 };
 
 export const getSupportedISORange = async (): Promise<{

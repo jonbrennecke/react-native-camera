@@ -504,7 +504,6 @@ class HSCameraManager: NSObject {
           completionHandler(nil, false)
           return
         }
-        strongSelf.setupAssetWriterMetadataItems()
         let startTime = CMClockGetTime(strongSelf.clock)
         guard case .success = strongSelf.assetWriter.startRecording(at: startTime) else {
           completionHandler(nil, false)
@@ -519,24 +518,16 @@ class HSCameraManager: NSObject {
     }
   }
 
-  private func setupAssetWriterMetadataItems() {
-    let item = AVMutableMetadataItem()
-    item.keySpace = AVMetadataKeySpace.quickTimeUserData
-    item.key = AVMetadataKey.quickTimeUserDataKeyInformation as NSString
-    item.value = String(format: "%.2f", aperture) as NSString
-    guard case .success = assetWriter.add(metadataItem: item) else {
-      return
-    }
-  }
-
-  @objc(stopCaptureAndSaveToCameraRoll:completionHandler:)
+  @objc(stopCaptureAndSaveToCameraRoll:customMetadata:completionHandler:)
   public func stopCapture(
     andSaveToCameraRoll saveToCameraRoll: Bool,
+    customMetadata metadata: [String: Any],
     _ completionHandler: @escaping (Bool, URL?) -> Void
   ) {
     cameraSetupQueue.async { [weak self] in
       guard let strongSelf = self else { return }
       if case let .recording(_, startTime) = strongSelf.state {
+        strongSelf.writeMetadata(metadata)
         strongSelf.assetWriterVideoInput?.finish()
         strongSelf.assetWriterDepthInput?.finish()
         let endTime = CMClockGetTime(strongSelf.clock)
@@ -554,6 +545,22 @@ class HSCameraManager: NSObject {
       } else {
         completionHandler(false, nil)
       }
+    }
+  }
+
+  private func writeMetadata(_ metadata: [String: Any]) {
+    do {
+      let jsonData = try JSONSerialization.data(withJSONObject: metadata, options: .sortedKeys)
+      let jsonString = String(data: jsonData, encoding: .ascii)
+      let item = AVMutableMetadataItem()
+      item.keySpace = AVMetadataKeySpace.quickTimeUserData
+      item.key = AVMetadataKey.quickTimeUserDataKeyInformation as NSString
+      item.value = jsonString as NSString?
+      guard case .success = assetWriter.add(metadataItem: item) else {
+        return
+      }
+    } catch {
+      print("Failed to write JSON metadata to asset writer.")
     }
   }
 }

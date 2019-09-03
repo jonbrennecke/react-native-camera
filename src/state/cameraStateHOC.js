@@ -38,7 +38,10 @@ type StateProps = {
 
 type DispatchProps = {
   startCapture: () => any,
-  stopCapture: ({ saveToCameraRoll: boolean }) => any,
+  stopCapture: ({
+    saveToCameraRoll: boolean,
+    metadata?: { [key: string]: any },
+  }) => any,
   loadSupportedFeatures: () => any,
   updateISO: (iso: number) => any,
   updateExposure: (exposure: number) => any,
@@ -75,8 +78,10 @@ function mapCameraDispatchToProps(
 ): $Exact<DispatchProps> {
   return {
     startCapture: () => dispatch(actionCreators.startCapture()),
-    stopCapture: (args: { saveToCameraRoll: boolean }) =>
-      dispatch(actionCreators.stopCapture(args)),
+    stopCapture: (args: {
+      saveToCameraRoll: boolean,
+      metadata?: { [key: string]: any },
+    }) => dispatch(actionCreators.stopCapture(args)),
     loadSupportedFeatures: () =>
       dispatch(actionCreators.loadSupportedFeatures()),
     updateISO: (iso: number) => dispatch(actionCreators.updateISO(iso)),

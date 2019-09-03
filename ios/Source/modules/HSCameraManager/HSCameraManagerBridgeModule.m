@@ -138,10 +138,12 @@ RCT_EXPORT_METHOD(startCameraCapture : (RCTResponseSenderBlock)callback) {
 }
 
 RCT_EXPORT_METHOD(stopCameraCapture
-                  : (BOOL)saveToCameraRoll callback
+                  : (BOOL)saveToCameraRoll metadata
+                  : (NSDictionary *)metadata callback
                   : (RCTResponseSenderBlock)callback) {
   [HSCameraManager.sharedInstance
       stopCaptureAndSaveToCameraRoll:saveToCameraRoll
+                      customMetadata:metadata
                    completionHandler:^(BOOL success, NSURL *_Nullable url) {
                      if (!success) {
                        NSString *description = @"Failed to stop camera capture";
