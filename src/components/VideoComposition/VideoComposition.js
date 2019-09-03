@@ -26,7 +26,7 @@ export type VideoCompositionProps = {
   isReadyToLoad?: boolean,
   onPlaybackProgress?: (progress: number) => void,
   onPlaybackStateChange?: (playbackState: PlaybackState) => void,
-  onMetadataLoaded?: (metadata: { [key: string]: string }) => void,
+  onMetadataLoaded?: (metadata: { [key: string]: any }) => void,
 };
 
 export class VideoComposition extends PureComponent<VideoCompositionProps> {
