@@ -23,7 +23,7 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
   public var depthTrackID: CMPersistentTrackID = kCMPersistentTrackID_Invalid
   public var videoTrackID: CMPersistentTrackID = kCMPersistentTrackID_Invalid
   public var previewMode: HSEffectPreviewMode = .portraitMode
-  public var blurAperture: Float = 0
+  public var blurAperture: Float = 2.4
   public var qualityFactor: Float = 0.1
 
   // MARK: - AVVideoCompositing implementation

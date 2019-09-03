@@ -33,8 +33,10 @@ class HSVideoCompositionExportTask: HSExportTask {
     if let compositor = assetExportSession?.customVideoCompositor as? HSVideoCompositor {
       compositor.depthTrackID = composition.depthTrackID
       compositor.videoTrackID = composition.videoTrackID
-      compositor.blurAperture = 2.4 // TODO: read from composition.metadata
       compositor.qualityFactor = 1
+      if let blurAperture = composition.metadata["blurAperture"] as? Float {
+        compositor.blurAperture = blurAperture
+      }
     }
     assetExportSession?.outputFileType = .mov
     assetExportSession?.outputURL = try? makeEmptyVideoOutputFile()
