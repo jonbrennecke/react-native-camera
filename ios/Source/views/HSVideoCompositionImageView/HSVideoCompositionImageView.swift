@@ -95,7 +95,8 @@ class HSVideoCompositionImageView: UIImageView {
       imageGenerator.requestedTimeToleranceAfter = .zero
       imageGenerator.requestedTimeToleranceBefore = .zero
       imageGenerator.appliesPreferredTrackTransform = true
-      imageGenerator.maximumSize = size
+      let scale = UIScreen.main.scale
+      imageGenerator.maximumSize = CGSize(width: size.width * scale, height: size.height * scale)
       if let compositor = imageGenerator.customVideoCompositor as? HSVideoCompositor {
         compositor.depthTrackID = composition.depthTrackID
         compositor.videoTrackID = composition.videoTrackID
@@ -114,14 +115,11 @@ class HSVideoCompositionImageView: UIImageView {
   }
 
   private func reloadImage() {
-    let startTime = CFAbsoluteTimeGetCurrent()
     regenerateImage(size: frame.size) { [weak self] image in
       guard let strongSelf = self else { return }
       if let cgImage = image {
         strongSelf.setImage(cgImage)
       }
-      let executionTime = CFAbsoluteTimeGetCurrent() - startTime
-      print("reloadImage: \(executionTime)")
     }
   }
 
@@ -136,7 +134,8 @@ class HSVideoCompositionImageView: UIImageView {
       imageGenerator.requestedTimeToleranceAfter = .zero
       imageGenerator.requestedTimeToleranceBefore = .zero
       imageGenerator.appliesPreferredTrackTransform = true
-      imageGenerator.maximumSize = size
+      let scale = UIScreen.main.scale
+      imageGenerator.maximumSize = CGSize(width: size.width * scale, height: size.height * scale)
       if let compositor = imageGenerator.customVideoCompositor as? HSVideoCompositor {
         compositor.blurAperture = strongSelf.blurAperture
         compositor.previewMode = strongSelf.previewMode
