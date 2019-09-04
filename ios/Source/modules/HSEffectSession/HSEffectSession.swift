@@ -29,7 +29,7 @@ class HSEffectSession: NSObject {
         calibrationData: calibrationData,
         blurAperture: blurAperture,
         scale: scale,
-        qualityFactor: 0.1
+        qualityFactor: 0.025
       ) else {
         return nil
       }
