@@ -70,8 +70,7 @@ class HSVideoCompositionView: UIView {
         compositor.blurAperture = strongSelf.blurAperture
         compositor.previewMode = strongSelf.previewMode
       }
-      let durationSeconds = CMTimeGetSeconds(avComposition.duration)
-      let time = CMTimeMakeWithSeconds(durationSeconds * 0.5, preferredTimescale: 600)
+      let time = CMTimeMakeWithSeconds(.zero, preferredTimescale: 600)
       imageGenerator.generateCGImagesAsynchronously(
         forTimes: [NSValue(time: time)]
       ) { [weak self] _, image, _, _, _ in

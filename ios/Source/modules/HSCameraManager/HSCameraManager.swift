@@ -10,6 +10,7 @@ class HSCameraManager: NSObject {
   private enum State {
     case none
     case stopped(startTime: CMTime, endTime: CMTime)
+    case waitingToRecord(toURL: URL)
     case recording(toURL: URL, startTime: CMTime)
     case waitingForFileOutputToFinish(toURL: URL)
   }
@@ -510,12 +511,7 @@ class HSCameraManager: NSObject {
         if let metadata = metadata {
           strongSelf.writeMetadata(metadata)
         }
-        let startTime = CMClockGetTime(strongSelf.clock)
-        guard case .success = strongSelf.assetWriter.startRecording(at: startTime) else {
-          completionHandler(nil, false)
-          return
-        }
-        strongSelf.state = .recording(toURL: outputURL, startTime: startTime)
+        strongSelf.state = .waitingToRecord(toURL: outputURL)
         strongSelf.notifyResolutionObservers()
         completionHandler(nil, true)
       } catch {
@@ -598,10 +594,13 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
         if !synchronizedDepthData.depthDataWasDropped {
           let depthData = synchronizedDepthData.depthData.applyingExifOrientation(orientation)
           let disparityPixelBuffer = strongSelf.depthDataConverter?.convert(depthData: depthData)
+          
+          strongSelf.startRecordingFromWaitingState()
           if case let .recording(_, startTime) = strongSelf.state, let disparityPixelBuffer = disparityPixelBuffer {
             let presentationTime = synchronizedDepthData.timestamp - startTime
             strongSelf.record(disparityPixelBuffer: disparityPixelBuffer, at: presentationTime)
           }
+          
           if let disparityPixelBuffer = disparityPixelBuffer {
             strongSelf.depthDataObservers.forEach {
               $0.cameraManagerDidOutput(
@@ -617,10 +616,13 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
       if let synchronizedVideoData = collection.synchronizedData(for: strongSelf.videoOutput) as? AVCaptureSynchronizedSampleBufferData {
         if !synchronizedVideoData.sampleBufferWasDropped {
           let videoPixelBuffer = HSPixelBuffer(sampleBuffer: synchronizedVideoData.sampleBuffer)
+          
+          strongSelf.startRecordingFromWaitingState()
           if case let .recording(_, startTime) = strongSelf.state, let videoPixelBuffer = videoPixelBuffer {
             let presentationTime = synchronizedVideoData.timestamp - startTime
             strongSelf.record(videoPixelBuffer: videoPixelBuffer, at: presentationTime)
           }
+          
           if let videoPixelBuffer = videoPixelBuffer {
             strongSelf.depthDataObservers.forEach {
               $0.cameraManagerDidOutput(
@@ -635,6 +637,15 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
         strongSelf.depthDataObservers.forEach {
           $0.cameraManagerDidFocus(on: focusPoint)
         }
+      }
+    }
+  }
+  
+  private func startRecordingFromWaitingState() {
+    if case let .waitingToRecord(toURL: url) = state {
+      let startTime = CMClockGetTime(clock)
+      if case .success = assetWriter.startRecording(at: startTime) {
+        state = .recording(toURL: url, startTime: startTime)
       }
     }
   }
