@@ -4,6 +4,9 @@ import Photos
 
 fileprivate let DEFAULT_DEPTH_CAPTURE_FRAMES_PER_SECOND = Float64(24)
 
+// the max number of concurrent drawables supported by CoreAnimation
+fileprivate let maxSimultaneousFrames: Int = 3
+
 @available(iOS 11.1, *)
 @objc
 class HSCameraManager: NSObject {
@@ -41,7 +44,7 @@ class HSCameraManager: NSObject {
   private var assetWriterDepthInput: HSVideoWriterFrameBufferInput?
   private var assetWriterVideoInput: HSVideoWriterFrameBufferInput?
   private var depthDataConverter: HSAVDepthDataToPixelBufferConverter?
-  private var outputSemaphore = DispatchSemaphore(value: 3)
+  private var outputSemaphore = DispatchSemaphore(value: maxSimultaneousFrames)
 
   private lazy var clock: CMClock = {
     captureSession.masterClock ?? CMClockGetHostTimeClock()
@@ -85,6 +88,12 @@ class HSCameraManager: NSObject {
 
   @objc(sharedInstance)
   public static let shared = HSCameraManager()
+  
+  deinit {
+    for _ in 0..<maxSimultaneousFrames {
+      outputSemaphore.signal()
+    }
+  }
 
   @objc
   public weak var delegate: HSCameraManagerDelegate?

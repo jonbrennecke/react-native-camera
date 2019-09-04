@@ -55,6 +55,7 @@ class HSMetalEffectView: MTKView, HSDebuggable {
     drawableSize = frame.size
     contentScaleFactor = UIScreen.main.scale
     autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    contentScaleFactor = UIScreen.main.scale
   }
 
   required init(coder _: NSCoder) {
@@ -62,7 +63,9 @@ class HSMetalEffectView: MTKView, HSDebuggable {
   }
 
   deinit {
-    renderSemaphore.signal()
+    for _ in 0..<maxSimultaneousFrames {
+      renderSemaphore.signal()
+    }
   }
 
   override func draw(_ rect: CGRect) {
