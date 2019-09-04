@@ -41,7 +41,7 @@ class HSCameraManager: NSObject {
   private var assetWriterDepthInput: HSVideoWriterFrameBufferInput?
   private var assetWriterVideoInput: HSVideoWriterFrameBufferInput?
   private var depthDataConverter: HSAVDepthDataToPixelBufferConverter?
-  private var outputSemaphore = DispatchSemaphore(value: 1)
+  private var outputSemaphore = DispatchSemaphore(value: 3)
 
   private lazy var clock: CMClock = {
     captureSession.masterClock ?? CMClockGetHostTimeClock()
@@ -164,7 +164,7 @@ class HSCameraManager: NSObject {
     outputSynchronizer = AVCaptureDataOutputSynchronizer(
       dataOutputs: [videoOutput, depthOutput]
     )
-    outputSynchronizer?.setDelegate(self, queue: cameraOutputQueue)
+    outputSynchronizer?.setDelegate(self, queue: DispatchQueue.main)
     return .success
   }
 
@@ -574,10 +574,10 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
   func dataOutputSynchronizer(
     _: AVCaptureDataOutputSynchronizer, didOutput collection: AVCaptureSynchronizedDataCollection
   ) {
-//    _ = outputSemaphore.wait(timeout: .distantFuture)
-//    defer {
-//      outputSemaphore.signal()
-//    }
+    _ = outputSemaphore.wait(timeout: .distantFuture)
+    defer {
+      outputSemaphore.signal()
+    }
 
     let startTime = CFAbsoluteTimeGetCurrent()
     defer {
