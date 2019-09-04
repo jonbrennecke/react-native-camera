@@ -303,7 +303,7 @@ class HSCameraManager: NSObject {
 
   public func setPosition(_ position: AVCaptureDevice.Position) {
     cameraSetupQueue.async { [weak self] in
-      guard let strongSelf = self else { return }
+      guard let strongSelf = self, position != strongSelf.position else { return }
       strongSelf.position = position
       strongSelf.captureSession.beginConfiguration()
       strongSelf.captureSession.inputs.forEach { strongSelf.captureSession.removeInput($0) }
