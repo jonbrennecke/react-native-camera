@@ -70,7 +70,7 @@ const Component = CameraStateContainer(
             <Camera
               style={styles.flex}
               cameraPosition="front"
-              previewMode="normal"
+              previewMode="portraitMode"
               resizeMode="scaleAspectWidth"
             />
             <Button
