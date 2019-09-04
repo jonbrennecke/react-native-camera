@@ -113,7 +113,7 @@ class HSCameraManager: NSObject {
     }
     assetWriterDepthInput = HSVideoWriterFrameBufferInput(
       videoSize: depthSize,
-      pixelFormatType: depthPixelFormat,
+      pixelFormatType: kCVPixelFormatType_OneComponent8,
       isRealTime: false
     )
     assetWriterVideoInput = HSVideoWriterFrameBufferInput(
@@ -586,12 +586,11 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
         }
       }
 
-      let orientation: CGImagePropertyOrientation = activeCaptureDevicePosition(session: strongSelf.captureSession) == .some(.front)
-        ? .leftMirrored : .right
-
       // output depth data
       if let synchronizedDepthData = collection.synchronizedData(for: strongSelf.depthOutput) as? AVCaptureSynchronizedDepthData {
         if !synchronizedDepthData.depthDataWasDropped {
+          let orientation: CGImagePropertyOrientation = activeCaptureDevicePosition(session: strongSelf.captureSession) == .some(.front)
+            ? .leftMirrored : .right
           let depthData = synchronizedDepthData.depthData.applyingExifOrientation(orientation)
           let disparityPixelBuffer = strongSelf.depthDataConverter?.convert(depthData: depthData)
           
