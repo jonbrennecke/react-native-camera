@@ -2,7 +2,9 @@ import AVFoundation
 import HSCameraUtils
 import Photos
 
-fileprivate let DEFAULT_DEPTH_CAPTURE_FRAMES_PER_SECOND = Float64(24)
+fileprivate let depthMinFramesPerSecond = Int(20)
+fileprivate let videoMinFramesPerSecond = Int(20)
+fileprivate let videoMaxFramesPerSecond = Int(30)
 
 // the max number of concurrent drawables supported by CoreAnimation
 fileprivate let maxSimultaneousFrames: Int = 3
@@ -88,9 +90,9 @@ class HSCameraManager: NSObject {
 
   @objc(sharedInstance)
   public static let shared = HSCameraManager()
-  
+
   deinit {
-    for _ in 0..<maxSimultaneousFrames {
+    for _ in 0 ..< maxSimultaneousFrames {
       outputSemaphore.signal()
     }
   }
@@ -280,6 +282,9 @@ class HSCameraManager: NSObject {
       videoCaptureDevice.activeFormat = searchResult.format
       videoCaptureDevice.activeDepthDataFormat = searchResult.depthDataFormat
       videoCaptureDevice.videoZoomFactor = searchResult.format.videoMinZoomFactorForDepthDataDelivery
+      videoCaptureDevice.activeVideoMinFrameDuration = CMTime(value: 1, timescale: CMTimeScale(videoMinFramesPerSecond))
+      videoCaptureDevice.activeVideoMaxFrameDuration = CMTime(value: 1, timescale: CMTimeScale(videoMaxFramesPerSecond))
+      videoCaptureDevice.activeDepthDataMinFrameDuration = CMTime(value: 1, timescale: CMTimeScale(depthMinFramesPerSecond))
     }
   }
 

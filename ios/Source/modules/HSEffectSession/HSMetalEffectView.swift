@@ -63,7 +63,7 @@ class HSMetalEffectView: MTKView, HSDebuggable {
   }
 
   deinit {
-    for _ in 0..<maxSimultaneousFrames {
+    for _ in 0 ..< maxSimultaneousFrames {
       renderSemaphore.signal()
     }
   }
