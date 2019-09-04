@@ -295,6 +295,7 @@ class HSCameraManager: NSObject {
         print("Failed to set up camera capture session")
       }
       strongSelf.captureSession.commitConfiguration()
+      strongSelf.notifyResolutionObservers()
     }
   }
 
@@ -593,13 +594,13 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
             ? .leftMirrored : .right
           let depthData = synchronizedDepthData.depthData.applyingExifOrientation(orientation)
           let disparityPixelBuffer = strongSelf.depthDataConverter?.convert(depthData: depthData)
-          
+
           strongSelf.startRecordingFromWaitingState()
           if case let .recording(_, startTime) = strongSelf.state, let disparityPixelBuffer = disparityPixelBuffer {
             let presentationTime = synchronizedDepthData.timestamp - startTime
             strongSelf.record(disparityPixelBuffer: disparityPixelBuffer, at: presentationTime)
           }
-          
+
           if let disparityPixelBuffer = disparityPixelBuffer {
             strongSelf.depthDataObservers.forEach {
               $0.cameraManagerDidOutput(
@@ -615,13 +616,13 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
       if let synchronizedVideoData = collection.synchronizedData(for: strongSelf.videoOutput) as? AVCaptureSynchronizedSampleBufferData {
         if !synchronizedVideoData.sampleBufferWasDropped {
           let videoPixelBuffer = HSPixelBuffer(sampleBuffer: synchronizedVideoData.sampleBuffer)
-          
+
           strongSelf.startRecordingFromWaitingState()
           if case let .recording(_, startTime) = strongSelf.state, let videoPixelBuffer = videoPixelBuffer {
             let presentationTime = synchronizedVideoData.timestamp - startTime
             strongSelf.record(videoPixelBuffer: videoPixelBuffer, at: presentationTime)
           }
-          
+
           if let videoPixelBuffer = videoPixelBuffer {
             strongSelf.depthDataObservers.forEach {
               $0.cameraManagerDidOutput(
@@ -639,7 +640,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
       }
     }
   }
-  
+
   private func startRecordingFromWaitingState() {
     if case let .waitingToRecord(toURL: url) = state {
       let startTime = CMClockGetTime(clock)
