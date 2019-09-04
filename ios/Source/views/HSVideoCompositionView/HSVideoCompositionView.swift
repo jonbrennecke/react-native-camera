@@ -158,8 +158,10 @@ class HSVideoCompositionView: UIView {
 
     if
       keyPath == #keyPath(AVPlayer.timeControlStatus),
-      let statusRawValue = change?[.newKey] as? NSNumber,
-      let status = AVPlayer.TimeControlStatus(rawValue: statusRawValue.intValue) {
+      let newStatusRawValue = change?[.newKey] as? NSNumber,
+      let oldStatusRawValue = change?[.oldKey] as? NSNumber,
+      oldStatusRawValue != newStatusRawValue,
+      let status = AVPlayer.TimeControlStatus(rawValue: newStatusRawValue.intValue) {
       switch status {
       case .waitingToPlayAtSpecifiedRate:
         playbackDelegate?.videoComposition(view: self, didChangePlaybackState: .waiting)
@@ -197,7 +199,6 @@ class HSVideoCompositionView: UIView {
   }
 
   private func onReadyToPlay() {
-    player.seek(to: .zero)
     removePeriodicTimeObserver()
     addPeriodicTimeObserver()
     if shouldPlayWhenReady {
@@ -212,7 +213,7 @@ class HSVideoCompositionView: UIView {
   @objc
   public var isReadyToLoad: Bool = false {
     didSet {
-      if isReadyToLoad {
+      if isReadyToLoad, !oldValue {
         configurePlayer()
       }
     }
