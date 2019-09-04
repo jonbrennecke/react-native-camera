@@ -18,13 +18,16 @@ class HSCameraManager: NSObject {
   private let isDebugLogEnabled = false
   private var state: State = .none
   private let cameraOutputQueue = DispatchQueue(
-    label: "com.jonbrennecke.HSCameraManager.cameraOutputQueue", qos: .background
+    label: "com.jonbrennecke.HSCameraManager.cameraOutputQueue",
+    qos: .userInteractive
   )
   private let cameraSetupQueue = DispatchQueue(
-    label: "com.jonbrennecke.HSCameraManager.cameraSetupQueue", qos: .background
+    label: "com.jonbrennecke.HSCameraManager.cameraSetupQueue",
+    qos: .background
   )
-  private let outputProcessingQueue = DispatchQueue(
-    label: "com.jonbrennecke.HSCameraManager.outputProcessingQueue", qos: .background
+  private let assetWriterQueue = DispatchQueue(
+    label: "com.jonbrennecke.HSCameraManager.assetWriterQueue",
+    qos: .background
   )
   private let videoOutput = AVCaptureVideoDataOutput()
   private let videoFileOutput = AVCaptureMovieFileOutput()
@@ -571,70 +574,72 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
   func dataOutputSynchronizer(
     _: AVCaptureDataOutputSynchronizer, didOutput collection: AVCaptureSynchronizedDataCollection
   ) {
-    outputProcessingQueue.async { [weak self] in
-      guard let strongSelf = self else { return }
+//    _ = outputSemaphore.wait(timeout: .distantFuture)
+//    defer {
+//      outputSemaphore.signal()
+//    }
 
-      _ = strongSelf.outputSemaphore.wait(timeout: .distantFuture)
-      defer {
-        strongSelf.outputSemaphore.signal()
+    let startTime = CFAbsoluteTimeGetCurrent()
+    defer {
+      let executionTime = CFAbsoluteTimeGetCurrent() - startTime
+      if isDebugLogEnabled {
+        print("[\(String(describing: HSCameraManager.self))]: execution time: \(executionTime)")
       }
+    }
 
-      let startTime = CFAbsoluteTimeGetCurrent()
-      defer {
-        let executionTime = CFAbsoluteTimeGetCurrent() - startTime
-        if strongSelf.isDebugLogEnabled {
-          print("[\(String(describing: HSCameraManager.self))]: execution time: \(executionTime)")
-        }
-      }
+    // output depth data
+    if let synchronizedDepthData = collection.synchronizedData(for: depthOutput) as? AVCaptureSynchronizedDepthData {
+      if !synchronizedDepthData.depthDataWasDropped {
+        let orientation: CGImagePropertyOrientation = activeCaptureDevicePosition(session: captureSession) == .some(.front)
+          ? .leftMirrored : .right
+        let depthData = synchronizedDepthData.depthData.applyingExifOrientation(orientation)
+        let disparityPixelBuffer = depthDataConverter?.convert(depthData: depthData)
 
-      // output depth data
-      if let synchronizedDepthData = collection.synchronizedData(for: strongSelf.depthOutput) as? AVCaptureSynchronizedDepthData {
-        if !synchronizedDepthData.depthDataWasDropped {
-          let orientation: CGImagePropertyOrientation = activeCaptureDevicePosition(session: strongSelf.captureSession) == .some(.front)
-            ? .leftMirrored : .right
-          let depthData = synchronizedDepthData.depthData.applyingExifOrientation(orientation)
-          let disparityPixelBuffer = strongSelf.depthDataConverter?.convert(depthData: depthData)
-
-          strongSelf.startRecordingFromWaitingState()
+        startRecordingFromWaitingState()
+        assetWriterQueue.async { [weak self] in
+          guard let strongSelf = self else { return }
           if case let .recording(_, startTime) = strongSelf.state, let disparityPixelBuffer = disparityPixelBuffer {
             let presentationTime = synchronizedDepthData.timestamp - startTime
             strongSelf.record(disparityPixelBuffer: disparityPixelBuffer, at: presentationTime)
           }
+        }
 
-          if let disparityPixelBuffer = disparityPixelBuffer {
-            strongSelf.depthDataObservers.forEach {
-              $0.cameraManagerDidOutput(
-                disparityPixelBuffer: disparityPixelBuffer,
-                calibrationData: depthData.cameraCalibrationData
-              )
-            }
+        if let disparityPixelBuffer = disparityPixelBuffer {
+          depthDataObservers.forEach {
+            $0.cameraManagerDidOutput(
+              disparityPixelBuffer: disparityPixelBuffer,
+              calibrationData: depthData.cameraCalibrationData
+            )
           }
         }
       }
+    }
 
-      // output video data
-      if let synchronizedVideoData = collection.synchronizedData(for: strongSelf.videoOutput) as? AVCaptureSynchronizedSampleBufferData {
-        if !synchronizedVideoData.sampleBufferWasDropped {
-          let videoPixelBuffer = HSPixelBuffer(sampleBuffer: synchronizedVideoData.sampleBuffer)
+    // output video data
+    if let synchronizedVideoData = collection.synchronizedData(for: videoOutput) as? AVCaptureSynchronizedSampleBufferData {
+      if !synchronizedVideoData.sampleBufferWasDropped {
+        let videoPixelBuffer = HSPixelBuffer(sampleBuffer: synchronizedVideoData.sampleBuffer)
 
-          strongSelf.startRecordingFromWaitingState()
+        if let videoPixelBuffer = videoPixelBuffer {
+          depthDataObservers.forEach {
+            $0.cameraManagerDidOutput(
+              videoPixelBuffer: videoPixelBuffer
+            )
+          }
+        }
+
+        startRecordingFromWaitingState()
+        assetWriterQueue.async { [weak self] in
+          guard let strongSelf = self else { return }
           if case let .recording(_, startTime) = strongSelf.state, let videoPixelBuffer = videoPixelBuffer {
             let presentationTime = synchronizedVideoData.timestamp - startTime
             strongSelf.record(videoPixelBuffer: videoPixelBuffer, at: presentationTime)
           }
-
-          if let videoPixelBuffer = videoPixelBuffer {
-            strongSelf.depthDataObservers.forEach {
-              $0.cameraManagerDidOutput(
-                videoPixelBuffer: videoPixelBuffer
-              )
-            }
-          }
         }
       }
 
-      if let focusPoint = strongSelf.videoCaptureDevice?.focusPointOfInterest {
-        strongSelf.depthDataObservers.forEach {
+      if let focusPoint = videoCaptureDevice?.focusPointOfInterest {
+        depthDataObservers.forEach {
           $0.cameraManagerDidFocus(on: focusPoint)
         }
       }

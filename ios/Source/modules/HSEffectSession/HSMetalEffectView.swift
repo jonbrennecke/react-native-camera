@@ -3,6 +3,9 @@ import HSCameraUtils
 import MetalKit
 import UIKit
 
+// the max number of concurrent drawables supported by CoreAnimation
+fileprivate let maxSimultaneousFrames: Int = 3
+
 class HSMetalEffectView: MTKView, HSDebuggable {
   private lazy var commandQueue: MTLCommandQueue! = {
     let maxCommandBufferCount = 10
@@ -30,7 +33,7 @@ class HSMetalEffectView: MTKView, HSDebuggable {
 
   private var imageExtent: CGRect = .zero
   private let colorSpace = CGColorSpaceCreateDeviceRGB()
-  private let renderSemaphore = DispatchSemaphore(value: 1)
+  private let renderSemaphore = DispatchSemaphore(value: maxSimultaneousFrames)
   private weak var effectSession: HSEffectSession?
 
   internal var isDebugLogEnabled = false
@@ -92,24 +95,26 @@ class HSMetalEffectView: MTKView, HSDebuggable {
   }
 
   private func present(image: CIImage) {
-    if let commandBuffer = commandQueue.makeCommandBuffer() {
-      defer { commandBuffer.commit() }
-      if let drawable = currentDrawable {
-        context.render(
-          image,
-          to: drawable.texture,
-          commandBuffer: commandBuffer,
-          bounds: image.extent,
-          colorSpace: colorSpace
-        )
-        commandBuffer.addScheduledHandler { [weak self] _ in
-          self?.renderSemaphore.signal()
-        }
-        commandBuffer.present(drawable, afterMinimumDuration: 1 / Double(preferredFramesPerSecond))
-        return
-      }
+    guard let commandBuffer = commandQueue.makeCommandBuffer() else {
+      renderSemaphore.signal()
+      return
     }
-    renderSemaphore.signal()
+    defer { commandBuffer.commit() }
+    guard let drawable = currentDrawable else {
+      renderSemaphore.signal()
+      return
+    }
+    context.render(
+      image,
+      to: drawable.texture,
+      commandBuffer: commandBuffer,
+      bounds: image.extent,
+      colorSpace: colorSpace
+    )
+    commandBuffer.addCompletedHandler { [weak self] _ in
+      self?.renderSemaphore.signal()
+    }
+    commandBuffer.present(drawable, afterMinimumDuration: 1 / Double(preferredFramesPerSecond))
   }
 
   public func captureDevicePointConverted(fromLayerPoint layerPoint: CGPoint) -> CGPoint {
