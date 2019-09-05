@@ -334,7 +334,6 @@ class HSCameraManager: NSObject {
       if device.isExposurePointOfInterestSupported {
         device.exposurePointOfInterest = point
         if device.isExposureModeSupported(.autoExpose) {
-          device.setExposureTargetBias(0)
           device.exposureMode = .autoExpose
         }
       }
