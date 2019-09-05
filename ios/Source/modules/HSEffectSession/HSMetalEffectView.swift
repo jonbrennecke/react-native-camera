@@ -120,13 +120,10 @@ class HSMetalEffectView: MTKView, HSDebuggable {
   }
 
   public func captureDevicePointConverted(fromLayerPoint layerPoint: CGPoint) -> CGPoint {
-    if let videoSize = HSCameraManager.shared.videoResolution {
-      let scale = scaleForResizing(imageExtent.size, to: frame.size, resizeMode: resizeMode)
-      return CGPoint(
-        x: (layerPoint.x / scale) / CGFloat(videoSize.width),
-        y: (layerPoint.y / scale) / CGFloat(videoSize.height)
-      )
-    }
-    return .zero
+    let scale = scaleForResizing(imageExtent.size, to: frame.size, resizeMode: resizeMode)
+    return CGPoint(
+      x: abs((layerPoint.x / scale) / frame.width),
+      y: abs(1 - (layerPoint.y / scale) / frame.height)
+    )
   }
 }
