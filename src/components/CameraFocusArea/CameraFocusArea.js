@@ -16,6 +16,10 @@ type FocusPoint = { x: number, y: number };
 
 type Props = {
   style?: ?Style,
+  positionAnimationEasing?: any,
+  positionAnimationDuration?: number,
+  touchAnimationEasing?: any,
+  touchAnimationDuration?: number,
   onRequestFocus: FocusPoint => void,
   renderFocusArea: (
     focusPosition: Animated.ValueXY,
@@ -71,14 +75,14 @@ export class CameraFocusArea extends PureComponent<Props, State> {
   animateTouchIn(focusPoint: FocusPoint) {
     Animated.timing(this.positionAnim, {
       toValue: focusPoint,
-      easing: Easing.linear,
-      duration: 100,
+      easing: this.props.positionAnimationEasing || Easing.linear,
+      duration: this.props.positionAnimationDuration || 100,
       useNativeDriver: true,
     }).start();
     Animated.timing(this.touchAnim, {
       toValue: 1,
-      duration: 300,
-      easing: Easing.inOut(Easing.quad),
+      duration: this.props.touchAnimationDuration || 300,
+      easing: this.props.touchAnimationEasing || Easing.inOut(Easing.quad),
       useNativeDriver: true,
     }).start();
   }
@@ -86,8 +90,8 @@ export class CameraFocusArea extends PureComponent<Props, State> {
   animateTouchOut() {
     Animated.timing(this.touchAnim, {
       toValue: 0,
-      duration: 300,
-      easing: Easing.inOut(Easing.quad),
+      duration: this.props.touchAnimationDuration || 300,
+      easing: this.props.touchAnimationEasing || Easing.inOut(Easing.quad),
       useNativeDriver: true,
     }).start();
   }
