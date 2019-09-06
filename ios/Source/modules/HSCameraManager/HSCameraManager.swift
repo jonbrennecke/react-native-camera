@@ -180,9 +180,20 @@ class HSCameraManager: NSObject {
   }
 
   private func setupVideoInput() -> HSCameraSetupResult {
+    // set up device
     guard let videoCaptureDevice = videoCaptureDevice else {
       return .failure
     }
+    if case .some = try? videoCaptureDevice.lockForConfiguration() {
+      defer {
+        videoCaptureDevice.unlockForConfiguration()
+      }
+      if videoCaptureDevice.isExposureModeSupported(.autoExpose) {
+        videoCaptureDevice.exposureMode = .continuousAutoExposure
+      }
+    }
+    
+    // set up input
     if let previousDevice = videoCaptureDeviceInput {
       captureSession.removeInput(previousDevice)
     }
