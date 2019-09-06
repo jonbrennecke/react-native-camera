@@ -5,6 +5,7 @@ import './CameraFormatList';
 import './VideoComposition';
 import './VideoCompositionEdit';
 import './VideoCompositionImage';
+import './VideoCompositionExport';
 import './MultiCamera';
 import './CameraFocusArea';
 import './VolumeButton';
