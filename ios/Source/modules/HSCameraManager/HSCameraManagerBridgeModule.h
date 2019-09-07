@@ -4,5 +4,5 @@
 #import <React/RCTBridgeModule.h>
 
 @class HSCameraManagerBridgeModule;
-@interface HSCameraManagerBridgeModule : NSObject<RCTBridgeModule>
+@interface HSCameraManagerBridgeModule : NSObject <RCTBridgeModule>
 @end
