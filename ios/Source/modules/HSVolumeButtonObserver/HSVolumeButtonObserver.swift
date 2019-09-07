@@ -20,7 +20,7 @@ class HSVolumeButtonObserver: NSObject {
     }
 
     do {
-      try audioSession.setCategory(.playback, options: .mixWithOthers)
+      try audioSession.setCategory(.playAndRecord, options: .mixWithOthers)
       try audioSession.setActive(true, options: [])
       audioSession.addObserver(
         self, forKeyPath:
