@@ -568,15 +568,6 @@ class HSCameraManager: NSObject {
         completionHandler(nil, false)
         return
       }
-
-//      let audioSession = AVAudioSession.sharedInstance()
-//      do {
-//        try audioSession.setCategory(.record)
-//        try audioSession.setActive(true, options: [])
-//      } catch {
-//        print(error)
-//      }
-
       do {
         let outputURL = try makeEmptyVideoOutputFile()
         guard case .success = strongSelf.setupAssetWriter(to: outputURL) else {
@@ -611,7 +602,7 @@ class HSCameraManager: NSObject {
         strongSelf.assetWriter.stopRecording(at: endTime) { url in
           if saveToCameraRoll {
             PHPhotoLibrary.shared().performChanges({
-              let request = PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
+              PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
               completionHandler(true, url)
             })
           } else {
