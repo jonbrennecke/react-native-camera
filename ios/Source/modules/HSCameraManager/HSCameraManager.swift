@@ -34,17 +34,25 @@ class HSCameraManager: NSObject {
     label: "com.jonbrennecke.HSCameraManager.assetWriterQueue",
     qos: .background
   )
-  private let videoOutput = AVCaptureVideoDataOutput()
-  private let videoFileOutput = AVCaptureMovieFileOutput()
-  private let depthOutput = AVCaptureDepthDataOutput()
   private var outputSynchronizer: AVCaptureDataOutputSynchronizer?
+
+  // video
   private var videoCaptureDevice: AVCaptureDevice?
   private var videoCaptureDeviceInput: AVCaptureDeviceInput?
+  private let videoOutput = AVCaptureVideoDataOutput()
+  private let depthOutput = AVCaptureDepthDataOutput()
+
+  // audio
   private var audioCaptureDevice: AVCaptureDevice?
   private var audioCaptureDeviceInput: AVCaptureDeviceInput?
+  private let audioOutput = AVCaptureAudioDataOutput()
+
+  // asset writer
   private var assetWriter = HSVideoWriter()
   private var assetWriterDepthInput: HSVideoWriterFrameBufferInput?
   private var assetWriterVideoInput: HSVideoWriterFrameBufferInput?
+  private var assetWriterAudioInput: HSVideoWriterAudioInput?
+
   private var depthDataConverter: HSAVDepthDataToPixelBufferConverter?
   private var outputSemaphore = DispatchSemaphore(value: maxSimultaneousFrames)
 
@@ -91,14 +99,14 @@ class HSCameraManager: NSObject {
   @objc(sharedInstance)
   public static let shared = HSCameraManager()
 
+  @objc
+  public weak var delegate: HSCameraManagerDelegate?
+
   deinit {
     for _ in 0 ..< maxSimultaneousFrames {
       outputSemaphore.signal()
     }
   }
-
-  @objc
-  public weak var delegate: HSCameraManagerDelegate?
 
   private func notifyResolutionObservers() {
     guard
@@ -128,16 +136,19 @@ class HSCameraManager: NSObject {
     assetWriterDepthInput = HSVideoWriterFrameBufferInput(
       videoSize: depthSize,
       pixelFormatType: kCVPixelFormatType_OneComponent8,
-      isRealTime: false
+      isRealTime: true
     )
     assetWriterVideoInput = HSVideoWriterFrameBufferInput(
       videoSize: videoSize,
       pixelFormatType: videoPixelFormat,
-      isRealTime: false
+      isRealTime: true
     )
+    assetWriterAudioInput = HSVideoWriterAudioInput(isRealTime: true)
     // order is important here, if the video track is added first it will be the one visible in Photos app
     guard
       case .success = assetWriter.prepareToRecord(to: outputURL),
+      let audioInput = assetWriterAudioInput,
+      case .success = assetWriter.add(input: audioInput),
       let videoInput = assetWriterVideoInput,
       case .success = assetWriter.add(input: videoInput),
       let depthInput = assetWriterDepthInput,
@@ -153,6 +164,7 @@ class HSCameraManager: NSObject {
     if captureSession.canSetSessionPreset(preset) {
       captureSession.sessionPreset = preset
     }
+    captureSession.usesApplicationAudioSession = true
 
     videoCaptureDevice = depthEnabledCaptureDevice(withPosition: position)
     if case .none = videoCaptureDevice {
@@ -160,6 +172,10 @@ class HSCameraManager: NSObject {
     }
 
     if case .failure = setupVideoInput() {
+      return .failure
+    }
+
+    if case .failure = setupAudioInput() {
       return .failure
     }
 
@@ -171,9 +187,13 @@ class HSCameraManager: NSObject {
       return .failure
     }
 
+    if case .failure = setupAudioOutput() {
+      return .failure
+    }
+
     configureActiveFormat()
     outputSynchronizer = AVCaptureDataOutputSynchronizer(
-      dataOutputs: [videoOutput, depthOutput]
+      dataOutputs: [videoOutput, depthOutput, audioOutput]
     )
     outputSynchronizer?.setDelegate(self, queue: DispatchQueue.main)
     return .success
@@ -192,10 +212,10 @@ class HSCameraManager: NSObject {
         videoCaptureDevice.exposureMode = .continuousAutoExposure
       }
     }
-    
+
     // set up input
-    if let previousDevice = videoCaptureDeviceInput {
-      captureSession.removeInput(previousDevice)
+    if let previousInput = videoCaptureDeviceInput {
+      captureSession.removeInput(previousInput)
     }
     videoCaptureDeviceInput = try? AVCaptureDeviceInput(device: videoCaptureDevice)
     guard let videoCaptureDeviceInput = videoCaptureDeviceInput else {
@@ -254,12 +274,28 @@ class HSCameraManager: NSObject {
     guard let audioCaptureDevice = audioCaptureDevice else {
       return .failure
     }
+    if let previousInput = audioCaptureDeviceInput {
+      captureSession.removeInput(previousInput)
+    }
     audioCaptureDeviceInput = try? AVCaptureDeviceInput(device: audioCaptureDevice)
     guard let audioCaptureDeviceInput = audioCaptureDeviceInput else {
       return .failure
     }
     if captureSession.canAddInput(audioCaptureDeviceInput) {
       captureSession.addInput(audioCaptureDeviceInput)
+    } else {
+      return .failure
+    }
+    return .success
+  }
+
+  private func setupAudioOutput() -> HSCameraSetupResult {
+    captureSession.removeOutput(audioOutput)
+    if captureSession.canAddOutput(audioOutput) {
+      captureSession.addOutput(audioOutput)
+      if let connection = audioOutput.connection(with: .audio) {
+        connection.isEnabled = true
+      }
     } else {
       return .failure
     }
@@ -357,6 +393,7 @@ class HSCameraManager: NSObject {
 
   private static let requiredPermissions: [PermissionVariant] = [
     .captureDevice(mediaType: .video),
+    .captureDevice(mediaType: .audio),
     .microphone,
     .mediaLibrary,
   ]
@@ -531,6 +568,15 @@ class HSCameraManager: NSObject {
         completionHandler(nil, false)
         return
       }
+
+//      let audioSession = AVAudioSession.sharedInstance()
+//      do {
+//        try audioSession.setCategory(.record)
+//        try audioSession.setActive(true, options: [])
+//      } catch {
+//        print(error)
+//      }
+
       do {
         let outputURL = try makeEmptyVideoOutputFile()
         guard case .success = strongSelf.setupAssetWriter(to: outputURL) else {
@@ -557,6 +603,7 @@ class HSCameraManager: NSObject {
     cameraSetupQueue.async { [weak self] in
       guard let strongSelf = self else { return }
       if case let .recording(_, startTime) = strongSelf.state {
+        strongSelf.assetWriterAudioInput?.finish()
         strongSelf.assetWriterVideoInput?.finish()
         strongSelf.assetWriterDepthInput?.finish()
         let endTime = CMClockGetTime(strongSelf.clock)
@@ -564,7 +611,7 @@ class HSCameraManager: NSObject {
         strongSelf.assetWriter.stopRecording(at: endTime) { url in
           if saveToCameraRoll {
             PHPhotoLibrary.shared().performChanges({
-              PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
+              let request = PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
               completionHandler(true, url)
             })
           } else {
@@ -604,11 +651,24 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
       outputSemaphore.signal()
     }
 
-    let startTime = CFAbsoluteTimeGetCurrent()
+    let startExecutionTime = CFAbsoluteTimeGetCurrent()
     defer {
-      let executionTime = CFAbsoluteTimeGetCurrent() - startTime
+      let executionTime = CFAbsoluteTimeGetCurrent() - startExecutionTime
       if isDebugLogEnabled {
         print("[\(String(describing: HSCameraManager.self))]: execution time: \(executionTime)")
+      }
+    }
+
+    // output audio data
+    if
+      let synchronizedAudioData = collection.synchronizedData(for: audioOutput) as? AVCaptureSynchronizedSampleBufferData,
+      !synchronizedAudioData.sampleBufferWasDropped {
+      startRecordingIfWaiting()
+      assetWriterQueue.async { [weak self] in
+        guard let strongSelf = self else { return }
+        if case .recording = strongSelf.state {
+          strongSelf.record(audioSampleBuffer: synchronizedAudioData.sampleBuffer)
+        }
       }
     }
 
@@ -620,12 +680,11 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
         let depthData = synchronizedDepthData.depthData.applyingExifOrientation(orientation)
         let disparityPixelBuffer = depthDataConverter?.convert(depthData: depthData)
 
-        startRecordingFromWaitingState()
+        startRecordingIfWaiting()
         assetWriterQueue.async { [weak self] in
           guard let strongSelf = self else { return }
-          if case let .recording(_, startTime) = strongSelf.state, let disparityPixelBuffer = disparityPixelBuffer {
-            let presentationTime = synchronizedDepthData.timestamp - startTime
-            strongSelf.record(disparityPixelBuffer: disparityPixelBuffer, at: presentationTime)
+          if case .recording = strongSelf.state, let disparityPixelBuffer = disparityPixelBuffer {
+            strongSelf.record(disparityPixelBuffer: disparityPixelBuffer, at: synchronizedDepthData.timestamp)
           }
         }
 
@@ -653,12 +712,11 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
           }
         }
 
-        startRecordingFromWaitingState()
+        startRecordingIfWaiting()
         assetWriterQueue.async { [weak self] in
           guard let strongSelf = self else { return }
-          if case let .recording(_, startTime) = strongSelf.state, let videoPixelBuffer = videoPixelBuffer {
-            let presentationTime = synchronizedVideoData.timestamp - startTime
-            strongSelf.record(videoPixelBuffer: videoPixelBuffer, at: presentationTime)
+          if case .recording = strongSelf.state, let videoPixelBuffer = videoPixelBuffer {
+            strongSelf.record(videoPixelBuffer: videoPixelBuffer, at: synchronizedVideoData.timestamp)
           }
         }
       }
@@ -671,7 +729,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
     }
   }
 
-  private func startRecordingFromWaitingState() {
+  private func startRecordingIfWaiting() {
     if case let .waitingToRecord(toURL: url) = state {
       let startTime = CMClockGetTime(clock)
       if case .success = assetWriter.startRecording(at: startTime) {
@@ -692,5 +750,9 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
       pixelBuffer: videoPixelBuffer, presentationTime: presentationTime
     )
     assetWriterVideoInput?.append(frameBuffer)
+  }
+
+  private func record(audioSampleBuffer sampleBuffer: CMSampleBuffer) {
+    assetWriterAudioInput?.append(sampleBuffer)
   }
 }

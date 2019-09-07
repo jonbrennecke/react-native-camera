@@ -11,7 +11,12 @@ class HSVideoCompositionView: UIView {
   )
   private let imageView = UIImageView(frame: .zero)
   private let playerLayer = AVPlayerLayer()
-  private var player = AVPlayer()
+  private var player: AVPlayer = {
+    let player = AVPlayer()
+    player.volume = 1
+    return player
+  }()
+
   private var playerItem: AVPlayerItem?
   private var videoAssetRequestID: PHImageRequestID?
   private var shouldPlayWhenReady: Bool = false
