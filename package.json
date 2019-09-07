@@ -1,6 +1,6 @@
 {
   "name": "@jonbrennecke/react-native-camera",
-  "version": "1.0.57",
+  "version": "1.0.58",
   "description": "",
   "main": "build/index.js",
   "scripts": {
