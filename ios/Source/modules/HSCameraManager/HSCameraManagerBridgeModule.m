@@ -4,17 +4,7 @@
 #import "HSCameraManagerBridgeModule.h"
 #import "HSReactNativeCamera-Swift.h"
 
-@implementation HSCameraManagerBridgeModule {
-  bool hasListeners;
-}
-
-- (instancetype)init {
-  self = [super init];
-  if (self) {
-    HSCameraManager.sharedInstance.delegate = self;
-  }
-  return self;
-}
+@implementation HSCameraManagerBridgeModule
 
 RCT_EXPORT_MODULE(HSCameraManager)
 
@@ -158,23 +148,8 @@ RCT_EXPORT_METHOD(stopCameraCapture
                    }];
 }
 
-- (void)startObserving {
-  hasListeners = YES;
-}
-
-- (void)stopObserving {
-  hasListeners = NO;
-}
-
 + (BOOL)requiresMainQueueSetup {
   return NO;
-}
-
-- (NSArray<NSString *> *)supportedEvents {
-  return @[
-    @"cameraManagerDidFinishFileOutput",
-    @"cameraManagerDidFinishFileOutputWithError"
-  ];
 }
 
 @end

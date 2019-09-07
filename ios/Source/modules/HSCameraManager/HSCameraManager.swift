@@ -99,9 +99,6 @@ class HSCameraManager: NSObject {
   @objc(sharedInstance)
   public static let shared = HSCameraManager()
 
-  @objc
-  public weak var delegate: HSCameraManagerDelegate?
-
   deinit {
     for _ in 0 ..< maxSimultaneousFrames {
       outputSemaphore.signal()
