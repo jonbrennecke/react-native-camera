@@ -62,6 +62,15 @@ class HSVideoComposition: NSObject {
     let depthLayerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: depthTrack)
     depthLayerInstruction.setTransform(depthTrack.preferredTransform, at: .zero)
 
+    // add optional audio track
+    if
+      let audioTrack = asset.tracks.first(where: { $0.mediaType == .audio }),
+      let compositionAudioTrack = composition.addMutableTrack(
+        withMediaType: .audio, preferredTrackID: audioTrack.trackID
+      ) {
+      try? compositionAudioTrack.insertTimeRange(audioTrack.timeRange, of: audioTrack, at: .zero)
+    }
+
     let instruction = AVMutableVideoCompositionInstruction()
     instruction.layerInstructions = [
       videoLayerInstruction,
