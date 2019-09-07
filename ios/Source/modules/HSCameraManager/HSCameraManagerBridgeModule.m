@@ -177,44 +177,4 @@ RCT_EXPORT_METHOD(stopCameraCapture
   ];
 }
 
-#pragma mark - CameraManagerDelegate
-
-- (void)cameraManagerDidBeginFileOutputToFileURL:(NSURL *)fileURL {
-  // unimplemented
-}
-
-- (void)cameraManagerDidFinishFileOutputToFileURL:(NSURL *)fileURL
-                                            asset:(PHObjectPlaceholder *)asset
-                                            error:(NSError *)error {
-  if (!hasListeners) {
-    return;
-  }
-  if (error) {
-    NSString *description = error.localizedDescription;
-    NSDictionary<NSString *, id> *error = RCTMakeError(description, @{}, nil);
-    [self sendEventWithName:@"cameraManagerDidFinishFileOutputWithError"
-                       body:error];
-    return;
-  }
-  if (!asset) {
-    return;
-  }
-  AVURLAsset *avasset = [[AVURLAsset alloc] initWithURL:fileURL options:nil];
-  CMTime duration = avasset.duration;
-  // TODO: this should be an HSMediaAsset
-  NSDictionary *body = @{
-    @"id" : asset.localIdentifier,
-    @"duration" : @(CMTimeGetSeconds(duration))
-  };
-  [self sendEventWithName:@"cameraManagerDidFinishFileOutput" body:body];
-}
-
-- (void)cameraManagerDidReceiveCameraDataOutputWithVideoData:
-    (CMSampleBufferRef)videoData {
-  // unimplemented
-}
-
-- (void)cameraManagerDidDetectFaces:(NSArray<AVMetadataFaceObject *> *)faces {
-}
-
 @end

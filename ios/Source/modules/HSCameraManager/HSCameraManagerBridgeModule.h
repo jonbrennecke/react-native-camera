@@ -5,13 +5,5 @@
 #import <React/RCTEventEmitter.h>
 
 @class HSCameraManagerBridgeModule;
-@interface HSCameraManagerBridgeModule
-    : RCTEventEmitter <RCTBridgeModule, HSCameraManagerDelegate>
-- (void)cameraManagerDidBeginFileOutputToFileURL:(NSURL *)fileURL;
-- (void)cameraManagerDidFinishFileOutputToFileURL:(NSURL *)fileURL
-                                            asset:(PHObjectPlaceholder *)asset
-                                            error:(NSError *)error;
-- (void)cameraManagerDidReceiveCameraDataOutputWithVideoData:
-    (CMSampleBufferRef)videoData;
-- (void)cameraManagerDidDetectFaces:(NSArray<AVMetadataFaceObject *> *)faces;
+@interface HSCameraManagerBridgeModule : RCTEventEmitter <RCTBridgeModule>
 @end
