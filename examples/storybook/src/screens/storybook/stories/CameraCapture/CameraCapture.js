@@ -38,11 +38,13 @@ const Component = CameraStateContainer(
   ({
     startCapture,
     stopCapture,
-    captureStatus
+    captureStatus,
+    loadSupportedFeatures
   }) => {
     const setup = async (getState, setState): Promise<void> => {
       try {
         await requestCameraPermissions();
+        await loadSupportedFeatures();
         startCameraPreview();
       } catch (error) {
         // eslint-disable-next-line no-console
