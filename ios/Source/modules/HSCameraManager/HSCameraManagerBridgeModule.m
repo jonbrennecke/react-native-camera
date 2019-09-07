@@ -19,6 +19,19 @@ RCT_EXPORT_METHOD(hasCameraPermissions : (RCTResponseSenderBlock)callback) {
   callback(@[ [NSNull null], @(hasPermissons) ]);
 }
 
+RCT_EXPORT_METHOD(getCameraDeviceSupport : (RCTResponseSenderBlock)callback) {
+  BOOL hasFrontCamera = [HSCameraManager
+      hasSupportedCameraDeviceWithPosition:AVCaptureDevicePositionFront];
+  BOOL hasBackCamera = [HSCameraManager
+      hasSupportedCameraDeviceWithPosition:AVCaptureDevicePositionBack];
+  callback(@[
+    [NSNull null], @{
+      @"hasSupportedFrontCamera" : @(hasFrontCamera),
+      @"hasSupportedBackCamera" : @(hasBackCamera)
+    }
+  ]);
+}
+
 RCT_EXPORT_METHOD(getSupportedISORange : (RCTResponseSenderBlock)callback) {
   HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
   NSDictionary *range = [cameraManager.supportedISORange asDictionary];

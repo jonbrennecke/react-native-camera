@@ -12,6 +12,10 @@ export type Range = { min: number, max: number };
 export type CameraISORange = Range;
 export type CameraExposureRange = Range;
 export type CameraFrameRateRange = Range;
+export type CameraDeviceSupportObject = {
+  hasSupportedFrontCamera: boolean,
+  hasSupportedBackCamera: boolean,
+};
 
 export type CameraFormat = {
   dimensions: { width: number, height: number },
@@ -35,6 +39,7 @@ export type CameraStateObject = {
   hasCameraPermissions: boolean,
   playbackState: PlaybackState,
   playbackProgress: number,
+  cameraDeviceSupport: ?CameraDeviceSupportObject,
 };
 
 export type CameraStateRecord = RecordOf<CameraStateObject>;
@@ -78,6 +83,11 @@ export interface ICameraState {
 
   getLastCapturedVideoURL(): ?string;
   setLastCapturedVideoURL(url: ?string): ICameraState;
+
+  getCameraDeviceSupport(): ?CameraDeviceSupportObject;
+  setCameraDeviceSupport(
+    deviceSupport: CameraDeviceSupportObject
+  ): ICameraState;
 }
 
 // eslint-disable-next-line flowtype/generic-spacing
@@ -187,5 +197,15 @@ export const createCameraState: CameraStateObject => Class<
 
     setLastCapturedVideoURL(url: ?string): ICameraState {
       return this.set('lastCapturedVideoURL', url);
+    }
+
+    getCameraDeviceSupport(): ?CameraDeviceSupportObject {
+      return this.get('cameraDeviceSupport');
+    }
+
+    setCameraDeviceSupport(
+      deviceSupport: CameraDeviceSupportObject
+    ): ICameraState {
+      return this.set('cameraDeviceSupport', deviceSupport);
     }
   };

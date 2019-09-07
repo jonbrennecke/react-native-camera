@@ -15,6 +15,7 @@ import type {
   CameraISORange,
   CameraExposureRange,
   CameraFormat,
+  CameraDeviceSupportObject,
   PlaybackState,
 } from './';
 
@@ -34,6 +35,7 @@ type StateProps = {
   playbackState: PlaybackState,
   playbackProgress: number,
   lastCapturedVideoURL: ?string,
+  cameraDeviceSupport: ?CameraDeviceSupportObject,
 };
 
 type DispatchProps = {
@@ -71,6 +73,7 @@ function mapCameraStateToProps(state: ICameraState): $Exact<StateProps> {
     playbackState: selectors.selectPlaybackState(state),
     playbackProgress: selectors.selectPlaybackProgress(state),
     lastCapturedVideoURL: selectors.selectLastCapturedVideoURL(state),
+    cameraDeviceSupport: selectors.selectCameraDeviceSupport(state),
   };
 }
 

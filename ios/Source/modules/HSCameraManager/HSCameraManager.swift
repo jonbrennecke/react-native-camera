@@ -408,6 +408,11 @@ class HSCameraManager: NSObject {
   }
 
   @objc
+  public static func hasSupportedCameraDevice(withPosition position: AVCaptureDevice.Position) -> Bool {
+    return getDepthEnabledCaptureDevices(withPosition: position).count > 0
+  }
+
+  @objc
   public var supportedISORange: HSMinMaxInterval {
     guard let format = videoCaptureDevice?.activeFormat else {
       return HSMinMaxInterval.zero

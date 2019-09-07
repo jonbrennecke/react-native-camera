@@ -82,3 +82,10 @@ export const getFormat = async (): Promise<CameraFormat> => {
 export const getDepthFormat = async (): Promise<CameraFormat> => {
   return await CameraManager.getDepthFormatAsync();
 };
+
+export const getCameraDeviceSupport = async (): Promise<{
+  hasSupportedFrontCamera: boolean,
+  hasSupportedBackCamera: boolean,
+}> => {
+  return await CameraManager.getCameraDeviceSupportAsync();
+};

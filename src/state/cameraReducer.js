@@ -9,6 +9,7 @@ import type {
   CameraISORange,
   CameraExposureRange,
   CameraFormat,
+  CameraDeviceSupportObject,
   PlaybackState,
 } from './cameraState';
 
@@ -26,6 +27,7 @@ const CameraState = createCameraState({
   playbackState: 'waiting',
   playbackProgress: 0,
   lastCapturedVideoURL: null,
+  cameraDeviceSupport: null,
 });
 
 export const initialState = new CameraState();
@@ -156,6 +158,16 @@ const reducers = {
       return state;
     }
     return state.setPlaybackProgress(payload.playbackProgress);
+  },
+
+  setCameraDeviceSupport: (
+    state,
+    { payload }: Action<{ cameraDeviceSupport: CameraDeviceSupportObject }>
+  ): ICameraState => {
+    if (!payload) {
+      return state;
+    }
+    return state.setCameraDeviceSupport(payload.cameraDeviceSupport);
   },
 };
 

@@ -9,6 +9,15 @@ internal func depthEnabledCaptureDevice(withPosition position: AVCaptureDevice.P
   return discoverySession.devices.first
 }
 
+@available(iOS 11.1, *)
+internal func getDepthEnabledCaptureDevices(withPosition position: AVCaptureDevice.Position) -> [AVCaptureDevice] {
+  let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [
+    .builtInTrueDepthCamera,
+    .builtInDualCamera,
+  ], mediaType: .video, position: position)
+  return discoverySession.devices
+}
+
 fileprivate func getOppositeCameraPosition(session: AVCaptureSession, defaultPosition: AVCaptureDevice.Position = .front) -> AVCaptureDevice.Position {
   let device = activeCaptureDevice(session: session)
   switch device?.position {
