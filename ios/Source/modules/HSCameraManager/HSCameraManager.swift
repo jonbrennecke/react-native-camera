@@ -61,6 +61,7 @@ class HSCameraManager: NSObject {
     captureSession.masterClock ?? CMClockGetHostTimeClock()
   }()
 
+  internal var audioCaptureSession = AVCaptureSession()
   internal var captureSession = AVCaptureSession()
   internal var depthDataObservers = HSObserverCollection<HSCameraDepthDataObserver>()
   internal var resolutionObservers = HSObserverCollection<HSCameraResolutionObserver>()
@@ -173,10 +174,6 @@ class HSCameraManager: NSObject {
       return .failure
     }
 
-    if case .failure = setupAudioInput() {
-      return .failure
-    }
-
     if case .failure = setupVideoOutput() {
       return .failure
     }
@@ -263,7 +260,33 @@ class HSCameraManager: NSObject {
     return .success
   }
 
-  private func setupAudioInput() -> HSCameraSetupResult {
+  private func attemptToSetupAudioCaptureSession() -> HSCameraSetupResult {
+    do {
+      try audioCaptureDevice?.lockForConfiguration()
+      audioCaptureSession.beginConfiguration()
+      if case .failure = setupAudioInput(captureSession: audioCaptureSession) {
+        return .failure
+      }
+      setupAudioOutput(captureSession: audioCaptureSession)
+      audioOutput.setSampleBufferDelegate(self, queue: cameraOutputQueue)
+      audioCaptureSession.commitConfiguration()
+      audioCaptureDevice?.unlockForConfiguration()
+      return .success
+    } catch {
+      return .failure
+    }
+  }
+
+  private func setupAudioOutput(captureSession: AVCaptureSession) {
+    if captureSession.canAddOutput(audioOutput) {
+      captureSession.addOutput(audioOutput)
+      if let connection = audioOutput.connection(with: .audio) {
+        connection.isEnabled = true
+      }
+    }
+  }
+
+  private func setupAudioInput(captureSession: AVCaptureSession) -> HSCameraSetupResult {
     audioCaptureDevice = AVCaptureDevice.default(for: .audio)
     guard let audioCaptureDevice = audioCaptureDevice else {
       return .failure
@@ -281,53 +304,6 @@ class HSCameraManager: NSObject {
       return .failure
     }
     return .success
-  }
-
-  
-  private func configureAudioForRecording(_ completionHandler: (() -> Void)? = nil) {
-    paused = true
-    guard let videoCaptureDevice = videoCaptureDevice else {
-      return
-    }
-    try? audioCaptureDevice?.lockForConfiguration()
-    captureSession.beginConfiguration()
-    if captureSession.canAddOutput(audioOutput) {
-      captureSession.addOutput(audioOutput)
-      if let connection = audioOutput.connection(with: .audio) {
-        connection.isEnabled = true
-      }
-    }
-    outputSynchronizer = nil
-    captureSession.commitConfiguration()
-    audioCaptureDevice?.unlockForConfiguration()
-    cameraSetupQueue.asyncAfter(deadline: DispatchTime.now() + 0.1) { [weak self] in
-      defer { completionHandler?() }
-      guard let strongSelf = self else { return }
-      strongSelf.outputSynchronizer = AVCaptureDataOutputSynchronizer(
-        dataOutputs: [strongSelf.videoOutput, strongSelf.depthOutput, strongSelf.audioOutput]
-      )
-      strongSelf.outputSynchronizer?.setDelegate(self, queue: DispatchQueue.main)
-      strongSelf.paused = false
-    }
-  }
-  
-  private func configureAudioForPreview(_ completionHandler: (() -> Void)? = nil) {
-    paused = true
-    try? audioCaptureDevice?.lockForConfiguration()
-    captureSession.beginConfiguration()
-    captureSession.removeOutput(audioOutput)
-    outputSynchronizer = nil
-    captureSession.commitConfiguration()
-    audioCaptureDevice?.unlockForConfiguration()
-    cameraSetupQueue.asyncAfter(deadline: DispatchTime.now() + 0.1) { [weak self] in
-      defer { completionHandler?() }
-      guard let strongSelf = self else { return }
-      strongSelf.outputSynchronizer = AVCaptureDataOutputSynchronizer(
-        dataOutputs: [strongSelf.videoOutput, strongSelf.depthOutput]
-      )
-      strongSelf.outputSynchronizer?.setDelegate(self, queue: DispatchQueue.main)
-      strongSelf.paused = false
-    }
   }
 
   private func configureActiveFormat() {
@@ -386,6 +362,9 @@ class HSCameraManager: NSObject {
       strongSelf.captureSession.outputs.forEach { strongSelf.captureSession.removeOutput($0) }
       if case .failure = strongSelf.attemptToSetupCameraCaptureSession() {
         print("Failed to set up camera capture session")
+      }
+      if case .failure = strongSelf.attemptToSetupAudioCaptureSession() {
+        print("Failed to set up audio capture session")
       }
       strongSelf.captureSession.commitConfiguration()
       strongSelf.notifyResolutionObservers()
@@ -557,6 +536,9 @@ class HSCameraManager: NSObject {
       if case .failure = strongSelf.attemptToSetupCameraCaptureSession() {
         print("Failed to set up camera capture session")
       }
+      if case .failure = strongSelf.attemptToSetupAudioCaptureSession() {
+        print("Failed to set up audio capture session")
+      }
       strongSelf.captureSession.commitConfiguration()
       if isRunning {
         strongSelf.captureSession.startRunning()
@@ -600,22 +582,20 @@ class HSCameraManager: NSObject {
         completionHandler(nil, false)
         return
       }
-      strongSelf.configureAudioForRecording() {
-        do {
-          let outputURL = try makeEmptyVideoOutputFile()
-          guard case .success = strongSelf.setupAssetWriter(to: outputURL) else {
-            completionHandler(nil, false)
-            return
-          }
-          if let metadata = metadata {
-            strongSelf.writeMetadata(metadata)
-          }
-          strongSelf.state = .waitingToRecord(toURL: outputURL)
-          strongSelf.notifyResolutionObservers()
-          completionHandler(nil, true)
-        } catch {
-          completionHandler(error, false)
+      do {
+        let outputURL = try makeEmptyVideoOutputFile()
+        guard case .success = strongSelf.setupAssetWriter(to: outputURL) else {
+          completionHandler(nil, false)
+          return
         }
+        if let metadata = metadata {
+          strongSelf.writeMetadata(metadata)
+        }
+        strongSelf.state = .waitingToRecord(toURL: outputURL)
+        strongSelf.notifyResolutionObservers()
+        completionHandler(nil, true)
+      } catch {
+        completionHandler(error, false)
       }
     }
   }
@@ -643,7 +623,7 @@ class HSCameraManager: NSObject {
             completionHandler(true, url)
           }
         }
-        strongSelf.configureAudioForPreview()
+        strongSelf.audioCaptureSession.stopRunning()
       } else {
         completionHandler(false, nil)
       }
@@ -683,19 +663,6 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
       let executionTime = CFAbsoluteTimeGetCurrent() - startExecutionTime
       if isDebugLogEnabled {
         print("[\(String(describing: HSCameraManager.self))]: execution time: \(executionTime)")
-      }
-    }
-
-    // output audio data
-    if
-      let synchronizedAudioData = collection.synchronizedData(for: audioOutput) as? AVCaptureSynchronizedSampleBufferData,
-      !synchronizedAudioData.sampleBufferWasDropped {
-      startRecordingIfWaiting()
-      assetWriterQueue.async { [weak self] in
-        guard let strongSelf = self else { return }
-        if case .recording = strongSelf.state {
-          strongSelf.record(audioSampleBuffer: synchronizedAudioData.sampleBuffer)
-        }
       }
     }
 
@@ -760,6 +727,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
     if case let .waitingToRecord(toURL: url) = state {
       let startTime = CMClockGetTime(clock)
       if case .success = assetWriter.startRecording(at: startTime) {
+        audioCaptureSession.startRunning()
         state = .recording(toURL: url, startTime: startTime)
       }
     }
@@ -781,5 +749,21 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
 
   private func record(audioSampleBuffer sampleBuffer: CMSampleBuffer) {
     assetWriterAudioInput?.append(sampleBuffer)
+  }
+}
+
+extension HSCameraManager: AVCaptureAudioDataOutputSampleBufferDelegate {
+  func captureOutput(
+    _: AVCaptureOutput,
+    didOutput sampleBuffer: CMSampleBuffer,
+    from _: AVCaptureConnection
+  ) {
+    startRecordingIfWaiting()
+    assetWriterQueue.async { [weak self] in
+      guard let strongSelf = self else { return }
+      if case .recording = strongSelf.state {
+        strongSelf.record(audioSampleBuffer: sampleBuffer)
+      }
+    }
   }
 }
