@@ -37,6 +37,9 @@ class HSVideoCompositionExportTask: HSExportTask {
       if let blurAperture = composition.metadata["blurAperture"] as? Float {
         compositor.blurAperture = blurAperture
       }
+      if let blurAperture = composition.metadata["blurAperture"] as? Double {
+        compositor.blurAperture = Float(blurAperture)
+      }
     }
     assetExportSession?.outputFileType = .mov
     assetExportSession?.outputURL = try? makeEmptyVideoOutputFile()
