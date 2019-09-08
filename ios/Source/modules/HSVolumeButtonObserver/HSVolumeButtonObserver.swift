@@ -21,7 +21,7 @@ class HSVolumeButtonObserver: NSObject {
     } catch {
       delegate?.volumeButtonObserver(didEncounterError: error)
     }
-    
+
     // set initial volume
     let volume = audioSession.outputVolume
     let epsilon = Float(0.001)

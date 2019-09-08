@@ -38,7 +38,8 @@
 RCT_EXPORT_MODULE(HSVideoCompositionExportManager)
 
 RCT_EXPORT_METHOD(export
-                  : (NSString *)assetID callback
+                  : (NSString *)assetID blurAperture
+                  : (NSNumber *)blurAperture callback
                   : (RCTResponseSenderBlock)callback) {
   [self
       fetchAVAssetWithAssetID:assetID
@@ -62,6 +63,10 @@ RCT_EXPORT_METHOD(export
                           callback(@[ error, [NSNull null] ]);
                           return;
                         }
+
+                        [composition.metadata setValue:blurAperture
+                                                forKey:@"blurAperture"];
+
                         [HSVideoCompositionExportManager.sharedInstance
                             exportComposition:composition];
                       }];

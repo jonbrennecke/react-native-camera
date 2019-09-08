@@ -5,7 +5,9 @@ class HSVideoComposition: NSObject {
   private let asset: AVAsset
   internal let videoTrackID: CMPersistentTrackID
   internal let depthTrackID: CMPersistentTrackID
-  internal let metadata: [String: Any]
+
+  @objc
+  public var metadata: [String: Any]
 
   public init(
     asset: AVAsset,

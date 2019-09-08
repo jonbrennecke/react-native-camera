@@ -19,8 +19,11 @@ export const VideoCompositionExportManagerEvents = {
   DidUpdateProgress: 'videoExportManagerDidUpdateProgress',
 };
 
-export const exportComposition = async (assetID: string) => {
-  await VideoCompositionExportManager.exportAsync(assetID);
+export const exportComposition = async (
+  assetID: string,
+  blurAperture: number
+) => {
+  await VideoCompositionExportManager.exportAsync(assetID, blurAperture);
 };
 
 export const addVideoCompositionExportProgressListener = (
