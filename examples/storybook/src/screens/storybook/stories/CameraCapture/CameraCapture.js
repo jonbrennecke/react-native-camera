@@ -37,7 +37,7 @@ const Component = CameraStateContainer(
     const setup = async (getState, setState): Promise<void> => {
       try {
         await requestCameraPermissions();
-        await loadSupportedFeatures();
+        // await loadSupportedFeatures();
         startCameraPreview();
       } catch (error) {
         // eslint-disable-next-line no-console

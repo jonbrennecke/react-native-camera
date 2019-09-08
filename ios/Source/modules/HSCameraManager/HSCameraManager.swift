@@ -22,6 +22,7 @@ class HSCameraManager: NSObject {
 
   private let isDebugLogEnabled = false
   private var state: State = .none
+  private var paused = false
   private let cameraOutputQueue = DispatchQueue(
     label: "com.jonbrennecke.HSCameraManager.cameraOutputQueue",
     qos: .userInteractive
@@ -184,13 +185,9 @@ class HSCameraManager: NSObject {
       return .failure
     }
 
-    if case .failure = setupAudioOutput() {
-      return .failure
-    }
-
     configureActiveFormat()
     outputSynchronizer = AVCaptureDataOutputSynchronizer(
-      dataOutputs: [videoOutput, depthOutput, audioOutput]
+      dataOutputs: [videoOutput, depthOutput]
     )
     outputSynchronizer?.setDelegate(self, queue: DispatchQueue.main)
     return .success
@@ -205,7 +202,7 @@ class HSCameraManager: NSObject {
       defer {
         videoCaptureDevice.unlockForConfiguration()
       }
-      if videoCaptureDevice.isExposureModeSupported(.autoExpose) {
+      if videoCaptureDevice.isExposureModeSupported(.continuousAutoExposure) {
         videoCaptureDevice.exposureMode = .continuousAutoExposure
       }
     }
@@ -286,17 +283,51 @@ class HSCameraManager: NSObject {
     return .success
   }
 
-  private func setupAudioOutput() -> HSCameraSetupResult {
-    captureSession.removeOutput(audioOutput)
+  
+  private func configureAudioForRecording(_ completionHandler: (() -> Void)? = nil) {
+    paused = true
+    guard let videoCaptureDevice = videoCaptureDevice else {
+      return
+    }
+    try? audioCaptureDevice?.lockForConfiguration()
+    captureSession.beginConfiguration()
     if captureSession.canAddOutput(audioOutput) {
       captureSession.addOutput(audioOutput)
       if let connection = audioOutput.connection(with: .audio) {
         connection.isEnabled = true
       }
-    } else {
-      return .failure
     }
-    return .success
+    outputSynchronizer = nil
+    captureSession.commitConfiguration()
+    audioCaptureDevice?.unlockForConfiguration()
+    cameraSetupQueue.asyncAfter(deadline: DispatchTime.now() + 0.1) { [weak self] in
+      defer { completionHandler?() }
+      guard let strongSelf = self else { return }
+      strongSelf.outputSynchronizer = AVCaptureDataOutputSynchronizer(
+        dataOutputs: [strongSelf.videoOutput, strongSelf.depthOutput, strongSelf.audioOutput]
+      )
+      strongSelf.outputSynchronizer?.setDelegate(self, queue: DispatchQueue.main)
+      strongSelf.paused = false
+    }
+  }
+  
+  private func configureAudioForPreview(_ completionHandler: (() -> Void)? = nil) {
+    paused = true
+    try? audioCaptureDevice?.lockForConfiguration()
+    captureSession.beginConfiguration()
+    captureSession.removeOutput(audioOutput)
+    outputSynchronizer = nil
+    captureSession.commitConfiguration()
+    audioCaptureDevice?.unlockForConfiguration()
+    cameraSetupQueue.asyncAfter(deadline: DispatchTime.now() + 0.1) { [weak self] in
+      defer { completionHandler?() }
+      guard let strongSelf = self else { return }
+      strongSelf.outputSynchronizer = AVCaptureDataOutputSynchronizer(
+        dataOutputs: [strongSelf.videoOutput, strongSelf.depthOutput]
+      )
+      strongSelf.outputSynchronizer?.setDelegate(self, queue: DispatchQueue.main)
+      strongSelf.paused = false
+    }
   }
 
   private func configureActiveFormat() {
@@ -543,7 +574,6 @@ class HSCameraManager: NSObject {
           strongSelf.notifyResolutionObservers()
           return
         }
-        return
       }
     }
   }
@@ -570,20 +600,22 @@ class HSCameraManager: NSObject {
         completionHandler(nil, false)
         return
       }
-      do {
-        let outputURL = try makeEmptyVideoOutputFile()
-        guard case .success = strongSelf.setupAssetWriter(to: outputURL) else {
-          completionHandler(nil, false)
-          return
+      strongSelf.configureAudioForRecording() {
+        do {
+          let outputURL = try makeEmptyVideoOutputFile()
+          guard case .success = strongSelf.setupAssetWriter(to: outputURL) else {
+            completionHandler(nil, false)
+            return
+          }
+          if let metadata = metadata {
+            strongSelf.writeMetadata(metadata)
+          }
+          strongSelf.state = .waitingToRecord(toURL: outputURL)
+          strongSelf.notifyResolutionObservers()
+          completionHandler(nil, true)
+        } catch {
+          completionHandler(error, false)
         }
-        if let metadata = metadata {
-          strongSelf.writeMetadata(metadata)
-        }
-        strongSelf.state = .waitingToRecord(toURL: outputURL)
-        strongSelf.notifyResolutionObservers()
-        completionHandler(nil, true)
-      } catch {
-        completionHandler(error, false)
       }
     }
   }
@@ -611,6 +643,7 @@ class HSCameraManager: NSObject {
             completionHandler(true, url)
           }
         }
+        strongSelf.configureAudioForPreview()
       } else {
         completionHandler(false, nil)
       }
@@ -639,6 +672,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
   func dataOutputSynchronizer(
     _: AVCaptureDataOutputSynchronizer, didOutput collection: AVCaptureSynchronizedDataCollection
   ) {
+    if paused { return }
     _ = outputSemaphore.wait(timeout: .distantFuture)
     defer {
       outputSemaphore.signal()
