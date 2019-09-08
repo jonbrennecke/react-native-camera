@@ -9,9 +9,12 @@ import {
   VideoComposition,
   exportComposition,
   addVideoCompositionExportFinishedListener,
-  addVideoCompositionExportProgressListener
+  addVideoCompositionExportProgressListener,
 } from '@jonbrennecke/react-native-camera';
-import { authorizeMediaLibrary, createMediaStateHOC } from '@jonbrennecke/react-native-media';
+import {
+  authorizeMediaLibrary,
+  createMediaStateHOC,
+} from '@jonbrennecke/react-native-media';
 
 import { createReduxStore } from './store';
 
@@ -26,7 +29,7 @@ const styles = {
     flex: 1,
     backgroundColor: '#000',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
 };
 
@@ -76,6 +79,6 @@ stories.addDecorator(withKnobs);
 stories.add('Video Composition Export', () => (
   <Provider store={store}>
     {/* $FlowFixMe */}
-    <StoryComponent/>
+    <StoryComponent />
   </Provider>
 ));

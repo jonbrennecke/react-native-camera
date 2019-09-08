@@ -24,5 +24,4 @@ const middleware = isProduction
   ? applyMiddleware(thunkMiddleware)
   : applyMiddleware(thunkMiddleware, loggerMiddleware);
 
-export const createReduxStore = () =>
-  createStore(rootReducer, middleware);
+export const createReduxStore = () => createStore(rootReducer, middleware);

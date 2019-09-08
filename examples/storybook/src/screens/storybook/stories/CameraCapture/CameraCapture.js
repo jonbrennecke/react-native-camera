@@ -8,7 +8,7 @@ import {
   Camera,
   requestCameraPermissions,
   startCameraPreview,
-  createCameraStateHOC
+  createCameraStateHOC,
 } from '@jonbrennecke/react-native-camera';
 
 import { createReduxStore } from './cameraCaptureStore';
@@ -30,17 +30,10 @@ const styles = {
 
 const initialState: State = {};
 
-const CameraStateContainer = createCameraStateHOC(
-  state => state.camera
-);
+const CameraStateContainer = createCameraStateHOC(state => state.camera);
 
 const Component = CameraStateContainer(
-  ({
-    startCapture,
-    stopCapture,
-    captureStatus,
-    loadSupportedFeatures
-  }) => {
+  ({ startCapture, stopCapture, captureStatus, loadSupportedFeatures }) => {
     const setup = async (getState, setState): Promise<void> => {
       try {
         await requestCameraPermissions();
@@ -55,7 +48,7 @@ const Component = CameraStateContainer(
       startCapture({
         metadata: {
           blurAperture: 10,
-        }
+        },
       });
     };
     const stop = () => {
@@ -77,7 +70,7 @@ const Component = CameraStateContainer(
             />
             <Button
               title={captureStatus === 'started' ? 'Stop' : 'Start'}
-              onPress={() => captureStatus === 'started' ? stop() : start()}
+              onPress={() => (captureStatus === 'started' ? stop() : start())}
             />
           </>
         )}
