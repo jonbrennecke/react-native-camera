@@ -163,7 +163,6 @@ class HSCameraManager: NSObject {
     if captureSession.canSetSessionPreset(preset) {
       captureSession.sessionPreset = preset
     }
-    captureSession.usesApplicationAudioSession = true
 
     videoCaptureDevice = depthEnabledCaptureDevice(withPosition: position)
     if case .none = videoCaptureDevice {
@@ -727,6 +726,8 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
     if case let .waitingToRecord(toURL: url) = state {
       let startTime = CMClockGetTime(clock)
       if case .success = assetWriter.startRecording(at: startTime) {
+        audioCaptureSession.usesApplicationAudioSession = true
+        audioCaptureSession.automaticallyConfiguresApplicationAudioSession = false
         audioCaptureSession.startRunning()
         state = .recording(toURL: url, startTime: startTime)
       }
