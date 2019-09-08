@@ -2,7 +2,7 @@
 import React, { PureComponent } from 'react';
 import { Provider } from 'react-redux';
 import { storiesOf } from '@storybook/react-native';
-import { withKnobs } from '@storybook/addon-knobs';
+import { withKnobs, number } from '@storybook/addon-knobs';
 import { SafeAreaView, Button } from 'react-native';
 import { autobind } from 'core-decorators';
 import {
@@ -65,8 +65,7 @@ class StoryComponent extends PureComponent<MediaStateHOCProps> {
           title="Export"
           onPress={() => {
             const lastAsset = this.props.assets.last();
-            console.log(lastAsset);
-            exportComposition(lastAsset.assetID);
+            exportComposition(lastAsset.assetID, { blurAperture: 16 });
           }}
         />
       </SafeAreaView>
