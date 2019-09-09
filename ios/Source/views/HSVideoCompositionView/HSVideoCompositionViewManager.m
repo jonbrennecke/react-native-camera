@@ -130,6 +130,7 @@ RCT_EXPORT_METHOD(seekToProgress
       @(HSVideoPlaybackStatePlaying) : @"playing",
       @(HSVideoPlaybackStatePaused) : @"paused",
       @(HSVideoPlaybackStateWaiting) : @"waiting",
+      @(HSVideoPlaybackStateReadyToPlay) : @"readyToPlay",
     };
     NSString *playbackStateKey = [conversionDict objectForKey:@(playbackState)];
     bridgeView.onPlaybackStateChange(@{@"playbackState" : playbackStateKey});

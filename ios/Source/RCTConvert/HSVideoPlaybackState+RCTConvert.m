@@ -7,6 +7,7 @@ RCT_ENUM_CONVERTER(HSVideoPlaybackState, (@{
                      @"playing" : @(HSVideoPlaybackStatePlaying),
                      @"paused" : @(HSVideoPlaybackStatePaused),
                      @"waiting" : @(HSVideoPlaybackStateWaiting),
+                     @"readyToPlay" : @(HSVideoPlaybackStateReadyToPlay)
                    }),
                    HSVideoPlaybackStateWaiting, integerValue)
 

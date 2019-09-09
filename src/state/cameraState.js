@@ -5,7 +5,7 @@ import type { RecordOf, RecordInstance, Map } from 'immutable';
 
 export type CameraCaptureStatus = 'started' | 'stopped';
 
-export type PlaybackState = 'playing' | 'paused' | 'waiting';
+export type PlaybackState = 'playing' | 'paused' | 'waiting' | 'readyToPlay';
 
 export type Range = { min: number, max: number };
 

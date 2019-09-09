@@ -123,7 +123,7 @@
 		FC20ADFC22E9130000181579 /* HSExportTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSExportTask.swift; sourceTree = "<group>"; };
 		FC29966B230DD9620006366F /* HSVideoCompositionViewPlaybackDelegate.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSVideoCompositionViewPlaybackDelegate.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC299671230DE8310006366F /* HSVideoCompositionBridgeView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSVideoCompositionBridgeView.swift; sourceTree = "<group>"; tabWidth = 2; };
-		FC299673230DEF370006366F /* HSVideoPlaybackState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSVideoPlaybackState.swift; sourceTree = "<group>"; };
+		FC299673230DEF370006366F /* HSVideoPlaybackState.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSVideoPlaybackState.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC2FB8EF22CBCEA5007CE0AF /* HSSegmentationModelLoader.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSSegmentationModelLoader.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC30F18623182608004B165F /* HSVideoCompositionImageView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSVideoCompositionImageView.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC30F18B2318310A004B165F /* HSVideoCompositionImageViewManager.m */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.c.objc; path = HSVideoCompositionImageViewManager.m; sourceTree = "<group>"; tabWidth = 2; };

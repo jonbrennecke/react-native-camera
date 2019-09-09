@@ -142,11 +142,7 @@ class HSVideoCompositionView: UIView {
     player.replaceCurrentItem(with: playerItem)
     player.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.old, .new], context: nil)
     player.addObserver(self, forKeyPath: #keyPath(AVPlayer.timeControlStatus), options: [.old, .new], context: nil)
-    DispatchQueue.main.async { [weak self] in
-      guard let strongSelf = self else { return }
-      strongSelf.playerLayer.player = strongSelf.player
-      strongSelf.player.play()
-    }
+    playerLayer.player = player
   }
 
   override func observeValue(
@@ -206,6 +202,7 @@ class HSVideoCompositionView: UIView {
   private func onReadyToPlay() {
     removePeriodicTimeObserver()
     addPeriodicTimeObserver()
+    playbackDelegate?.videoComposition(view: self, didChangePlaybackState: .readyToPlay)
     if shouldPlayWhenReady {
       player.play()
     } else {
