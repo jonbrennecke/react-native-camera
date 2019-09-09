@@ -3,9 +3,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import identity from 'lodash/identity';
 
+
 import { actionCreators } from './cameraActionCreators';
 import * as selectors from './cameraSelectors';
 
+import type { Map } from 'immutable';
 import type { ComponentType } from 'react';
 
 import type { Dispatch } from '../types';
@@ -32,7 +34,8 @@ type StateProps = {
   format: ?CameraFormat,
   depthFormat: ?CameraFormat,
   hasCameraPermissions: boolean,
-  playbackState: PlaybackState,
+  playbackStateMap: Map<string, PlaybackState>,
+  playbackState: (assetID: string) => ?PlaybackState,
   playbackProgress: number,
   lastCapturedVideoURL: ?string,
   cameraDeviceSupport: ?CameraDeviceSupportObject,
@@ -52,7 +55,7 @@ type DispatchProps = {
   loadCameraPermissions: () => any,
   requestCameraPermissions: () => any,
   setBlurAperture: (blurAperture: number) => any,
-  setPlaybackState: (playbackState: PlaybackState) => any,
+  setPlaybackState: (assetID: string, playbackState: PlaybackState) => any,
   setPlaybackProgress: (playbackProgress: number) => any,
 };
 
@@ -70,7 +73,8 @@ function mapCameraStateToProps(state: ICameraState): $Exact<StateProps> {
     depthFormat: selectors.selectDepthFormat(state),
     blurAperture: selectors.selectBlurAperture(state),
     hasCameraPermissions: selectors.selectHasCameraPermissions(state),
-    playbackState: selectors.selectPlaybackState(state),
+    playbackStateMap: selectors.selectPlaybackStateMap(state),
+    playbackState: (assetID: string) => selectors.selectPlaybackState(state, assetID),
     playbackProgress: selectors.selectPlaybackProgress(state),
     lastCapturedVideoURL: selectors.selectLastCapturedVideoURL(state),
     cameraDeviceSupport: selectors.selectCameraDeviceSupport(state),
@@ -98,8 +102,8 @@ function mapCameraDispatchToProps(
       dispatch(actionCreators.requestCameraPermissions()),
     setBlurAperture: (blurAperture: number) =>
       dispatch(actionCreators.setBlurAperture({ blurAperture })),
-    setPlaybackState: (playbackState: PlaybackState) =>
-      dispatch(actionCreators.setPlaybackState({ playbackState })),
+    setPlaybackState: (assetID: string, playbackState: PlaybackState) =>
+      dispatch(actionCreators.setPlaybackState({ assetID, playbackState })),
     setPlaybackProgress: (playbackProgress: number) =>
       dispatch(actionCreators.setPlaybackProgress({ playbackProgress })),
   };

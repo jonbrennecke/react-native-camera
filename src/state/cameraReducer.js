@@ -1,6 +1,7 @@
 // @flow
 import { createReducer } from './createReducer';
 import { createCameraState } from './cameraState';
+import { Map } from 'immutable';
 
 import type { Action } from '../types';
 import type {
@@ -28,6 +29,7 @@ const CameraState = createCameraState({
   playbackProgress: 0,
   lastCapturedVideoURL: null,
   cameraDeviceSupport: null,
+  playbackStateMap: Map({}),
 });
 
 export const initialState = new CameraState();
@@ -142,12 +144,12 @@ const reducers = {
 
   setPlaybackState: (
     state,
-    { payload }: Action<{ playbackState: PlaybackState }>
+    { payload }: Action<{ assetID: string, playbackState: PlaybackState }>
   ): ICameraState => {
     if (!payload) {
       return state;
     }
-    return state.setPlaybackState(payload.playbackState);
+    return state.setPlaybackState(payload.assetID, payload.playbackState);
   },
 
   setPlaybackProgress: (

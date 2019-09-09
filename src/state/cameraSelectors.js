@@ -31,8 +31,11 @@ export const selectDepthFormat = (state: ICameraState) =>
 export const selectBlurAperture = (state: ICameraState) =>
   state.getBlurAperture();
 
-export const selectPlaybackState = (state: ICameraState) =>
-  state.getPlaybackState();
+export const selectPlaybackStateMap = (state: ICameraState) =>
+  state.getPlaybackStateMap();
+
+export const selectPlaybackState = (state: ICameraState, assetID: string) =>
+  state.getPlaybackState(assetID);
 
 export const selectPlaybackProgress = (state: ICameraState) =>
   state.getPlaybackProgress();

@@ -1,7 +1,7 @@
 // @flow
 import { Record } from 'immutable';
 
-import type { RecordOf, RecordInstance } from 'immutable';
+import type { RecordOf, RecordInstance, Map } from 'immutable';
 
 export type CameraCaptureStatus = 'started' | 'stopped';
 
@@ -37,7 +37,7 @@ export type CameraStateObject = {
   format: ?CameraFormat,
   depthFormat: ?CameraFormat,
   hasCameraPermissions: boolean,
-  playbackState: PlaybackState,
+  playbackStateMap: Map<string, PlaybackState>,
   playbackProgress: number,
   cameraDeviceSupport: ?CameraDeviceSupportObject,
 };
@@ -75,8 +75,11 @@ export interface ICameraState {
   getBlurAperture(): number;
   setBlurAperture(blurAperture: number): ICameraState;
 
-  getPlaybackState(): PlaybackState;
-  setPlaybackState(playbackState: PlaybackState): ICameraState;
+  getPlaybackStateMap(): Map<string, PlaybackState>;
+  setPlaybackStateMap(playbackStateMap: Map<string, PlaybackState>): ICameraState;
+
+  getPlaybackState(assetID: string): ?PlaybackState;
+  setPlaybackState(assetID: string, playbackState: PlaybackState): ICameraState;
 
   getPlaybackProgress(): number;
   setPlaybackProgress(progress: number): ICameraState;
@@ -175,12 +178,22 @@ export const createCameraState: CameraStateObject => Class<
       return this.set('blurAperture', blurAperture);
     }
 
-    getPlaybackState(): PlaybackState {
-      return this.get('playbackState');
+    getPlaybackStateMap(): Map<string, PlaybackState> {
+      return this.get('playbackStateMap');
     }
 
-    setPlaybackState(playbackState: PlaybackState): ICameraState {
-      return this.set('playbackState', playbackState);
+    setPlaybackStateMap(playbackStateMap: Map<string, PlaybackState>): ICameraState {
+      return this.set('playbackStateMap', playbackStateMap);
+    }
+
+    getPlaybackState(assetID: string): ?PlaybackState {
+      return this.getPlaybackStateMap().get(assetID);
+    }
+
+    setPlaybackState(assetID: string, playbackState: PlaybackState): ICameraState {
+      const playbackStateMap = this.getPlaybackStateMap();
+      const updatedPlaybackStateMap = playbackStateMap.set(assetID, playbackState);
+      return this.setPlaybackStateMap(updatedPlaybackStateMap);
     }
 
     getPlaybackProgress(): number {
