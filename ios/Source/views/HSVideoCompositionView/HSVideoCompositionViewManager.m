@@ -37,6 +37,8 @@ RCT_EXPORT_VIEW_PROPERTY(onPlaybackStateChange, RCTDirectEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(onMetadataLoaded, RCTDirectEventBlock)
 
+RCT_EXPORT_VIEW_PROPERTY(onDidPlayToEnd, RCTDirectEventBlock)
+
 RCT_EXPORT_METHOD(play : (nonnull NSNumber *)reactTag) {
   [self.bridge.uiManager addUIBlock:^(
                              RCTUIManager *uiManager,
@@ -146,6 +148,18 @@ RCT_EXPORT_METHOD(seekToProgress
       (HSVideoCompositionBridgeView *)view;
   if (bridgeView.onMetadataLoaded) {
     bridgeView.onMetadataLoaded(@{@"metadata" : metadata});
+  }
+}
+
+- (void)videoCompositionViewDidPlayToEnd:
+    (HSVideoCompositionView *_Nonnull)view {
+  if (![view isKindOfClass:[HSVideoCompositionBridgeView class]]) {
+    return;
+  }
+  HSVideoCompositionBridgeView *bridgeView =
+      (HSVideoCompositionBridgeView *)view;
+  if (bridgeView.onMetadataLoaded) {
+    bridgeView.onDidPlayToEnd(@{});
   }
 }
 

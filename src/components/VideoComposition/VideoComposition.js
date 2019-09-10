@@ -27,6 +27,7 @@ export type VideoCompositionProps = {
   onPlaybackProgress?: (progress: number) => void,
   onPlaybackStateChange?: (playbackState: PlaybackState) => void,
   onMetadataLoaded?: (metadata: { [key: string]: any }) => void,
+  onDidPlayToEnd?: () => void,
 };
 
 export class VideoComposition extends PureComponent<VideoCompositionProps> {
@@ -97,6 +98,12 @@ export class VideoComposition extends PureComponent<VideoCompositionProps> {
             return;
           }
           this.props.onMetadataLoaded(nativeEvent.metadata);
+        }}
+        onDidPlayToEnd={() => {
+          if (!this.props.onDidPlayToEnd) {
+            return;
+          }
+          this.props.onDidPlayToEnd();
         }}
       />
     );

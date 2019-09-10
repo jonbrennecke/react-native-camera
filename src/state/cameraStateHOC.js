@@ -3,7 +3,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import identity from 'lodash/identity';
 
-
 import { actionCreators } from './cameraActionCreators';
 import * as selectors from './cameraSelectors';
 
@@ -74,7 +73,8 @@ function mapCameraStateToProps(state: ICameraState): $Exact<StateProps> {
     blurAperture: selectors.selectBlurAperture(state),
     hasCameraPermissions: selectors.selectHasCameraPermissions(state),
     playbackStateMap: selectors.selectPlaybackStateMap(state),
-    playbackState: (assetID: string) => selectors.selectPlaybackState(state, assetID),
+    playbackState: (assetID: string) =>
+      selectors.selectPlaybackState(state, assetID),
     playbackProgress: selectors.selectPlaybackProgress(state),
     lastCapturedVideoURL: selectors.selectLastCapturedVideoURL(state),
     cameraDeviceSupport: selectors.selectCameraDeviceSupport(state),

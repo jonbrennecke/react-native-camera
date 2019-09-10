@@ -42,6 +42,10 @@ class HSVideoCompositionView: UIView {
   @objc
   public weak var playbackDelegate: HSVideoCompositionViewPlaybackDelegate?
 
+  deinit {
+    NotificationCenter.default.removeObserver(self)
+  }
+
   // MARK: - UIView methods
 
   override func didMoveToSuperview() {
@@ -142,6 +146,12 @@ class HSVideoCompositionView: UIView {
     player.replaceCurrentItem(with: playerItem)
     player.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.old, .new], context: nil)
     player.addObserver(self, forKeyPath: #keyPath(AVPlayer.timeControlStatus), options: [.old, .new], context: nil)
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(onDidPlayToEndNotification),
+      name: Notification.Name.AVPlayerItemDidPlayToEndTime,
+      object: nil
+    )
     playerLayer.player = player
   }
 
@@ -208,6 +218,11 @@ class HSVideoCompositionView: UIView {
     } else {
       player.pause()
     }
+  }
+
+  @objc
+  private func onDidPlayToEndNotification() {
+    playbackDelegate?.videoCompositionDidPlayToEnd(self)
   }
 
   // MARK: - objc interface

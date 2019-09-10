@@ -76,7 +76,9 @@ export interface ICameraState {
   setBlurAperture(blurAperture: number): ICameraState;
 
   getPlaybackStateMap(): Map<string, PlaybackState>;
-  setPlaybackStateMap(playbackStateMap: Map<string, PlaybackState>): ICameraState;
+  setPlaybackStateMap(
+    playbackStateMap: Map<string, PlaybackState>
+  ): ICameraState;
 
   getPlaybackState(assetID: string): ?PlaybackState;
   setPlaybackState(assetID: string, playbackState: PlaybackState): ICameraState;
@@ -182,7 +184,9 @@ export const createCameraState: CameraStateObject => Class<
       return this.get('playbackStateMap');
     }
 
-    setPlaybackStateMap(playbackStateMap: Map<string, PlaybackState>): ICameraState {
+    setPlaybackStateMap(
+      playbackStateMap: Map<string, PlaybackState>
+    ): ICameraState {
       return this.set('playbackStateMap', playbackStateMap);
     }
 
@@ -190,9 +194,15 @@ export const createCameraState: CameraStateObject => Class<
       return this.getPlaybackStateMap().get(assetID);
     }
 
-    setPlaybackState(assetID: string, playbackState: PlaybackState): ICameraState {
+    setPlaybackState(
+      assetID: string,
+      playbackState: PlaybackState
+    ): ICameraState {
       const playbackStateMap = this.getPlaybackStateMap();
-      const updatedPlaybackStateMap = playbackStateMap.set(assetID, playbackState);
+      const updatedPlaybackStateMap = playbackStateMap.set(
+        assetID,
+        playbackState
+      );
       return this.setPlaybackStateMap(updatedPlaybackStateMap);
     }
 
