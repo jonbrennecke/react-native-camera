@@ -346,7 +346,7 @@ class HSCameraManager: NSObject {
       size: size,
       input: depthPixelFormat,
       output: kCVPixelFormatType_OneComponent8,
-      bounds: position == .front ? 0.1 ... 5 : 0 ... 2
+      bounds: position == .front ? 0.1 ... 5 : 0 ... 0.75
     )
   }
 
