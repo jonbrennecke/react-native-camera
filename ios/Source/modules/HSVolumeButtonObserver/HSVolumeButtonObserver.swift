@@ -9,27 +9,32 @@ class HSVolumeButtonObserver: NSObject {
   public func startObservingVolumeButton(with volumeDelegate: HSVolumeButtonObserverDelegate) {
     delegate = volumeDelegate
     let audioSession = AVAudioSession.sharedInstance()
+    audioSession.addObserver(
+      self, forKeyPath:
+      #keyPath(AVAudioSession.outputVolume),
+      options: [.old, .new],
+      context: nil
+    )
     do {
-      try audioSession.setCategory(.playAndRecord, options: .mixWithOthers)
+      try audioSession.setCategory(.ambient, options: .mixWithOthers)
       try audioSession.setActive(true, options: [])
-      audioSession.addObserver(
-        self, forKeyPath:
-        #keyPath(AVAudioSession.outputVolume),
-        options: [.old, .new],
-        context: nil
-      )
     } catch {
       delegate?.volumeButtonObserver(didEncounterError: error)
     }
 
     // set initial volume
-    let volume = audioSession.outputVolume
-    let epsilon = Float(0.001)
-    if fabsf(volume - 1.0) < epsilon {
-      setVolume(1 - epsilon)
-    } else if fabsf(volume - 0.0) < epsilon {
-      setVolume(epsilon)
-    }
+    DispatchQueue
+      .global(qos: .background)
+      .asyncAfter(deadline: DispatchTime.now() + 0.5) { [weak self] in
+        guard let strongSelf = self else { return }
+        let volume = audioSession.outputVolume
+        let epsilon = Float(0.001)
+        if fabsf(volume - 1.0) < epsilon {
+          strongSelf.setVolume(1 - epsilon)
+        } else if fabsf(volume - 0.0) < epsilon {
+          strongSelf.setVolume(epsilon)
+        }
+      }
   }
 
   @objc
