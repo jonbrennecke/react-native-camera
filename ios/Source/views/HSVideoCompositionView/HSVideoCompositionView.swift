@@ -135,6 +135,9 @@ class HSVideoCompositionView: UIView {
       // TODO: throw an error
       return
     }
+    let audioSession = AVAudioSession.sharedInstance()
+    try? audioSession.setCategory(.playback)
+    try? audioSession.setActive(true, options: .init())
     playerItem = AVPlayerItem(asset: avComposition)
     playerItem?.videoComposition = avVideoComposition
     if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
