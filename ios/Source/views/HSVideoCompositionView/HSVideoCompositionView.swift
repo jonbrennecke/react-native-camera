@@ -283,8 +283,8 @@ class HSVideoCompositionView: UIView {
     guard
       let composition = composition,
       let (_, avVideoComposition) = composition.makeAVComposition()
-      else {
-        return
+    else {
+      return
     }
     playerItem?.videoComposition = avVideoComposition
     if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {

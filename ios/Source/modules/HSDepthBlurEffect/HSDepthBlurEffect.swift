@@ -257,12 +257,12 @@ class HSDepthBlurEffect {
       return depthBlurImage
     }
   }
-  
+
   private func applyWatermark(to image: CIImage, properties: WatermarkProperties) -> CIImage? {
     guard let watermarkCGImage = generateWatermarkCGImage(
       byResourceName: properties.fileName, extension: properties.fileExtension
-      ) else {
-        return image
+    ) else {
+      return image
     }
     let scaleFactor = CGFloat(0.4)
     let watermarkImage = CIImage(cgImage: watermarkCGImage)
