@@ -12,6 +12,7 @@ class HSDepthBlurEffect {
   public struct WatermarkProperties {
     public let fileName: String
     public let fileExtension: String
+    public let scale: Float
   }
 
   private lazy var metalDevice: MTLDevice! = {
@@ -264,12 +265,12 @@ class HSDepthBlurEffect {
     ) else {
       return image
     }
-    let scaleFactor = CGFloat(0.4)
+    let scale = CGFloat(properties.scale)
     let watermarkImage = CIImage(cgImage: watermarkCGImage)
     let transformedWatermarkImage = watermarkImage
-      .transformed(by: CGAffineTransform(scaleX: scaleFactor, y: scaleFactor))
+      .transformed(by: CGAffineTransform(scaleX: scale, y: scale))
       .transformed(by: CGAffineTransform(
-        translationX: image.extent.width - watermarkImage.extent.width * scaleFactor - 20,
+        translationX: image.extent.width - watermarkImage.extent.width * scale - 20,
         y: 20
       ))
     return applySourceAtopCompositingFilter(

@@ -140,7 +140,7 @@ class HSCameraView: UIView {
           return
         }
         view.watermarkProperties = HSDepthBlurEffect.WatermarkProperties(
-          fileName: fileName, fileExtension: ""
+          fileName: fileName, fileExtension: "", scale: 0.45
         )
       }
     }

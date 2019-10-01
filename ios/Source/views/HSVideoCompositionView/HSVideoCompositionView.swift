@@ -22,6 +22,7 @@ class HSVideoCompositionView: UIView {
   private var shouldPlayWhenReady: Bool = false
   private var playbackTimeObserverToken: Any?
   private var blurAperture: Float = 2.4
+  private var watermarkProperties: HSDepthBlurEffect.WatermarkProperties?
 
   private var composition: HSVideoComposition? {
     didSet {
@@ -78,6 +79,7 @@ class HSVideoCompositionView: UIView {
         compositor.videoTrackID = composition.videoTrackID
         compositor.blurAperture = strongSelf.blurAperture
         compositor.previewMode = strongSelf.previewMode
+        compositor.watermarkProperties = strongSelf.watermarkProperties
       }
       let time = CMTimeMakeWithSeconds(.zero, preferredTimescale: 600)
       imageGenerator.generateCGImagesAsynchronously(
@@ -145,6 +147,7 @@ class HSVideoCompositionView: UIView {
       compositor.videoTrackID = composition.videoTrackID
       compositor.blurAperture = blurAperture
       compositor.previewMode = previewMode
+      compositor.watermarkProperties = watermarkProperties
     }
     player.replaceCurrentItem(with: playerItem)
     player.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.old, .new], context: nil)
@@ -254,6 +257,7 @@ class HSVideoCompositionView: UIView {
       compositor.videoTrackID = composition.videoTrackID
       compositor.blurAperture = blurAperture
       compositor.previewMode = previewMode
+      compositor.watermarkProperties = watermarkProperties
     }
     loadPreviewImage()
   }
@@ -273,6 +277,7 @@ class HSVideoCompositionView: UIView {
         compositor.videoTrackID = composition.videoTrackID
         compositor.blurAperture = blurAperture
         compositor.previewMode = previewMode
+        compositor.watermarkProperties = watermarkProperties
       }
       loadPreviewImage()
     }
@@ -280,6 +285,9 @@ class HSVideoCompositionView: UIView {
 
   @objc
   public func setWatermarkImageNameWithExtension(_ fileName: String?) {
+    watermarkProperties = fileName != nil ? HSDepthBlurEffect.WatermarkProperties(
+      fileName: fileName!, fileExtension: "", scale: 1
+    ) : nil
     guard
       let composition = composition,
       let (_, avVideoComposition) = composition.makeAVComposition()
@@ -292,9 +300,7 @@ class HSVideoCompositionView: UIView {
       compositor.videoTrackID = composition.videoTrackID
       compositor.blurAperture = blurAperture
       compositor.previewMode = previewMode
-      compositor.watermarkProperties = fileName != nil ? HSDepthBlurEffect.WatermarkProperties(
-        fileName: fileName!, fileExtension: ""
-      ) : nil
+      compositor.watermarkProperties = watermarkProperties
     }
     loadPreviewImage()
   }
