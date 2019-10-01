@@ -100,6 +100,7 @@ class StoryComponent extends Component<Props, State> {
           max: 20,
           step: 0.1,
         })}
+        watermarkImageNameWithExtension={boolean('Watermark', false) ? 'Watermark.png' : null}
         isReadyToLoad={boolean('Ready to load', false)}
         onPlaybackProgress={progress => {
           // eslint-disable-next-line no-console

@@ -39,6 +39,8 @@ RCT_EXPORT_VIEW_PROPERTY(onMetadataLoaded, RCTDirectEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(onDidPlayToEnd, RCTDirectEventBlock)
 
+RCT_EXPORT_VIEW_PROPERTY(watermarkImageNameWithExtension, NSString *)
+
 RCT_EXPORT_METHOD(play : (nonnull NSNumber *)reactTag) {
   [self.bridge.uiManager addUIBlock:^(
                              RCTUIManager *uiManager,

@@ -25,6 +25,7 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
   public var previewMode: HSEffectPreviewMode = .portraitMode
   public var blurAperture: Float = 2.4
   public var qualityFactor: Float = 0.1
+  public var watermarkProperties: HSDepthBlurEffect.WatermarkProperties?
 
   // MARK: - AVVideoCompositing implementation
 
@@ -91,6 +92,7 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
           previewMode: previewMode == .depth ? .depth : .portraitBlur,
           disparityPixelBuffer: HSPixelBuffer(pixelBuffer: disparityCVPixelBuffer),
           videoPixelBuffer: HSPixelBuffer(pixelBuffer: videoCVPixelBuffer),
+          watermarkProperties: watermarkProperties,
           calibrationData: nil,
           blurAperture: blurAperture,
           qualityFactor: qualityFactor

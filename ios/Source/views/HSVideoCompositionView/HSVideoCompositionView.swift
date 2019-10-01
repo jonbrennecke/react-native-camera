@@ -278,23 +278,26 @@ class HSVideoCompositionView: UIView {
     }
   }
 
-//  @objc
-//  public var watermarkImageNameWithExtension: String? {
-//    didSet {
-//      guard
-//        let composition = composition,
-//        let (_, avVideoComposition) = composition.makeAVComposition()
-//        else {
-//          return
-//      }
-//      playerItem?.videoComposition = avVideoComposition
-//      if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
-//
-//        compositor.previewMode = previewMode
-//      }
-//      loadPreviewImage()
-//    }
-//  }
+  @objc
+  public func setWatermarkImageNameWithExtension(_ fileName: String?) {
+    guard
+      let composition = composition,
+      let (_, avVideoComposition) = composition.makeAVComposition()
+      else {
+        return
+    }
+    playerItem?.videoComposition = avVideoComposition
+    if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
+      compositor.depthTrackID = composition.depthTrackID
+      compositor.videoTrackID = composition.videoTrackID
+      compositor.blurAperture = blurAperture
+      compositor.previewMode = previewMode
+      compositor.watermarkProperties = fileName != nil ? HSDepthBlurEffect.WatermarkProperties(
+        fileName: fileName!, fileExtension: ""
+      ) : nil
+    }
+    loadPreviewImage()
+  }
 
   @objc
   public var resizeMode: HSResizeMode = .scaleAspectFill {
