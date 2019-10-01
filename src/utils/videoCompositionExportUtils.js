@@ -21,7 +21,7 @@ export const VideoCompositionExportManagerEvents = {
 
 export const exportComposition = async (
   assetID: string,
-  config?: { blurAperture?: number }
+  config?: { blurAperture?: number, watermarkImageNameWithExtension?: ?string, }
 ) => {
   await VideoCompositionExportManager.exportAsync(assetID, config);
 };

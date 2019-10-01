@@ -40,6 +40,11 @@ class HSVideoCompositionExportTask: HSExportTask {
       if let blurAperture = composition.metadata["blurAperture"] as? Double {
         compositor.blurAperture = Float(blurAperture)
       }
+      if let fileName = composition.metadata["watermarkImageNameWithExtension"] as? String {
+        compositor.watermarkProperties = HSDepthBlurEffect.WatermarkProperties(
+          fileName: fileName, fileExtension: "", scale: 1
+        )
+      }
     }
     assetExportSession?.outputFileType = .mov
     assetExportSession?.outputURL = try? makeEmptyVideoOutputFile()
