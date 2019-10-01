@@ -277,6 +277,24 @@ class HSVideoCompositionView: UIView {
       loadPreviewImage()
     }
   }
+  
+//  @objc
+//  public var watermarkImageNameWithExtension: String? {
+//    didSet {
+//      guard
+//        let composition = composition,
+//        let (_, avVideoComposition) = composition.makeAVComposition()
+//        else {
+//          return
+//      }
+//      playerItem?.videoComposition = avVideoComposition
+//      if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
+//        
+//        compositor.previewMode = previewMode
+//      }
+//      loadPreviewImage()
+//    }
+//  }
 
   @objc
   public var resizeMode: HSResizeMode = .scaleAspectFill {

@@ -12,6 +12,7 @@ class HSEffectSession: NSObject {
   private lazy var depthBlurEffect = HSDepthBlurEffect()
 
   public var previewMode: HSEffectPreviewMode = .portraitMode
+  public var watermarkProperties: HSDepthBlurEffect.WatermarkProperties?
 
   internal func makeEffectImage(blurAperture: Float = 2.5, size: CGSize, resizeMode: HSResizeMode) -> CIImage? {
     return autoreleasepool {
@@ -26,6 +27,7 @@ class HSEffectSession: NSObject {
         previewMode: previewMode == .depth ? .depth : .portraitBlur,
         disparityPixelBuffer: disparityPixelBuffer,
         videoPixelBuffer: videoPixelBuffer,
+        watermarkProperties: watermarkProperties,
         calibrationData: calibrationData,
         blurAperture: blurAperture,
         scale: scale,

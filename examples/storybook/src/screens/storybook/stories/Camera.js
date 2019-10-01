@@ -73,6 +73,7 @@ stories.add('Camera', () => (
             max: 20,
             step: 0.1,
           })}
+          watermarkImageNameWithExtension={boolean('Watermark', false) ? 'Watermark.png' : null}
         />
       )}
     />

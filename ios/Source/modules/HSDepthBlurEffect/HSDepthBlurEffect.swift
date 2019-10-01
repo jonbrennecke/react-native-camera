@@ -8,6 +8,11 @@ class HSDepthBlurEffect {
     case depth
     case portraitBlur
   }
+  
+  public struct WatermarkProperties {
+    public let fileName: String
+    public let fileExtension: String
+  }
 
   private lazy var metalDevice: MTLDevice! = {
     guard let device = MTLCreateSystemDefaultDevice() else {
@@ -65,6 +70,14 @@ class HSDepthBlurEffect {
     filter.setDefaults()
     return filter
   }()
+  
+  private lazy var sourceAtopCompositingFilter: CIFilter? = {
+    guard let filter = CIFilter(name: "CISourceAtopCompositing") else {
+      return nil
+    }
+    filter.setDefaults()
+    return filter
+  }()
 
   fileprivate func normalize(image inputImage: CIImage, context: CIContext = CIContext()) -> CIImage? {
     guard
@@ -74,7 +87,6 @@ class HSDepthBlurEffect {
     else {
       return nil
     }
-    print(min, max)
     return normalizedImage
   }
 
@@ -124,6 +136,15 @@ class HSDepthBlurEffect {
     filter.setValue(inputImage, forKey: kCIInputImageKey)
     return filter
   }
+  
+  private func applySourceAtopCompositingFilter(inputImage: CIImage, backgroundImage: CIImage) -> CIImage? {
+    guard let sourceAtopCompositingFilter = sourceAtopCompositingFilter else {
+      return nil
+    }
+    sourceAtopCompositingFilter.setValue(inputImage, forKey: kCIInputImageKey)
+    sourceAtopCompositingFilter.setValue(backgroundImage, forKey: kCIInputBackgroundImageKey)
+    return sourceAtopCompositingFilter.outputImage
+  }
 
   private var imageBufferResizer: HSImageBufferResizer?
 
@@ -144,6 +165,7 @@ class HSDepthBlurEffect {
     previewMode: PreviewMode,
     disparityPixelBuffer: HSPixelBuffer,
     videoPixelBuffer: HSPixelBuffer,
+    watermarkProperties: WatermarkProperties?,
     calibrationData _: AVCameraCalibrationData?,
     blurAperture: Float,
     scale: Float = 1,
@@ -178,9 +200,37 @@ class HSDepthBlurEffect {
     depthBlurFilter.setValue(blurAperture, forKey: "inputAperture")
     depthBlurFilter.setValue(videoImage, forKey: kCIInputImageKey)
     depthBlurFilter.setValue(disparityImage, forKey: kCIInputDisparityImageKey)
-//    depthBlurFilter.setValue(calibrationData, forKey: "inputCalibrationData")
-//    depthBlurFilter.setValue(CIVector(cgRect: CGRect.zero), forKey: "inputFocusRect")
-    return depthBlurFilter.outputImage
+    guard let depthBlurImage =  depthBlurFilter.outputImage else {
+      return nil
+    }
+    if let properties = watermarkProperties {
+      return applyWatermark(
+        to: depthBlurImage,
+        properties: properties
+      )
+    } else {
+      return depthBlurImage
+    }
+  }
+  
+  private func applyWatermark(to image: CIImage, properties: WatermarkProperties) -> CIImage? {
+    guard let watermarkCGImage = generateWatermarkCGImage(
+      byResourceName: properties.fileName, extension: properties.fileExtension
+    ) else {
+      return image
+    }
+    let scaleFactor = CGFloat(0.4)
+    let watermarkImage = CIImage(cgImage: watermarkCGImage)
+    let transformedWatermarkImage = watermarkImage
+        .transformed(by: CGAffineTransform(scaleX: scaleFactor, y: scaleFactor))
+        .transformed(by: CGAffineTransform(
+          translationX: image.extent.width - watermarkImage.extent.width * scaleFactor - 20,
+          y: 20
+        ))
+    return applySourceAtopCompositingFilter(
+      inputImage: transformedWatermarkImage,
+      backgroundImage: image
+    )
   }
 
   public func makeEffectImageWithoutScaling(
@@ -215,5 +265,19 @@ class HSDepthBlurEffect {
     //    depthBlurFilter.setValue(calibrationData, forKey: "inputCalibrationData")
     //    depthBlurFilter.setValue(CIVector(cgRect: CGRect.zero), forKey: "inputFocusRect")
     return depthBlurFilter.outputImage
+  }
+  
+  private func generateWatermarkCGImage(byResourceName name: String, extension ext: String) -> CGImage? {
+    guard let path = Bundle.main.path(forResource: name, ofType: ext) else {
+      return nil
+    }
+    let url = URL(fileURLWithPath: path)
+    guard
+      let imageSource = CGImageSourceCreateWithURL(url as CFURL, nil),
+      let image = CGImageSourceCreateImageAtIndex(imageSource, 0, nil)
+      else {
+        return nil
+    }
+    return image
   }
 }

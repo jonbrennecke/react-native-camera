@@ -34,6 +34,15 @@ class HSEffectPreviewView: UIView {
       effectView.isPaused = newValue
     }
   }
+  
+  public var watermarkProperties: HSDepthBlurEffect.WatermarkProperties? {
+    didSet {
+      guard let properties = watermarkProperties else {
+        return
+      }
+      effectSession.watermarkProperties = properties
+    }
+  }
 
   override func didMoveToSuperview() {
     super.didMoveToSuperview()

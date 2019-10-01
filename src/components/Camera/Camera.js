@@ -28,6 +28,7 @@ export type CameraProps = {
   resizeMode?: CameraResizeMode,
   blurAperture?: number,
   isPaused?: boolean,
+  watermarkImageNameWithExtension?: ?string
 };
 
 export class Camera extends PureComponent<CameraProps> {
@@ -53,6 +54,7 @@ export class Camera extends PureComponent<CameraProps> {
         resizeMode={this.props.resizeMode}
         blurAperture={this.props.blurAperture}
         isPaused={this.props.isPaused}
+        watermarkImageNameWithExtension={this.props.watermarkImageNameWithExtension}
         pointerEvents="none"
       />
     );

@@ -24,6 +24,7 @@ export type VideoCompositionProps = {
   resizeMode?: CameraResizeMode,
   blurAperture?: number,
   isReadyToLoad?: boolean,
+  watermarkImageNameWithExtension?: ?string,
   onPlaybackProgress?: (progress: number) => void,
   onPlaybackStateChange?: (playbackState: PlaybackState) => void,
   onMetadataLoaded?: (metadata: { [key: string]: any }) => void,
@@ -81,6 +82,7 @@ export class VideoComposition extends PureComponent<VideoCompositionProps> {
         resizeMode={this.props.resizeMode}
         blurAperture={this.props.blurAperture}
         isReadyToLoad={this.props.isReadyToLoad}
+        watermarkImageNameWithExtension={this.props.watermarkImageNameWithExtension}
         onPlaybackProgress={({ nativeEvent }) => {
           if (!nativeEvent || !this.props.onPlaybackProgress) {
             return;
