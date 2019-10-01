@@ -134,10 +134,11 @@ class HSCameraView: UIView {
   @objc
   public var watermarkImageNameWithExtension: String? {
     didSet {
-      guard let fileName = watermarkImageNameWithExtension else {
-        return
-      }
       if case let .effect(view) = previewView {
+        guard let fileName = watermarkImageNameWithExtension else {
+          view.watermarkProperties = nil
+          return
+        }
         view.watermarkProperties = HSDepthBlurEffect.WatermarkProperties(
           fileName: fileName, fileExtension: ""
         )

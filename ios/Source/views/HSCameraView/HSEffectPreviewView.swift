@@ -36,11 +36,11 @@ class HSEffectPreviewView: UIView {
   }
   
   public var watermarkProperties: HSDepthBlurEffect.WatermarkProperties? {
-    didSet {
-      guard let properties = watermarkProperties else {
-        return
-      }
-      effectSession.watermarkProperties = properties
+    get {
+      return effectSession.watermarkProperties
+    }
+    set {
+      effectSession.watermarkProperties = newValue
     }
   }
 
