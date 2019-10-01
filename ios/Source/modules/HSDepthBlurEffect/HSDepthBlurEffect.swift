@@ -8,7 +8,7 @@ class HSDepthBlurEffect {
     case depth
     case portraitBlur
   }
-  
+
   public struct WatermarkProperties {
     public let fileName: String
     public let fileExtension: String
@@ -70,7 +70,7 @@ class HSDepthBlurEffect {
     filter.setDefaults()
     return filter
   }()
-  
+
   private lazy var sourceAtopCompositingFilter: CIFilter? = {
     guard let filter = CIFilter(name: "CISourceAtopCompositing") else {
       return nil
@@ -136,7 +136,7 @@ class HSDepthBlurEffect {
     filter.setValue(inputImage, forKey: kCIInputImageKey)
     return filter
   }
-  
+
   private func applySourceAtopCompositingFilter(inputImage: CIImage, backgroundImage: CIImage) -> CIImage? {
     guard let sourceAtopCompositingFilter = sourceAtopCompositingFilter else {
       return nil
@@ -200,7 +200,7 @@ class HSDepthBlurEffect {
     depthBlurFilter.setValue(blurAperture, forKey: "inputAperture")
     depthBlurFilter.setValue(videoImage, forKey: kCIInputImageKey)
     depthBlurFilter.setValue(disparityImage, forKey: kCIInputDisparityImageKey)
-    guard let depthBlurImage =  depthBlurFilter.outputImage else {
+    guard let depthBlurImage = depthBlurFilter.outputImage else {
       return nil
     }
     if let properties = watermarkProperties {
@@ -212,7 +212,7 @@ class HSDepthBlurEffect {
       return depthBlurImage
     }
   }
-  
+
   private func applyWatermark(to image: CIImage, properties: WatermarkProperties) -> CIImage? {
     guard let watermarkCGImage = generateWatermarkCGImage(
       byResourceName: properties.fileName, extension: properties.fileExtension
@@ -222,11 +222,11 @@ class HSDepthBlurEffect {
     let scaleFactor = CGFloat(0.4)
     let watermarkImage = CIImage(cgImage: watermarkCGImage)
     let transformedWatermarkImage = watermarkImage
-        .transformed(by: CGAffineTransform(scaleX: scaleFactor, y: scaleFactor))
-        .transformed(by: CGAffineTransform(
-          translationX: image.extent.width - watermarkImage.extent.width * scaleFactor - 20,
-          y: 20
-        ))
+      .transformed(by: CGAffineTransform(scaleX: scaleFactor, y: scaleFactor))
+      .transformed(by: CGAffineTransform(
+        translationX: image.extent.width - watermarkImage.extent.width * scaleFactor - 20,
+        y: 20
+      ))
     return applySourceAtopCompositingFilter(
       inputImage: transformedWatermarkImage,
       backgroundImage: image
@@ -266,7 +266,7 @@ class HSDepthBlurEffect {
     //    depthBlurFilter.setValue(CIVector(cgRect: CGRect.zero), forKey: "inputFocusRect")
     return depthBlurFilter.outputImage
   }
-  
+
   private func generateWatermarkCGImage(byResourceName name: String, extension ext: String) -> CGImage? {
     guard let path = Bundle.main.path(forResource: name, ofType: ext) else {
       return nil
@@ -275,8 +275,8 @@ class HSDepthBlurEffect {
     guard
       let imageSource = CGImageSourceCreateWithURL(url as CFURL, nil),
       let image = CGImageSourceCreateImageAtIndex(imageSource, 0, nil)
-      else {
-        return nil
+    else {
+      return nil
     }
     return image
   }

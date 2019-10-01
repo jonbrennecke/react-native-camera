@@ -277,7 +277,7 @@ class HSVideoCompositionView: UIView {
       loadPreviewImage()
     }
   }
-  
+
 //  @objc
 //  public var watermarkImageNameWithExtension: String? {
 //    didSet {
@@ -289,7 +289,7 @@ class HSVideoCompositionView: UIView {
 //      }
 //      playerItem?.videoComposition = avVideoComposition
 //      if let compositor = playerItem?.customVideoCompositor as? HSVideoCompositor {
-//        
+//
 //        compositor.previewMode = previewMode
 //      }
 //      loadPreviewImage()

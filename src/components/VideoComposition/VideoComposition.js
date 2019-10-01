@@ -82,7 +82,9 @@ export class VideoComposition extends PureComponent<VideoCompositionProps> {
         resizeMode={this.props.resizeMode}
         blurAperture={this.props.blurAperture}
         isReadyToLoad={this.props.isReadyToLoad}
-        watermarkImageNameWithExtension={this.props.watermarkImageNameWithExtension}
+        watermarkImageNameWithExtension={
+          this.props.watermarkImageNameWithExtension
+        }
         onPlaybackProgress={({ nativeEvent }) => {
           if (!nativeEvent || !this.props.onPlaybackProgress) {
             return;

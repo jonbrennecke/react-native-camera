@@ -34,7 +34,7 @@ class HSEffectPreviewView: UIView {
       effectView.isPaused = newValue
     }
   }
-  
+
   public var watermarkProperties: HSDepthBlurEffect.WatermarkProperties? {
     get {
       return effectSession.watermarkProperties

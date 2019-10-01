@@ -130,7 +130,7 @@ class HSCameraView: UIView {
       }
     }
   }
-  
+
   @objc
   public var watermarkImageNameWithExtension: String? {
     didSet {
