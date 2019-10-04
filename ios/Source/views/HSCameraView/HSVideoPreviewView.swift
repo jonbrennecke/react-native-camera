@@ -5,7 +5,7 @@ import UIKit
 class HSVideoPreviewView: UIView {
   private lazy var previewLayer: AVCaptureVideoPreviewLayer = {
     let layer = AVCaptureVideoPreviewLayer(session: HSCameraManager.shared.captureSession)
-    layer.videoGravity = .resizeAspect
+    layer.videoGravity = .resizeAspectFill
     return layer
   }()
 
