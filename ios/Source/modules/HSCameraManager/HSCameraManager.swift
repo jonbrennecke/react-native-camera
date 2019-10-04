@@ -359,6 +359,10 @@ class HSCameraManager: NSObject {
       if isRunning {
         strongSelf.captureSession.stopRunning()
       }
+      try? strongSelf.videoCaptureDevice?.lockForConfiguration()
+      defer {
+        strongSelf.videoCaptureDevice?.unlockForConfiguration()
+      }
       strongSelf.position = position
       strongSelf.captureSession.beginConfiguration()
       strongSelf.captureSession.inputs.forEach { strongSelf.captureSession.removeInput($0) }
@@ -371,7 +375,6 @@ class HSCameraManager: NSObject {
       }
       strongSelf.captureSession.commitConfiguration()
       strongSelf.notifyResolutionObservers()
-      strongSelf.captureSession.commitConfiguration()
       if isRunning {
         strongSelf.captureSession.startRunning()
       }
@@ -558,10 +561,9 @@ class HSCameraManager: NSObject {
     cameraSetupQueue.async { [weak self] in
       guard let strongSelf = self else { return }
       if case .authorized = AVCaptureDevice.authorizationStatus(for: .video) {
-        guard strongSelf.captureSession.isRunning else {
+        if !strongSelf.captureSession.isRunning {
           strongSelf.captureSession.startRunning()
           strongSelf.notifyResolutionObservers()
-          return
         }
       }
     }

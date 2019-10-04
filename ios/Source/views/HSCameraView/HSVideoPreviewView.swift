@@ -42,12 +42,13 @@ class HSVideoPreviewView: UIView {
     resize(videoResolution: videoResolution)
   }
 
-  internal func resize(videoResolution: Size<Int>) {
-    let size = CGSize(width: videoResolution.width, height: videoResolution.height)
-    let scale = scaleForResizing(size, to: frame.size, resizeMode: resizeMode)
+  internal func resize(videoResolution _: Size<Int>) {
+    CATransaction.begin()
+    CATransaction.setDisableActions(true)
+    defer { CATransaction.commit() }
     previewLayer.frame = CGRect(
       origin: .zero,
-      size: size.applying(CGAffineTransform(scaleX: scale, y: scale))
+      size: frame.size
     )
   }
 

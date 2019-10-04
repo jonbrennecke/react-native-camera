@@ -150,12 +150,7 @@ class HSCameraView: UIView {
 extension HSCameraView: HSCameraManagerResolutionDelegate {
   func cameraManagerDidChangeResolution(videoResolution: Size<Int>, depthResolution _: Size<Int>) {
     DispatchQueue.main.async { [weak self] in
-      guard let strongSelf = self else { return }
-      strongSelf.layoutSubviews()
-      if case let .video(view) = strongSelf.previewView {
-        view.frame = strongSelf.bounds
-        view.resize(videoResolution: videoResolution)
-      }
+      self?.layoutSubviews()
     }
   }
 }
