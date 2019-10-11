@@ -190,7 +190,6 @@ class HSCameraManager: NSObject {
   }
 
   private func setupVideoInput() -> HSCameraSetupResult {
-    // set up device
     guard let videoCaptureDevice = videoCaptureDevice else {
       return .failure
     }
