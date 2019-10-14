@@ -120,9 +120,11 @@ RCT_EXPORT_METHOD(setFormat
                           }];
 }
 
-RCT_EXPORT_METHOD(startCameraPreview:(NSDictionary*)propertiesJSON callback
+RCT_EXPORT_METHOD(startCameraPreview
+                  : (NSDictionary *)propertiesJSON callback
                   : (RCTResponseSenderBlock)callback) {
-  HSCameraConfigurationProperties *properties = [RCTConvert HSCameraConfigurationProperties:propertiesJSON];
+  HSCameraConfigurationProperties *properties =
+      [RCTConvert HSCameraConfigurationProperties:propertiesJSON];
   if (!properties) {
     NSString *description = @"Failed to parse properties JSON object.";
     NSDictionary<NSString *, id> *error = RCTMakeError(description, @{}, nil);

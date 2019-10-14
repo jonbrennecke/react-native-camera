@@ -6,5 +6,5 @@
 #import "HSReactNativeCamera-Swift.h"
 
 @interface RCTConvert (HSCameraConfigurationProperties)
-+ (HSCameraConfigurationProperties*)HSCameraConfigurationProperties:(id)json;
++ (HSCameraConfigurationProperties *)HSCameraConfigurationProperties:(id)json;
 @end

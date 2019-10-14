@@ -3,16 +3,17 @@
 
 @implementation RCTConvert (HSCameraConfigurationProperties)
 
-+ (HSCameraConfigurationProperties*)HSCameraConfigurationProperties:(id)json {
-    NSDictionary * dict = [RCTConvert NSDictionary:json];
-    if (!dict) {
-      return NULL;
-    }
-  HSCameraResolutionPreset resolutionPreset = [RCTConvert HSCameraResolutionPreset:[dict valueForKey:@"resolutionPreset"]];
++ (HSCameraConfigurationProperties *)HSCameraConfigurationProperties:(id)json {
+  NSDictionary *dict = [RCTConvert NSDictionary:json];
+  if (!dict) {
+    return NULL;
+  }
+  HSCameraResolutionPreset resolutionPreset = [RCTConvert
+      HSCameraResolutionPreset:[dict valueForKey:@"resolutionPreset"]];
   BOOL depthEnabled = [RCTConvert BOOL:[dict valueForKey:@"depthEnabled"]];
   return [[HSCameraConfigurationProperties alloc]
-          initWithResolutionPreset:resolutionPreset
-          depthEnabled:depthEnabled];
+      initWithResolutionPreset:resolutionPreset
+                  depthEnabled:depthEnabled];
 }
 
 @end

@@ -27,7 +27,9 @@ export type CameraSetupProperties = {
   depthEnabled: boolean,
 };
 
-export const startCameraPreview = async (properties: $Shape<CameraSetupProperties>) => {
+export const startCameraPreview = async (
+  properties: $Shape<CameraSetupProperties>
+) => {
   await CameraManager.startCameraPreviewAsync(properties);
 };
 

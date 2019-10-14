@@ -164,14 +164,14 @@ class HSCameraManager: NSObject {
     }
     return .success
   }
-  
+
   private func set(resolutionPreset preset: HSCameraResolutionPreset) {
     let preset: AVCaptureSession.Preset = preset.avCaptureSessionPreset
     if captureSession.canSetSessionPreset(preset) {
       captureSession.sessionPreset = preset
     }
   }
-  
+
   private func setupVideoCaptureDevice(
     depthEnabled: Bool, position: AVCaptureDevice.Position
   ) -> HSCameraSetupResult {
@@ -399,7 +399,7 @@ class HSCameraManager: NSObject {
       strongSelf.captureSession.beginConfiguration()
       strongSelf.captureSession.inputs.forEach { strongSelf.captureSession.removeInput($0) }
       strongSelf.captureSession.outputs.forEach { strongSelf.captureSession.removeOutput($0) }
-//      TODO
+//      TODO:
 //      if case .failure = strongSelf.attemptToSetupCameraCaptureSession() {
 //        print("Failed to set up camera capture session")
 //      }

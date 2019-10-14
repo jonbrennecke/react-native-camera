@@ -1,7 +1,7 @@
 import AVFoundation
 
 @objc
-enum HSCameraResolutionPreset : Int {
+enum HSCameraResolutionPreset: Int {
   @objc(HSCameraResolutionPresetHD720p)
   case hd720p
   @objc(HSCameraResolutionPresetHD1080p)
@@ -10,7 +10,7 @@ enum HSCameraResolutionPreset : Int {
   case hd4K
   @objc(HSCameraResolutionPresetVGA)
   case vga
-  
+
   var avCaptureSessionPreset: AVCaptureSession.Preset {
     switch self {
     case .hd4K:
