@@ -193,7 +193,6 @@ class HSCameraManager: NSObject {
     if case .failure = setupVideoCaptureDevice() {
       return .failure
     }
-    configureActiveFormat()
 
     if case .failure = setupVideoInput() {
       return .failure
@@ -209,6 +208,7 @@ class HSCameraManager: NSObject {
       }
     }
 
+    configureActiveFormat()
     outputSynchronizer = config.depthEnabled
       ? AVCaptureDataOutputSynchronizer(
         dataOutputs: [videoOutput, depthOutput]
