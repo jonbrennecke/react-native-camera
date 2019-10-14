@@ -112,18 +112,14 @@ class HSCameraManager: NSObject {
   }
 
   private func notifyResolutionObservers() {
-    guard
-      let videoResolution = videoResolution,
-      let depthResolution = depthResolution
-    else {
-      return
-    }
     resolutionObservers.forEach { observer in
       if !observer.isPaused {
-        observer.cameraManagerDidChangeResolution(
-          videoResolution: videoResolution,
-          depthResolution: depthResolution
-        )
+        if let videoResolution = videoResolution {
+          observer.cameraManagerDidChange(videoResolution: videoResolution)
+        }
+        if let depthResolution = depthResolution {
+          observer.cameraManagerDidChange(depthResolution: depthResolution)
+        }
       }
     }
   }

@@ -8,7 +8,11 @@ class HSCameraResolutionObserver: HSObserver {
     self.delegate = delegate
   }
 
-  func cameraManagerDidChangeResolution(videoResolution: Size<Int>, depthResolution: Size<Int>) {
-    delegate?.cameraManagerDidChangeResolution(videoResolution: videoResolution, depthResolution: depthResolution)
+  func cameraManagerDidChange(videoResolution: Size<Int>) {
+    delegate?.cameraManagerDidChange(videoResolution: videoResolution)
+  }
+
+  func cameraManagerDidChange(depthResolution: Size<Int>) {
+    delegate?.cameraManagerDidChange(depthResolution: depthResolution)
   }
 }
