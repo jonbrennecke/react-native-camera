@@ -2,5 +2,6 @@ import Foundation
 import HSCameraUtils
 
 protocol HSCameraManagerResolutionDelegate: AnyObject {
-  func cameraManagerDidChangeResolution(videoResolution: Size<Int>, depthResolution: Size<Int>)
+  func cameraManagerDidChange(videoResolution: Size<Int>)
+  func cameraManagerDidChange(depthResolution: Size<Int>)
 }

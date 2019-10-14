@@ -7,6 +7,13 @@ import type { CameraFormat } from '../state';
 const { HSCameraManager: NativeCameraManager } = NativeModules;
 const CameraManager = Bluebird.promisifyAll(NativeCameraManager);
 
+export const CameraResolutionPresets = {
+  hd720p: 'hd720p',
+  hd1080p: 'hd1080p',
+  hd4K: 'hd4K',
+  vga: 'vga',
+};
+
 export const requestCameraPermissions = async (): Promise<boolean> => {
   return CameraManager.requestCameraPermissionsAsync();
 };
@@ -15,8 +22,15 @@ export const hasCameraPermissions = async (): Promise<boolean> => {
   return await CameraManager.hasCameraPermissionsAsync();
 };
 
-export const startCameraPreview = () => {
-  CameraManager.startCameraPreview();
+export type CameraConfigurationProperties = {
+  resolutionPreset: $Keys<typeof CameraResolutionPresets>,
+  depthEnabled: boolean,
+};
+
+export const startCameraPreview = async (
+  config: CameraConfigurationProperties
+) => {
+  await CameraManager.startCameraPreviewAsync(config);
 };
 
 export const stopCameraPreview = () => {
@@ -61,11 +75,11 @@ export const setExposure = async (exposure: number): Promise<void> => {
   return await CameraManager.setExposureAsync(exposure);
 };
 
-// eslint-disable-next-line flowtype/generic-spacing
-export const getSupportedFormats = async (): Promise<
-  { [key: string]: any }[]
-> => {
-  return await CameraManager.getSupportedFormatsAsync();
+export const getSupportedFormats = async (
+  depthEnabled: boolean,
+  position: 'front' | 'back'
+): Promise<{ [key: string]: any }[]> => {
+  return await CameraManager.getSupportedFormatsAsync(depthEnabled, position);
 };
 
 export const setFormatWithDepth = async (

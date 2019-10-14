@@ -33,12 +33,14 @@ const initialState: State = {};
 const CameraStateContainer = createCameraStateHOC(state => state.camera);
 
 const Component = CameraStateContainer(
-  ({ startCapture, stopCapture, captureStatus, loadSupportedFeatures }) => {
-    const setup = async (getState, setState): Promise<void> => {
+  ({ startCapture, stopCapture, captureStatus }) => {
+    const setup = async (): Promise<void> => {
       try {
         await requestCameraPermissions();
-        // await loadSupportedFeatures();
-        startCameraPreview();
+        startCameraPreview({
+          resolutionPreset: 'hd720p',
+          depthEnabled: false,
+        });
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error(error);
@@ -60,12 +62,12 @@ const Component = CameraStateContainer(
       <StorybookStateWrapper
         initialState={initialState}
         onMount={setup}
-        render={getState => (
+        render={() => (
           <>
             <Camera
               style={styles.flex}
               cameraPosition="front"
-              previewMode="portraitMode"
+              previewMode="normal"
               resizeMode="scaleAspectWidth"
             />
             <Button

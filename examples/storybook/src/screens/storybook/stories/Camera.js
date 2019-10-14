@@ -24,7 +24,11 @@ const styles = {
 const loadAsync = async () => {
   try {
     await requestCameraPermissions();
-    startCameraPreview();
+    const depthEnabled = true;
+    startCameraPreview({
+      resolutionPreset: 'hd720p',
+      depthEnabled,
+    });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -55,7 +59,7 @@ stories.add('Camera', () => (
               Depth: 'depth',
               'Portrait mode': 'portraitMode',
             },
-            'portraitMode'
+            'normal'
           )}
           resizeMode={select(
             'Resize mode',
@@ -73,7 +77,9 @@ stories.add('Camera', () => (
             max: 20,
             step: 0.1,
           })}
-          watermarkImageNameWithExtension={boolean('Watermark', false) ? 'Watermark.png' : null}
+          watermarkImageNameWithExtension={
+            boolean('Watermark', false) ? 'Watermark.png' : null
+          }
         />
       )}
     />

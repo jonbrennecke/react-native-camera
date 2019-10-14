@@ -1,6 +1,8 @@
 #import <Photos/Photos.h>
 #import <React/RCTUtils.h>
 
+#import "HSCameraConfigurationProperties+RCTConvert.h"
+
 #import "HSCameraManagerBridgeModule.h"
 #import "HSReactNativeCamera-Swift.h"
 
@@ -65,11 +67,16 @@ RCT_EXPORT_METHOD(setExposure
        }];
 }
 
-RCT_EXPORT_METHOD(getSupportedFormats : (RCTResponseSenderBlock)callback) {
-  HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
-  NSMutableArray<id> *formats = [[NSMutableArray alloc]
-      initWithCapacity:cameraManager.supportedFormats.count];
-  for (HSCameraFormat *format in cameraManager.supportedFormats) {
+RCT_EXPORT_METHOD(getSupportedFormats
+                  : (BOOL)depthEnabled position
+                  : (AVCaptureDevicePosition)position callback
+                  : (RCTResponseSenderBlock)callback) {
+  NSArray<id> *supportedFormats =
+      [HSCameraManager getSupportedFormatsWithDepthEnabled:depthEnabled
+                                                  position:position];
+  NSMutableArray<id> *formats =
+      [[NSMutableArray alloc] initWithCapacity:supportedFormats.count];
+  for (HSCameraFormat *format in supportedFormats) {
     [formats addObject:[format asDictionary]];
   }
   callback(@[ [NSNull null], formats ]);
@@ -118,10 +125,21 @@ RCT_EXPORT_METHOD(setFormat
                           }];
 }
 
-RCT_EXPORT_METHOD(startCameraPreview) {
+RCT_EXPORT_METHOD(startCameraPreview
+                  : (NSDictionary *)configJSON callback
+                  : (RCTResponseSenderBlock)callback) {
+  HSCameraConfigurationProperties *config =
+      [RCTConvert HSCameraConfigurationProperties:configJSON];
+  if (!config) {
+    NSString *description = @"Failed to parse config JSON object.";
+    NSDictionary<NSString *, id> *error = RCTMakeError(description, @{}, nil);
+    callback(@[ error, [NSNull null] ]);
+    return;
+  }
   HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
-  [cameraManager setupCameraCaptureSession];
+  [cameraManager setupCameraCaptureSessionWithConfig:config];
   [cameraManager startPreview];
+  callback(@[ [NSNull null], [NSNull null] ]);
 }
 
 RCT_EXPORT_METHOD(stopCameraPreview) {
