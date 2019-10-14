@@ -9,7 +9,7 @@ fileprivate let videoMaxFramesPerSecond = Int(30)
 // the max number of concurrent drawables supported by CoreAnimation
 fileprivate let maxSimultaneousFrames: Int = 3
 
-@available(iOS 11.1, *)
+@available(iOS 11, *)
 @objc
 class HSCameraManager: NSObject {
   private enum State {
@@ -21,6 +21,7 @@ class HSCameraManager: NSObject {
   }
 
   private let isDebugLogEnabled = false
+  private var isDepthEnabled = false
   private var state: State = .none
   private var paused = false
   private let cameraOutputQueue = DispatchQueue(
@@ -124,7 +125,7 @@ class HSCameraManager: NSObject {
     }
   }
 
-  private func setupAssetWriter(to outputURL: URL) -> HSCameraSetupResult {
+  private func setupAssetWriter(to outputURL: URL, withDepthEnabled enableDepth: Bool) -> HSCameraSetupResult {
     assetWriter = HSVideoWriter()
     guard
       let depthSize = depthResolution,
@@ -149,23 +150,47 @@ class HSCameraManager: NSObject {
       let audioInput = assetWriterAudioInput,
       case .success = assetWriter.add(input: audioInput),
       let videoInput = assetWriterVideoInput,
-      case .success = assetWriter.add(input: videoInput),
-      let depthInput = assetWriterDepthInput,
-      case .success = assetWriter.add(input: depthInput)
+      case .success = assetWriter.add(input: videoInput)
     else {
       return .failure
     }
+    if enableDepth {
+      guard
+        let depthInput = assetWriterDepthInput,
+        case .success = assetWriter.add(input: depthInput)
+      else {
+        return .failure
+      }
+    }
     return .success
   }
-
-  private func attemptToSetupCameraCaptureSession() -> HSCameraSetupResult {
-    let preset: AVCaptureSession.Preset = .hd1280x720
+  
+  private func set(resolutionPreset preset: HSCameraResolutionPreset) {
+    let preset: AVCaptureSession.Preset = preset.avCaptureSessionPreset
     if captureSession.canSetSessionPreset(preset) {
       captureSession.sessionPreset = preset
     }
+  }
+  
+  private func setupVideoCaptureDevice(
+    depthEnabled: Bool, position: AVCaptureDevice.Position
+  ) -> HSCameraSetupResult {
+    if #available(iOS 11.1, *) {
+      videoCaptureDevice = depthEnabled
+        ? depthEnabledCaptureDevice(withPosition: position)
+        : captureDevice(withPosition: position)
+    } else {
+      videoCaptureDevice = captureDevice(withPosition: position)
+    }
+    return videoCaptureDevice != nil ? .success : .failure
+  }
 
-    videoCaptureDevice = depthEnabledCaptureDevice(withPosition: position)
-    if case .none = videoCaptureDevice {
+  private func attemptToSetupCameraCaptureSession(
+    _ properties: HSCameraConfigurationProperties
+  ) -> HSCameraSetupResult {
+    isDepthEnabled = properties.depthEnabled
+    set(resolutionPreset: properties.resolutionPreset)
+    if case .failure = setupVideoCaptureDevice(depthEnabled: properties.depthEnabled, position: position) {
       return .failure
     }
 
@@ -177,14 +202,20 @@ class HSCameraManager: NSObject {
       return .failure
     }
 
-    if case .failure = setupDepthOutput() {
-      return .failure
+    if isDepthEnabled {
+      if case .failure = setupDepthOutput() {
+        return .failure
+      }
     }
 
     configureActiveFormat()
-    outputSynchronizer = AVCaptureDataOutputSynchronizer(
-      dataOutputs: [videoOutput, depthOutput]
-    )
+    outputSynchronizer = isDepthEnabled
+      ? AVCaptureDataOutputSynchronizer(
+        dataOutputs: [videoOutput, depthOutput]
+      )
+      : AVCaptureDataOutputSynchronizer(
+        dataOutputs: [videoOutput]
+      )
     outputSynchronizer?.setDelegate(self, queue: DispatchQueue.main)
     return .success
   }
@@ -333,7 +364,9 @@ class HSCameraManager: NSObject {
       videoCaptureDevice.videoZoomFactor = searchResult.format.videoMinZoomFactorForDepthDataDelivery
       videoCaptureDevice.activeVideoMinFrameDuration = CMTime(value: 1, timescale: CMTimeScale(videoMinFramesPerSecond))
       videoCaptureDevice.activeVideoMaxFrameDuration = CMTime(value: 1, timescale: CMTimeScale(videoMaxFramesPerSecond))
-      videoCaptureDevice.activeDepthDataMinFrameDuration = CMTime(value: 1, timescale: CMTimeScale(depthMinFramesPerSecond))
+      if #available(iOS 12.0, *) {
+        videoCaptureDevice.activeDepthDataMinFrameDuration = CMTime(value: 1, timescale: CMTimeScale(depthMinFramesPerSecond))
+      }
     }
   }
 
@@ -366,9 +399,10 @@ class HSCameraManager: NSObject {
       strongSelf.captureSession.beginConfiguration()
       strongSelf.captureSession.inputs.forEach { strongSelf.captureSession.removeInput($0) }
       strongSelf.captureSession.outputs.forEach { strongSelf.captureSession.removeOutput($0) }
-      if case .failure = strongSelf.attemptToSetupCameraCaptureSession() {
-        print("Failed to set up camera capture session")
-      }
+//      TODO
+//      if case .failure = strongSelf.attemptToSetupCameraCaptureSession() {
+//        print("Failed to set up camera capture session")
+//      }
       if case .failure = strongSelf.attemptToSetupAudioCaptureSession() {
         print("Failed to set up audio capture session")
       }
@@ -428,7 +462,10 @@ class HSCameraManager: NSObject {
 
   @objc
   public static func hasSupportedCameraDevice(withPosition position: AVCaptureDevice.Position) -> Bool {
-    return getDepthEnabledCaptureDevices(withPosition: position).count > 0
+    if #available(iOS 11.1, *) {
+      return getDepthEnabledCaptureDevices(withPosition: position).count > 0
+    }
+    return false
   }
 
   @objc
@@ -534,7 +571,7 @@ class HSCameraManager: NSObject {
   }
 
   @objc
-  public func setupCameraCaptureSession() {
+  public func setupCameraCaptureSession(properties: HSCameraConfigurationProperties) {
     cameraSetupQueue.async { [weak self] in
       guard let strongSelf = self else { return }
       let isRunning = strongSelf.captureSession.isRunning
@@ -542,7 +579,7 @@ class HSCameraManager: NSObject {
         strongSelf.captureSession.stopRunning()
       }
       strongSelf.captureSession.beginConfiguration()
-      if case .failure = strongSelf.attemptToSetupCameraCaptureSession() {
+      if case .failure = strongSelf.attemptToSetupCameraCaptureSession(properties) {
         print("Failed to set up camera capture session")
       }
       if case .failure = strongSelf.attemptToSetupAudioCaptureSession() {
@@ -592,7 +629,9 @@ class HSCameraManager: NSObject {
       }
       do {
         let outputURL = try makeEmptyVideoOutputFile()
-        guard case .success = strongSelf.setupAssetWriter(to: outputURL) else {
+        guard case .success = strongSelf.setupAssetWriter(
+          to: outputURL, withDepthEnabled: strongSelf.isDepthEnabled
+        ) else {
           completionHandler(nil, false)
           return
         }
@@ -655,7 +694,7 @@ class HSCameraManager: NSObject {
   }
 }
 
-@available(iOS 11.1, *)
+@available(iOS 11.0, *)
 extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
   func dataOutputSynchronizer(
     _: AVCaptureDataOutputSynchronizer, didOutput collection: AVCaptureSynchronizedDataCollection

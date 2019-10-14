@@ -147,6 +147,7 @@ class HSCameraView: UIView {
   }
 }
 
+@available(iOS 11.1, *)
 extension HSCameraView: HSCameraManagerResolutionDelegate {
   func cameraManagerDidChangeResolution(videoResolution: Size<Int>, depthResolution _: Size<Int>) {
     DispatchQueue.main.async { [weak self] in

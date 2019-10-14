@@ -1,6 +1,8 @@
 #import <Photos/Photos.h>
 #import <React/RCTUtils.h>
 
+#import "HSCameraConfigurationProperties+RCTConvert.h"
+
 #import "HSCameraManagerBridgeModule.h"
 #import "HSReactNativeCamera-Swift.h"
 
@@ -118,10 +120,19 @@ RCT_EXPORT_METHOD(setFormat
                           }];
 }
 
-RCT_EXPORT_METHOD(startCameraPreview) {
+RCT_EXPORT_METHOD(startCameraPreview:(NSDictionary*)propertiesJSON callback
+                  : (RCTResponseSenderBlock)callback) {
+  HSCameraConfigurationProperties *properties = [RCTConvert HSCameraConfigurationProperties:propertiesJSON];
+  if (!properties) {
+    NSString *description = @"Failed to parse properties JSON object.";
+    NSDictionary<NSString *, id> *error = RCTMakeError(description, @{}, nil);
+    callback(@[ error, [NSNull null] ]);
+    return;
+  }
   HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
-  [cameraManager setupCameraCaptureSession];
+  [cameraManager setupCameraCaptureSessionWithProperties:properties];
   [cameraManager startPreview];
+  callback(@[ [NSNull null], [NSNull null] ]);
 }
 
 RCT_EXPORT_METHOD(stopCameraPreview) {

@@ -24,7 +24,12 @@ const styles = {
 const loadAsync = async () => {
   try {
     await requestCameraPermissions();
-    startCameraPreview();
+    startCameraPreview({
+      // resolutionPreset: 'hd720p',
+      // depthEnabled: true,
+      resolutionPreset: 'hd720p',
+      depthEnabled: false,
+    });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);

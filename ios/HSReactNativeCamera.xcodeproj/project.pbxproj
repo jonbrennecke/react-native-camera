@@ -64,6 +64,10 @@
 		FCBFAF1122CBF28B00A0AC11 /* createSegmentationMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBFAF1022CBF28B00A0AC11 /* createSegmentationMask.swift */; };
 		FCC96F3622FA9DAA00CDCEB2 /* HSResizeMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC96F3522FA9DAA00CDCEB2 /* HSResizeMode.swift */; };
 		FCC96F3922FA9E1300CDCEB2 /* HSResizeMode+RCTConvert.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC96F3822FA9E1300CDCEB2 /* HSResizeMode+RCTConvert.m */; };
+		FCCAAAF623510D10002C891F /* HSCameraResolutionPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCCAAAF523510D10002C891F /* HSCameraResolutionPreset.swift */; };
+		FCCAAAF923510D82002C891F /* HSCameraConfigurationProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCCAAAF823510D82002C891F /* HSCameraConfigurationProperties.swift */; };
+		FCCAAAFB23510F35002C891F /* HSCameraResolutionPreset+RCTConvert.m in Sources */ = {isa = PBXBuildFile; fileRef = FCCAAAFA23510F35002C891F /* HSCameraResolutionPreset+RCTConvert.m */; };
+		FCCAAAFF23511278002C891F /* HSCameraConfigurationProperties+RCTConvert.m in Sources */ = {isa = PBXBuildFile; fileRef = FCCAAAFE23511278002C891F /* HSCameraConfigurationProperties+RCTConvert.m */; };
 		FCD20B5A231247CB003662FA /* HSCameraResolutionObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCD20B59231247CB003662FA /* HSCameraResolutionObserver.swift */; };
 		FCD20B5D23124830003662FA /* HSObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCD20B5C23124830003662FA /* HSObserver.swift */; };
 		FCD20B5F23124944003662FA /* HSObserverCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCD20B5E23124944003662FA /* HSObserverCollection.swift */; };
@@ -186,6 +190,12 @@
 		FCC96F3522FA9DAA00CDCEB2 /* HSResizeMode.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSResizeMode.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FCC96F3822FA9E1300CDCEB2 /* HSResizeMode+RCTConvert.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "HSResizeMode+RCTConvert.m"; sourceTree = "<group>"; };
 		FCC96F3A22FA9E1D00CDCEB2 /* HSResizeMode+RCTConvert.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HSResizeMode+RCTConvert.h"; sourceTree = "<group>"; };
+		FCCAAAF523510D10002C891F /* HSCameraResolutionPreset.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSCameraResolutionPreset.swift; sourceTree = "<group>"; tabWidth = 2; };
+		FCCAAAF823510D82002C891F /* HSCameraConfigurationProperties.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSCameraConfigurationProperties.swift; sourceTree = "<group>"; tabWidth = 2; };
+		FCCAAAFA23510F35002C891F /* HSCameraResolutionPreset+RCTConvert.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "HSCameraResolutionPreset+RCTConvert.m"; sourceTree = "<group>"; };
+		FCCAAAFC2351107E002C891F /* HSCameraResolutionPreset+RCTConvert.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HSCameraResolutionPreset+RCTConvert.h"; sourceTree = "<group>"; };
+		FCCAAAFD2351123E002C891F /* HSCameraConfigurationProperties+RCTConvert.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HSCameraConfigurationProperties+RCTConvert.h"; sourceTree = "<group>"; };
+		FCCAAAFE23511278002C891F /* HSCameraConfigurationProperties+RCTConvert.m */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.c.objc; path = "HSCameraConfigurationProperties+RCTConvert.m"; sourceTree = "<group>"; tabWidth = 2; };
 		FCD20B59231247CB003662FA /* HSCameraResolutionObserver.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSCameraResolutionObserver.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FCD20B5C23124830003662FA /* HSObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSObserver.swift; sourceTree = "<group>"; };
 		FCD20B5E23124944003662FA /* HSObserverCollection.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSObserverCollection.swift; sourceTree = "<group>"; tabWidth = 2; };
@@ -378,6 +388,8 @@
 				FC845E1D22B992B200522016 /* HSCameraManagerBridgeModule.m */,
 				FC845E1F22B992BB00522016 /* HSCameraManagerBridgeModule.h */,
 				FC6CB74D2318C75D00310C3D /* HSCameraFormatSearchDescriptor.swift */,
+				FCCAAAF823510D82002C891F /* HSCameraConfigurationProperties.swift */,
+				FCCAAAF523510D10002C891F /* HSCameraResolutionPreset.swift */,
 			);
 			path = HSCameraManager;
 			sourceTree = "<group>";
@@ -454,6 +466,8 @@
 		FCC96F3722FA9DBC00CDCEB2 /* RCTConvert */ = {
 			isa = PBXGroup;
 			children = (
+				FCCAAAFA23510F35002C891F /* HSCameraResolutionPreset+RCTConvert.m */,
+				FCCAAAFC2351107E002C891F /* HSCameraResolutionPreset+RCTConvert.h */,
 				FC7EFBE522FA11A10002B254 /* AVCaptureDevicePosition+RCTConvert.m */,
 				FC7EFBE822FA121C0002B254 /* AVCaptureDevicePosition+RCTConvert.h */,
 				FC7EFBEF22FA560D0002B254 /* HSEffectPreviewMode+RCTConvert.m */,
@@ -462,6 +476,8 @@
 				FCC96F3A22FA9E1D00CDCEB2 /* HSResizeMode+RCTConvert.h */,
 				FC82B6A3230DF83000D4AB4F /* HSVideoPlaybackState+RCTConvert.m */,
 				FC82B6A6230DF87600D4AB4F /* HSVideoPlaybackState+RCTConvert.h */,
+				FCCAAAFD2351123E002C891F /* HSCameraConfigurationProperties+RCTConvert.h */,
+				FCCAAAFE23511278002C891F /* HSCameraConfigurationProperties+RCTConvert.m */,
 			);
 			path = RCTConvert;
 			sourceTree = "<group>";
@@ -595,6 +611,7 @@
 				FCFE0F4B23122B7F00765907 /* WeakReference.swift in Sources */,
 				FCBFAF0822CBE27300A0AC11 /* Result.swift in Sources */,
 				FC6155A322FCA57600BF446D /* HSMetalEffectView.swift in Sources */,
+				FCCAAAFF23511278002C891F /* HSCameraConfigurationProperties+RCTConvert.m in Sources */,
 				FC6CB7652319957A00310C3D /* HSHiddenVolumeViewManager.m in Sources */,
 				FC552C9922E9320C00775729 /* fileUtils.swift in Sources */,
 				FC664EE722CAD98D00FD8AE7 /* HSCameraManagerDepthDataDelegate.swift in Sources */,
@@ -602,9 +619,11 @@
 				FC552CA222E939F800775729 /* HSVideoCompositionExportManagerBridgeModule.m in Sources */,
 				FCDF906422E6885900AD5F4D /* HSMinMaxInterval.swift in Sources */,
 				FC664EED22CAD9A500FD8AE7 /* HSCameraView.swift in Sources */,
+				FCCAAAF623510D10002C891F /* HSCameraResolutionPreset.swift in Sources */,
 				FC904B9222EFDBB20010AD4F /* HSMinMaxInterval+FromDictionary.swift in Sources */,
 				FC7EFBEE22FA55AF0002B254 /* HSEffectPreviewMode.swift in Sources */,
 				FC2FB8F022CBCEA5007CE0AF /* HSSegmentationModelLoader.swift in Sources */,
+				FCCAAAFB23510F35002C891F /* HSCameraResolutionPreset+RCTConvert.m in Sources */,
 				FC03B62D22DFD6C700E283B3 /* HSPortraitMask.swift in Sources */,
 				FC552CA022E9390900775729 /* HSVideoCompositionExportManagerDelegate.swift in Sources */,
 				FC6CB7622319937700310C3D /* HSHiddenVolumeView.swift in Sources */,
@@ -622,6 +641,7 @@
 				FC664EE822CAD98D00FD8AE7 /* HSCameraSetupResult.swift in Sources */,
 				FC664EE322CAD98000FD8AE7 /* HSEffectSession.swift in Sources */,
 				FC31DAB422E6279700D1FADD /* HSDepthBlurEffect.swift in Sources */,
+				FCCAAAF923510D82002C891F /* HSCameraConfigurationProperties.swift in Sources */,
 				FC82B6AC230F70E700D4AB4F /* resizeUtils.swift in Sources */,
 				FC7EFBEC22FA20550002B254 /* HSEffectPreviewView.swift in Sources */,
 				FC526E7C22F0B9B700582BB5 /* ToDictionary.swift in Sources */,
@@ -760,7 +780,7 @@
 				DEVELOPMENT_TEAM = 6DUV3UU8M8;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/Frameworks/**";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -802,7 +822,7 @@
 				DEVELOPMENT_TEAM = 6DUV3UU8M8;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/Frameworks/**";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",

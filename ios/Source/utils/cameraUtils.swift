@@ -9,6 +9,14 @@ internal func depthEnabledCaptureDevice(withPosition position: AVCaptureDevice.P
   return discoverySession.devices.first
 }
 
+internal func captureDevice(withPosition position: AVCaptureDevice.Position) -> AVCaptureDevice? {
+  let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [
+    .builtInWideAngleCamera,
+    .builtInTelephotoCamera,
+  ], mediaType: .video, position: position)
+  return discoverySession.devices.first
+}
+
 @available(iOS 11.1, *)
 internal func getDepthEnabledCaptureDevices(withPosition position: AVCaptureDevice.Position) -> [AVCaptureDevice] {
   let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [
