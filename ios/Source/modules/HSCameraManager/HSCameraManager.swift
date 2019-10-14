@@ -175,11 +175,9 @@ class HSCameraManager: NSObject {
     }
   }
 
-  private func setupVideoCaptureDevice(
-    depthEnabled: Bool, position: AVCaptureDevice.Position
-  ) -> HSCameraSetupResult {
+  private func setupVideoCaptureDevice() -> HSCameraSetupResult {
     if #available(iOS 11.1, *) {
-      videoCaptureDevice = depthEnabled
+      videoCaptureDevice = config.depthEnabled
         ? depthEnabledCaptureDevice(withPosition: position)
         : captureDevice(withPosition: position)
     } else {
@@ -192,7 +190,7 @@ class HSCameraManager: NSObject {
     _ config: HSCameraConfigurationProperties
   ) -> HSCameraSetupResult {
     set(configProperties: config)
-    if case .failure = setupVideoCaptureDevice(depthEnabled: config.depthEnabled, position: position) {
+    if case .failure = setupVideoCaptureDevice() {
       return .failure
     }
     configureActiveFormat()
@@ -348,7 +346,7 @@ class HSCameraManager: NSObject {
       }
       let searchDescriptor = HSCameraFormatSearchDescriptor(
         depthPixelFormatTypeRule: config.depthEnabled ? .oneOf([depthPixelFormat]) : .any,
-        depthDimensionsRule: config.depthEnabled && position == .front
+        depthDimensionsRule: config.depthEnabled
           ? .greaterThanOrEqualTo(Size<Int>(width: 640, height: 360))
           : .any,
         videoDimensionsRule: .equalTo(config.resolutionPreset.landscapeSize),
@@ -550,8 +548,7 @@ class HSCameraManager: NSObject {
     position: AVCaptureDevice.Position
   ) -> [HSCameraFormat] {
     if #available(iOS 11.1, *) {
-      let videoCaptureDevice =
-        depthEnabled
+      let videoCaptureDevice = depthEnabled
         ? depthEnabledCaptureDevice(withPosition: position)
         : captureDevice(withPosition: position)
       return videoCaptureDevice?
