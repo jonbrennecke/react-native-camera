@@ -21,7 +21,10 @@ class HSCameraManager: NSObject {
   }
 
   private let isDebugLogEnabled = false
-  private var isDepthEnabled = false
+  private var config = HSCameraConfigurationProperties(
+    resolutionPreset: .hd720p,
+    depthEnabled: false
+  )
   private var state: State = .none
   private var paused = false
   private let cameraOutputQueue = DispatchQueue(
@@ -125,19 +128,18 @@ class HSCameraManager: NSObject {
     }
   }
 
-  private func setupAssetWriter(to outputURL: URL, withDepthEnabled enableDepth: Bool) -> HSCameraSetupResult {
+  private func setupAssetWriter(to outputURL: URL) -> HSCameraSetupResult {
     assetWriter = HSVideoWriter()
-    guard
-      let depthSize = depthResolution,
-      let videoSize = videoResolution
-    else {
+    if config.depthEnabled, let depthSize = depthResolution {
+      assetWriterDepthInput = HSVideoWriterFrameBufferInput(
+        videoSize: depthSize,
+        pixelFormatType: kCVPixelFormatType_OneComponent8,
+        isRealTime: true
+      )
+    }
+    guard let videoSize = videoResolution else {
       return .failure
     }
-    assetWriterDepthInput = HSVideoWriterFrameBufferInput(
-      videoSize: depthSize,
-      pixelFormatType: kCVPixelFormatType_OneComponent8,
-      isRealTime: true
-    )
     assetWriterVideoInput = HSVideoWriterFrameBufferInput(
       videoSize: videoSize,
       pixelFormatType: videoPixelFormat,
@@ -154,7 +156,7 @@ class HSCameraManager: NSObject {
     else {
       return .failure
     }
-    if enableDepth {
+    if config.depthEnabled {
       guard
         let depthInput = assetWriterDepthInput,
         case .success = assetWriter.add(input: depthInput)
@@ -163,6 +165,11 @@ class HSCameraManager: NSObject {
       }
     }
     return .success
+  }
+
+  private func set(configProperties config: HSCameraConfigurationProperties) {
+    self.config = config
+    set(resolutionPreset: config.resolutionPreset)
   }
 
   private func set(resolutionPreset preset: HSCameraResolutionPreset) {
@@ -186,11 +193,10 @@ class HSCameraManager: NSObject {
   }
 
   private func attemptToSetupCameraCaptureSession(
-    _ properties: HSCameraConfigurationProperties
+    _ config: HSCameraConfigurationProperties
   ) -> HSCameraSetupResult {
-    isDepthEnabled = properties.depthEnabled
-    set(resolutionPreset: properties.resolutionPreset)
-    if case .failure = setupVideoCaptureDevice(depthEnabled: properties.depthEnabled, position: position) {
+    set(configProperties: config)
+    if case .failure = setupVideoCaptureDevice(depthEnabled: config.depthEnabled, position: position) {
       return .failure
     }
 
@@ -202,14 +208,14 @@ class HSCameraManager: NSObject {
       return .failure
     }
 
-    if isDepthEnabled {
+    if config.depthEnabled {
       if case .failure = setupDepthOutput() {
         return .failure
       }
     }
 
     configureActiveFormat()
-    outputSynchronizer = isDepthEnabled
+    outputSynchronizer = config.depthEnabled
       ? AVCaptureDataOutputSynchronizer(
         dataOutputs: [videoOutput, depthOutput]
       )
@@ -399,10 +405,9 @@ class HSCameraManager: NSObject {
       strongSelf.captureSession.beginConfiguration()
       strongSelf.captureSession.inputs.forEach { strongSelf.captureSession.removeInput($0) }
       strongSelf.captureSession.outputs.forEach { strongSelf.captureSession.removeOutput($0) }
-//      TODO:
-//      if case .failure = strongSelf.attemptToSetupCameraCaptureSession() {
-//        print("Failed to set up camera capture session")
-//      }
+      if case .failure = strongSelf.attemptToSetupCameraCaptureSession(strongSelf.config) {
+        print("Failed to set up camera capture session")
+      }
       if case .failure = strongSelf.attemptToSetupAudioCaptureSession() {
         print("Failed to set up audio capture session")
       }
@@ -571,7 +576,7 @@ class HSCameraManager: NSObject {
   }
 
   @objc
-  public func setupCameraCaptureSession(properties: HSCameraConfigurationProperties) {
+  public func setupCameraCaptureSession(config: HSCameraConfigurationProperties) {
     cameraSetupQueue.async { [weak self] in
       guard let strongSelf = self else { return }
       let isRunning = strongSelf.captureSession.isRunning
@@ -579,7 +584,7 @@ class HSCameraManager: NSObject {
         strongSelf.captureSession.stopRunning()
       }
       strongSelf.captureSession.beginConfiguration()
-      if case .failure = strongSelf.attemptToSetupCameraCaptureSession(properties) {
+      if case .failure = strongSelf.attemptToSetupCameraCaptureSession(config) {
         print("Failed to set up camera capture session")
       }
       if case .failure = strongSelf.attemptToSetupAudioCaptureSession() {
@@ -629,9 +634,7 @@ class HSCameraManager: NSObject {
       }
       do {
         let outputURL = try makeEmptyVideoOutputFile()
-        guard case .success = strongSelf.setupAssetWriter(
-          to: outputURL, withDepthEnabled: strongSelf.isDepthEnabled
-        ) else {
+        guard case .success = strongSelf.setupAssetWriter(to: outputURL) else {
           completionHandler(nil, false)
           return
         }

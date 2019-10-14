@@ -121,18 +121,18 @@ RCT_EXPORT_METHOD(setFormat
 }
 
 RCT_EXPORT_METHOD(startCameraPreview
-                  : (NSDictionary *)propertiesJSON callback
+                  : (NSDictionary *)configJSON callback
                   : (RCTResponseSenderBlock)callback) {
-  HSCameraConfigurationProperties *properties =
-      [RCTConvert HSCameraConfigurationProperties:propertiesJSON];
-  if (!properties) {
-    NSString *description = @"Failed to parse properties JSON object.";
+  HSCameraConfigurationProperties *config =
+      [RCTConvert HSCameraConfigurationProperties:configJSON];
+  if (!config) {
+    NSString *description = @"Failed to parse config JSON object.";
     NSDictionary<NSString *, id> *error = RCTMakeError(description, @{}, nil);
     callback(@[ error, [NSNull null] ]);
     return;
   }
   HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
-  [cameraManager setupCameraCaptureSessionWithProperties:properties];
+  [cameraManager setupCameraCaptureSessionWithConfig:config];
   [cameraManager startPreview];
   callback(@[ [NSNull null], [NSNull null] ]);
 }
