@@ -67,11 +67,16 @@ RCT_EXPORT_METHOD(setExposure
        }];
 }
 
-RCT_EXPORT_METHOD(getSupportedFormats : (RCTResponseSenderBlock)callback) {
-  HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
-  NSMutableArray<id> *formats = [[NSMutableArray alloc]
-      initWithCapacity:cameraManager.supportedFormats.count];
-  for (HSCameraFormat *format in cameraManager.supportedFormats) {
+RCT_EXPORT_METHOD(getSupportedFormats
+                  : (BOOL)depthEnabled position
+                  : (AVCaptureDevicePosition)position callback
+                  : (RCTResponseSenderBlock)callback) {
+  NSArray<id> *supportedFormats =
+      [HSCameraManager getSupportedFormatsWithDepthEnabled:depthEnabled
+                                                  position:position];
+  NSMutableArray<id> *formats =
+      [[NSMutableArray alloc] initWithCapacity:supportedFormats.count];
+  for (HSCameraFormat *format in supportedFormats) {
     [formats addObject:[format asDictionary]];
   }
   callback(@[ [NSNull null], formats ]);

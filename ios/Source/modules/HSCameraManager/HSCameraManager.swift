@@ -195,6 +195,7 @@ class HSCameraManager: NSObject {
     if case .failure = setupVideoCaptureDevice(depthEnabled: config.depthEnabled, position: position) {
       return .failure
     }
+    configureActiveFormat()
 
     if case .failure = setupVideoInput() {
       return .failure
@@ -210,7 +211,6 @@ class HSCameraManager: NSObject {
       }
     }
 
-    configureActiveFormat()
     outputSynchronizer = config.depthEnabled
       ? AVCaptureDataOutputSynchronizer(
         dataOutputs: [videoOutput, depthOutput]
@@ -347,13 +347,11 @@ class HSCameraManager: NSObject {
         configureDepthDataConverter()
       }
       let searchDescriptor = HSCameraFormatSearchDescriptor(
-        depthPixelFormatTypeRule: .oneOf([depthPixelFormat]),
-        depthDimensionsRule: position == .front
+        depthPixelFormatTypeRule: config.depthEnabled ? .oneOf([depthPixelFormat]) : .any,
+        depthDimensionsRule: config.depthEnabled && position == .front
           ? .greaterThanOrEqualTo(Size<Int>(width: 640, height: 360))
           : .any,
-        videoDimensionsRule: position == .front
-          ? .equalTo(Size<Int>(width: 1280, height: 720))
-          : .equalTo(Size<Int>(width: 640, height: 480)),
+        videoDimensionsRule: .equalTo(config.resolutionPreset.landscapeSize),
         frameRateRule: .greaterThanOrEqualTo(20),
         sortRule: .maximizeFrameRate,
         depthFormatSortRule: .maximizeDimensions
@@ -547,13 +545,27 @@ class HSCameraManager: NSObject {
   }
 
   @objc
-  public var supportedFormats: [HSCameraFormat]? {
-    guard let videoCaptureDevice = videoCaptureDevice else {
-      return nil
+  public static func getSupportedFormats(
+    depthEnabled: Bool,
+    position: AVCaptureDevice.Position
+  ) -> [HSCameraFormat] {
+    if #available(iOS 11.1, *) {
+      let videoCaptureDevice =
+        depthEnabled
+        ? depthEnabledCaptureDevice(withPosition: position)
+        : captureDevice(withPosition: position)
+      return videoCaptureDevice?
+        .formats
+        .filter({ $0.mediaType == .video })
+        .map({ HSCameraFormat(format: $0) })
+        ?? []
     }
-    return videoCaptureDevice.formats
+    let videoCaptureDevice = captureDevice(withPosition: position)
+    return videoCaptureDevice?
+      .formats
       .filter({ $0.mediaType == .video })
       .map({ HSCameraFormat(format: $0) })
+      ?? []
   }
 
   @objc

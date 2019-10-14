@@ -3,11 +3,13 @@ import React from 'react';
 import { storiesOf } from '@storybook/react-native';
 import { withKnobs, select, number, boolean } from '@storybook/addon-knobs';
 import { SafeAreaView } from 'react-native';
+import maxBy from 'lodash/maxBy';
 
 import {
   Camera,
   requestCameraPermissions,
   startCameraPreview,
+  getSupportedFormats,
 } from '@jonbrennecke/react-native-camera';
 
 import { StorybookAsyncWrapper } from '../utils';
@@ -24,11 +26,12 @@ const styles = {
 const loadAsync = async () => {
   try {
     await requestCameraPermissions();
+    const depthEnabled = true;
+    const supportedFormats = await getSupportedFormats(depthEnabled, 'front');
+    const maxFmt = maxBy(supportedFormats, fmt => fmt.dimensions.width);
     startCameraPreview({
-      // resolutionPreset: 'hd720p',
-      // depthEnabled: true,
-      resolutionPreset: 'hd720p',
-      depthEnabled: false,
+      resolutionPreset: maxFmt.dimensions.width > 1280 ? 'hd1080p' : 'hd720p',
+      depthEnabled,
     });
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -60,7 +63,7 @@ stories.add('Camera', () => (
               Depth: 'depth',
               'Portrait mode': 'portraitMode',
             },
-            'portraitMode'
+            'normal'
           )}
           resizeMode={select(
             'Resize mode',

@@ -22,15 +22,15 @@ export const hasCameraPermissions = async (): Promise<boolean> => {
   return await CameraManager.hasCameraPermissionsAsync();
 };
 
-export type CameraSetupProperties = {
+export type CameraConfigurationProperties = {
   resolutionPreset: $Keys<typeof CameraResolutionPresets>,
   depthEnabled: boolean,
 };
 
 export const startCameraPreview = async (
-  properties: $Shape<CameraSetupProperties>
+  config: CameraConfigurationProperties
 ) => {
-  await CameraManager.startCameraPreviewAsync(properties);
+  await CameraManager.startCameraPreviewAsync(config);
 };
 
 export const stopCameraPreview = () => {
@@ -75,11 +75,11 @@ export const setExposure = async (exposure: number): Promise<void> => {
   return await CameraManager.setExposureAsync(exposure);
 };
 
-// eslint-disable-next-line flowtype/generic-spacing
-export const getSupportedFormats = async (): Promise<
-  { [key: string]: any }[]
-> => {
-  return await CameraManager.getSupportedFormatsAsync();
+export const getSupportedFormats = async (
+  depthEnabled: boolean,
+  position: 'front' | 'back'
+): Promise<{ [key: string]: any }[]> => {
+  return await CameraManager.getSupportedFormatsAsync(depthEnabled, position);
 };
 
 export const setFormatWithDepth = async (

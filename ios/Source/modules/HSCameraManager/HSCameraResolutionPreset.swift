@@ -1,4 +1,5 @@
 import AVFoundation
+import HSCameraUtils
 
 @objc
 enum HSCameraResolutionPreset: Int {
@@ -22,5 +23,23 @@ enum HSCameraResolutionPreset: Int {
     case .vga:
       return .vga640x480
     }
+  }
+
+  var landscapeSize: Size<Int> {
+    switch self {
+    case .hd4K:
+      return Size(width: 3840, height: 2160)
+    case .hd720p:
+      return Size(width: 1280, height: 720)
+    case .hd1080p:
+      return Size(width: 1920, height: 1080)
+    case .vga:
+      return Size(width: 640, height: 480)
+    }
+  }
+
+  var portraitSize: Size<Int> {
+    let size = landscapeSize
+    return Size(width: size.height, height: size.width)
   }
 }

@@ -41,7 +41,7 @@ export const actionCreators = {
     await dispatch(actionCreators.loadCameraDeviceSupport());
     await dispatch(actionCreators.loadSupportedISORange());
     await dispatch(actionCreators.loadSupportedExposureRange());
-    await dispatch(actionCreators.loadSupportedFormats());
+    // await dispatch(actionCreators.loadSupportedFormats());
     await dispatch(actionCreators.loadActiveFormat());
   },
 
@@ -55,10 +55,10 @@ export const actionCreators = {
     dispatch(actionCreators.setExposure({ exposure }));
   },
 
-  loadSupportedFormats: () => async (dispatch: Dispatch<any>) => {
-    const formats = await cameraUtils.getSupportedFormats();
-    dispatch(actionCreators.setSupportedFormats({ formats }));
-  },
+  // loadSupportedFormats: () => async (dispatch: Dispatch<any>) => {
+  //   const formats = await cameraUtils.getSupportedFormats();
+  //   dispatch(actionCreators.setSupportedFormats({ formats }));
+  // },
 
   loadActiveFormat: () => async (dispatch: Dispatch<*>) => {
     const format = await cameraUtils.getFormat();
