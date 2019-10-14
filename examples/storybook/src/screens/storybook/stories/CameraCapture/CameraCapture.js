@@ -34,7 +34,7 @@ const CameraStateContainer = createCameraStateHOC(state => state.camera);
 
 const Component = CameraStateContainer(
   ({ startCapture, stopCapture, captureStatus }) => {
-    const setup = async (getState): Promise<void> => {
+    const setup = async (): Promise<void> => {
       try {
         await requestCameraPermissions();
         startCameraPreview({
