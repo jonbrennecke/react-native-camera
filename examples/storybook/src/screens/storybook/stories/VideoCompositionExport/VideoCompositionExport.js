@@ -65,7 +65,10 @@ class StoryComponent extends PureComponent<MediaStateHOCProps> {
           title="Export"
           onPress={() => {
             const lastAsset = this.props.assets.last();
-            exportComposition(lastAsset.assetID, { blurAperture: 16, watermarkImageNameWithExtension: 'Watermark.png' });
+            exportComposition(lastAsset.assetID, {
+              blurAperture: 16,
+              watermarkImageNameWithExtension: 'Watermark.png',
+            });
           }}
         />
       </SafeAreaView>
