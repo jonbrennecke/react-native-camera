@@ -56,7 +56,7 @@ export const setExposure = async (exposure: number): Promise<void> => {
 export const getSupportedFormats = async (
   depthEnabled: boolean,
   position: 'front' | 'back'
-): Promise<{ [key: string]: any }[]> => {
+): Promise<CameraFormat[]> => {
   return await CameraManager.getSupportedFormatsAsync(depthEnabled, position);
 };
 
