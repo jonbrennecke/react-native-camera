@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native';
 import {
   Camera,
   requestCameraPermissions,
-  startCameraPreview,
+  CameraResolutionPresets,
 } from '@jonbrennecke/react-native-camera';
 
 import { StorybookAsyncWrapper } from '../utils';
@@ -24,11 +24,6 @@ const styles = {
 const loadAsync = async () => {
   try {
     await requestCameraPermissions();
-    const depthEnabled = true;
-    startCameraPreview({
-      resolutionPreset: 'hd720p',
-      depthEnabled,
-    });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -44,6 +39,16 @@ stories.add('Camera', () => (
       render={() => (
         <Camera
           style={styles.camera}
+          resolutionPreset={select(
+            'Camera Resolution',
+            {
+              'VGA': CameraResolutionPresets.vga,
+              '720p': CameraResolutionPresets.hd720p,
+              '1080p': CameraResolutionPresets.hd1080p,
+              '4K': CameraResolutionPresets.hd4K,
+            },
+            CameraResolutionPresets.hd720p,
+          )}
           cameraPosition={select(
             'Camera Position',
             {

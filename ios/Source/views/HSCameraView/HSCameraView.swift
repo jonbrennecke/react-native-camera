@@ -46,6 +46,8 @@ class HSCameraView: UIView {
 
   override func didMoveToSuperview() {
     super.didMoveToSuperview()
+    HSCameraManager.shared.setupCameraCaptureSession()
+    HSCameraManager.shared.startPreview()
     layoutSubviews()
   }
 
@@ -86,19 +88,20 @@ class HSCameraView: UIView {
   }
 
   @objc
-  public var cameraPosition: AVCaptureDevice.Position {
-    get {
-      return HSCameraManager.shared.position
-    }
-    set {
-      HSCameraManager.shared.setPosition(newValue)
-    }
+  public func setCameraPosition(_ position: AVCaptureDevice.Position) {
+    HSCameraManager.shared.setPosition(position)
+  }
+
+  @objc
+  public func setResolutionPreset(_ resolutionPrest: HSCameraResolutionPreset) {
+    HSCameraManager.shared.setResolutionPreset(resolutionPrest)
   }
 
   @objc
   public func setPreviewMode(_ previewMode: HSEffectPreviewMode) {
     switch previewMode {
     case .depth, .portraitMode:
+      HSCameraManager.shared.setDepthEnabled(true)
       // TODO: don't recreate the preview view if we already have one
       let view = HSEffectPreviewView()
       view.effectSession.previewMode = previewMode
@@ -106,6 +109,7 @@ class HSCameraView: UIView {
       view.resizeMode = resizeMode
       previewView = .effect(view)
     default:
+      HSCameraManager.shared.setDepthEnabled(false)
       previewView = .video(HSVideoPreviewView())
     }
   }

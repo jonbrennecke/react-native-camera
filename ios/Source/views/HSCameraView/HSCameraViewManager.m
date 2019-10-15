@@ -29,6 +29,8 @@ RCT_EXPORT_VIEW_PROPERTY(isPaused, BOOL)
 
 RCT_EXPORT_VIEW_PROPERTY(watermarkImageNameWithExtension, NSString *)
 
+RCT_EXPORT_VIEW_PROPERTY(resolutionPreset, HSCameraResolutionPreset)
+
 RCT_EXPORT_METHOD(focusOnPoint
                   : (nonnull NSNumber *)reactTag point
                   : (CGPoint)point) {
