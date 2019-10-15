@@ -36,13 +36,10 @@ class HSVideoPreviewView: UIView {
 
   override func layoutSubviews() {
     super.layoutSubviews()
-    guard let videoResolution = HSCameraManager.shared.videoResolution else {
-      return
-    }
-    resize(videoResolution: videoResolution)
+    resize()
   }
 
-  internal func resize(videoResolution _: Size<Int>) {
+  internal func resize() {
     CATransaction.begin()
     CATransaction.setDisableActions(true)
     defer { CATransaction.commit() }
