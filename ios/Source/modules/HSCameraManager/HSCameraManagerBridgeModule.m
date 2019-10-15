@@ -125,28 +125,6 @@ RCT_EXPORT_METHOD(setFormat
                           }];
 }
 
-RCT_EXPORT_METHOD(startCameraPreview
-                  : (NSDictionary *)configJSON callback
-                  : (RCTResponseSenderBlock)callback) {
-  HSCameraConfigurationProperties *config =
-      [RCTConvert HSCameraConfigurationProperties:configJSON];
-  if (!config) {
-    NSString *description = @"Failed to parse config JSON object.";
-    NSDictionary<NSString *, id> *error = RCTMakeError(description, @{}, nil);
-    callback(@[ error, [NSNull null] ]);
-    return;
-  }
-  HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
-  [cameraManager setupCameraCaptureSessionWithConfig:config];
-  [cameraManager startPreview];
-  callback(@[ [NSNull null], [NSNull null] ]);
-}
-
-RCT_EXPORT_METHOD(stopCameraPreview) {
-  HSCameraManager *cameraManager = HSCameraManager.sharedInstance;
-  [cameraManager stopPreview];
-}
-
 RCT_EXPORT_METHOD(startCameraCapture
                   : (NSDictionary *)metadata
                   : (RCTResponseSenderBlock)callback) {

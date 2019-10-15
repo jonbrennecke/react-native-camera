@@ -169,7 +169,7 @@
 		FC82B6AB230F70E700D4AB4F /* resizeUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = resizeUtils.swift; sourceTree = "<group>"; };
 		FC845E1522B98A3D00522016 /* cameraUtils.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = cameraUtils.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC845E1722B98D6300522016 /* HSCameraView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSCameraView.swift; sourceTree = "<group>"; tabWidth = 2; };
-		FC845E1922B98E5600522016 /* HSCameraViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HSCameraViewManager.m; sourceTree = "<group>"; };
+		FC845E1922B98E5600522016 /* HSCameraViewManager.m */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.c.objc; path = HSCameraViewManager.m; sourceTree = "<group>"; tabWidth = 2; };
 		FC845E1B22B98E5F00522016 /* HSCameraViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSCameraViewManager.h; sourceTree = "<group>"; };
 		FC845E1D22B992B200522016 /* HSCameraManagerBridgeModule.m */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.c.objc; path = HSCameraManagerBridgeModule.m; sourceTree = "<group>"; tabWidth = 2; };
 		FC845E1F22B992BB00522016 /* HSCameraManagerBridgeModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSCameraManagerBridgeModule.h; sourceTree = "<group>"; };

@@ -21,8 +21,16 @@ export type CameraResizeMode =
   | 'scaleAspectHeight'
   | 'scaleAspectFill';
 
+export const CameraResolutionPresets = {
+  hd720p: 'hd720p',
+  hd1080p: 'hd1080p',
+  hd4K: 'hd4K',
+  vga: 'vga',
+};
+
 export type CameraProps = {
   style?: ?Style,
+  resolutionPreset?: $Keys<typeof CameraResolutionPresets>,
   cameraPosition?: CameraPosition,
   previewMode?: CameraPreviewMode,
   resizeMode?: CameraResizeMode,
@@ -57,6 +65,7 @@ export class Camera extends PureComponent<CameraProps> {
         watermarkImageNameWithExtension={
           this.props.watermarkImageNameWithExtension
         }
+        resolutionPreset={this.props.resolutionPreset}
         pointerEvents="none"
       />
     );
