@@ -21,11 +21,11 @@ type Props = {
   touchAnimationEasing?: any,
   touchAnimationDuration?: number,
   onRequestFocus: FocusPoint => void,
-  renderFocusArea: ?((
+  renderFocusArea: ?(
     focusPosition: Animated.ValueXY,
     touchAnim: Animated.Value,
     focusPoint: FocusPoint
-  ) => Element<*>),
+  ) => Element<*>,
 };
 
 type State = {
@@ -104,11 +104,12 @@ export class CameraFocusArea extends PureComponent<Props, State> {
         onPressOut={this.touchableOnPressOut}
       >
         <View style={[styles.container, this.props.style]}>
-          {this.props.renderFocusArea && this.props.renderFocusArea(
-            this.positionAnim,
-            this.touchAnim,
-            this.state.focusPoint
-          )}
+          {this.props.renderFocusArea &&
+            this.props.renderFocusArea(
+              this.positionAnim,
+              this.touchAnim,
+              this.state.focusPoint
+            )}
         </View>
       </TouchableWithoutFeedback>
     );
