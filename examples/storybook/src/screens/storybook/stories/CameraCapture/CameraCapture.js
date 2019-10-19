@@ -7,7 +7,6 @@ import { Provider } from 'react-redux';
 import {
   Camera,
   requestCameraPermissions,
-  startCameraPreview,
   createCameraStateHOC,
 } from '@jonbrennecke/react-native-camera';
 
@@ -37,10 +36,6 @@ const Component = CameraStateContainer(
     const setup = async (): Promise<void> => {
       try {
         await requestCameraPermissions();
-        startCameraPreview({
-          resolutionPreset: 'hd720p',
-          depthEnabled: false,
-        });
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error(error);
