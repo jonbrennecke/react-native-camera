@@ -658,6 +658,9 @@ class HSCameraManager: NSObject {
         }
         strongSelf.state = .waitingToRecord(toURL: outputURL)
         strongSelf.notifyResolutionObservers()
+        let audioSession = AVAudioSession.sharedInstance()
+        try? audioSession.setCategory(.playAndRecord, options: .mixWithOthers)
+        try? audioSession.setActive(true, options: [])
         completionHandler(nil, true)
       } catch {
         completionHandler(error, false)
