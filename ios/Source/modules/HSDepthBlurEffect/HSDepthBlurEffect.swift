@@ -1,7 +1,7 @@
 import Accelerate
 import AVFoundation
 import CoreImage
-import HSCameraUtils
+import ImageUtils
 
 class HSDepthBlurEffect {
   public enum PreviewMode {
@@ -153,7 +153,7 @@ class HSDepthBlurEffect {
     guard let resizer = imageBufferResizer, size == resizer.size else {
       imageBufferResizer = HSImageBufferResizer(
         size: size,
-        bufferInfo: HSBufferInfo(pixelFormatType: kCVPixelFormatType_32BGRA)
+        bufferInfo: BufferInfo(pixelFormatType: kCVPixelFormatType_32BGRA)
       )
       return imageBufferResizer
     }
@@ -164,8 +164,8 @@ class HSDepthBlurEffect {
 
   public func makeEffectImage(
     previewMode: PreviewMode,
-    disparityPixelBuffer: HSPixelBuffer,
-    videoPixelBuffer: HSPixelBuffer,
+    disparityPixelBuffer: PixelBuffer,
+    videoPixelBuffer: PixelBuffer,
     watermarkProperties: WatermarkProperties?,
     calibrationData _: AVCameraCalibrationData?,
     blurAperture: Float,
@@ -176,13 +176,13 @@ class HSDepthBlurEffect {
       width: Int((Float(videoPixelBuffer.size.width) * scale).rounded()),
       height: Int((Float(videoPixelBuffer.size.height) * scale).rounded())
     )
-    let videoImageBuffer = HSImageBuffer(pixelBuffer: videoPixelBuffer)
+    let videoImageBuffer = ImageBuffer(pixelBuffer: videoPixelBuffer)
     guard
       let resizer = createImageBufferResizer(size: scaledSize),
       let videoImage = resizer
       .resize(imageBuffer: videoImageBuffer)?
       .makeCIImage(),
-      let disparityImage = HSImageBuffer(pixelBuffer: disparityPixelBuffer).makeCIImage()
+      let disparityImage = ImageBuffer(pixelBuffer: disparityPixelBuffer).makeCIImage()
     else {
       return nil
     }
@@ -216,16 +216,16 @@ class HSDepthBlurEffect {
 
   public func makeEffectImageWithoutScaling(
     previewMode: PreviewMode,
-    disparityPixelBuffer: HSPixelBuffer,
-    videoPixelBuffer: HSPixelBuffer,
+    disparityPixelBuffer: PixelBuffer,
+    videoPixelBuffer: PixelBuffer,
     watermarkProperties: WatermarkProperties?,
     calibrationData _: AVCameraCalibrationData?,
     blurAperture: Float,
     qualityFactor: Float = 0.1
   ) -> CIImage? {
     guard
-      let videoImage = HSImageBuffer(pixelBuffer: videoPixelBuffer).makeCIImage(),
-      let disparityImage = HSImageBuffer(pixelBuffer: disparityPixelBuffer).makeCIImage()
+      let videoImage = ImageBuffer(pixelBuffer: videoPixelBuffer).makeCIImage(),
+      let disparityImage = ImageBuffer(pixelBuffer: disparityPixelBuffer).makeCIImage()
     else {
       return nil
     }

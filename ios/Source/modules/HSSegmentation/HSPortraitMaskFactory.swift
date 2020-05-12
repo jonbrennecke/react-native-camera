@@ -1,5 +1,5 @@
 import AVFoundation
-import HSCameraUtils
+import ImageUtils
 
 struct HSPortraitMaskFactory {
   private var model: HSSegmentationModel
@@ -70,12 +70,12 @@ struct HSPortraitMaskFactory {
     return HSPortraitMask(depthBuffer: depthBuffer, cameraBuffer: cameraBuffer, maskBuffer: maskBuffer)
   }
 
-  private mutating func preprocess(sampleBuffer: CMSampleBuffer) -> HSPixelBuffer? {
+  private mutating func preprocess(sampleBuffer: CMSampleBuffer) -> PixelBuffer? {
     guard
       let modelCameraInputSize = model.sizeOf(input: .cameraImage),
       let modelCameraInputPixelBufferPool = modelCameraInputPixelBufferPool,
       let cameraCVPixelBufferPool = cameraCVPixelBufferPool,
-      let colorPixelBuffer = HSPixelBuffer(sampleBuffer: sampleBuffer)
+      let colorPixelBuffer = PixelBuffer(sampleBuffer: sampleBuffer)
     else {
       return nil
     }
@@ -84,7 +84,7 @@ struct HSPortraitMaskFactory {
     ) else {
       return nil
     }
-    let imageBuffer = HSImageBuffer(pixelBuffer: grayscalePixelBuffer)
+    let imageBuffer = ImageBuffer(pixelBuffer: grayscalePixelBuffer)
     return imageBuffer.resize(
       to: modelCameraInputSize,
       pixelBufferPool: modelCameraInputPixelBufferPool,
@@ -92,7 +92,7 @@ struct HSPortraitMaskFactory {
     )?.pixelBuffer
   }
 
-  private mutating func preprocess(depthData: AVDepthData) -> HSPixelBuffer? {
+  private mutating func preprocess(depthData: AVDepthData) -> PixelBuffer? {
     guard
       let modelDepthInputSize = model.sizeOf(input: .depthImage),
       let modelDepthInputPixelBufferPool = modelDepthInputPixelBufferPool,
@@ -100,15 +100,15 @@ struct HSPortraitMaskFactory {
     else {
       return nil
     }
-    let buffer = HSPixelBuffer(depthData: depthData)
-    let iterator: HSPixelBufferIterator<Float> = buffer.makeIterator()
+    let buffer = PixelBuffer(depthData: depthData)
+    let iterator: PixelBufferIterator<Float> = buffer.makeIterator()
     let bounds = iterator.bounds()
     guard let depthPixelBuffer = convertDisparityOrDepthPixelBufferToUInt8(
       pixelBuffer: buffer, pixelBufferPool: rawDepthCVPixelBufferPool, bounds: bounds
     ) else {
       return nil
     }
-    let imageBuffer = HSImageBuffer(pixelBuffer: depthPixelBuffer)
+    let imageBuffer = ImageBuffer(pixelBuffer: depthPixelBuffer)
     return imageBuffer.resize(
       to: modelDepthInputSize,
       pixelBufferPool: modelDepthInputPixelBufferPool,

@@ -1,5 +1,5 @@
 import Foundation
-import HSCameraUtils
+import ImageUtils
 
 protocol HSCameraManagerResolutionDelegate: AnyObject {
   func cameraManagerDidChange(videoResolution: Size<Int>)

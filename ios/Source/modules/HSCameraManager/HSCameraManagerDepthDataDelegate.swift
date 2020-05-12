@@ -1,10 +1,10 @@
 import AVFoundation
-import HSCameraUtils
+import ImageUtils
 
 @available(iOS 11.0, *)
 protocol HSCameraManagerDepthDataDelegate: AnyObject {
   var isPaused: Bool { get set }
-  func cameraManagerDidOutput(disparityPixelBuffer: HSPixelBuffer, calibrationData: AVCameraCalibrationData?)
-  func cameraManagerDidOutput(videoPixelBuffer: HSPixelBuffer)
+  func cameraManagerDidOutput(disparityPixelBuffer: PixelBuffer, calibrationData: AVCameraCalibrationData?)
+  func cameraManagerDidOutput(videoPixelBuffer: PixelBuffer)
   func cameraManagerDidFocus(on focusPoint: CGPoint)
 }

@@ -1,5 +1,5 @@
 import AVFoundation
-import HSCameraUtils
+import ImageUtils
 
 @objc
 enum HSCameraResolutionPreset: Int {

@@ -1,6 +1,6 @@
 import AVFoundation
 import CoreGraphics
-import HSCameraUtils
+import ImageUtils
 import MetalKit
 import UIKit
 
@@ -70,22 +70,22 @@ class HSEffectSession: NSObject {
 
   // MARK: - Objective-C interface
 
-  public var disparityPixelBuffer: HSPixelBuffer?
+  public var disparityPixelBuffer: PixelBuffer?
 
   public var calibrationData: AVCameraCalibrationData?
 
-  public var videoPixelBuffer: HSPixelBuffer?
+  public var videoPixelBuffer: PixelBuffer?
 
   public var focusPoint: CGPoint?
 }
 
 extension HSEffectSession: HSCameraManagerDepthDataDelegate {
-  func cameraManagerDidOutput(disparityPixelBuffer: HSPixelBuffer, calibrationData: AVCameraCalibrationData?) {
+  func cameraManagerDidOutput(disparityPixelBuffer: PixelBuffer, calibrationData: AVCameraCalibrationData?) {
     self.disparityPixelBuffer = disparityPixelBuffer
     self.calibrationData = calibrationData
   }
 
-  func cameraManagerDidOutput(videoPixelBuffer: HSPixelBuffer) {
+  func cameraManagerDidOutput(videoPixelBuffer: PixelBuffer) {
     self.videoPixelBuffer = videoPixelBuffer
   }
 

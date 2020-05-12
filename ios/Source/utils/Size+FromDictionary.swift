@@ -1,4 +1,4 @@
-import HSCameraUtils
+import ImageUtils
 
 extension Size: FromDictionary {
   public static func from(dictionary: Dictionary<String, Any>) -> Size? {

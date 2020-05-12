@@ -1,4 +1,5 @@
 import UIKit
+import React
 
 @objc
 class HSVideoCompositionBridgeView: HSVideoCompositionView {

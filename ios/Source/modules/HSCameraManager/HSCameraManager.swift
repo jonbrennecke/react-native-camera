@@ -1,5 +1,5 @@
 import AVFoundation
-import HSCameraUtils
+import ImageUtils
 import Photos
 
 fileprivate let depthMinFramesPerSecond = Int(20)
@@ -52,12 +52,12 @@ class HSCameraManager: NSObject {
   private let audioOutput = AVCaptureAudioDataOutput()
 
   // asset writer
-  private var assetWriter = HSVideoWriter()
-  private var assetWriterDepthInput: HSVideoWriterFrameBufferInput?
-  private var assetWriterVideoInput: HSVideoWriterFrameBufferInput?
-  private var assetWriterAudioInput: HSVideoWriterAudioInput?
+  private var assetWriter = VideoWriter()
+  private var assetWriterDepthInput: VideoWriterFrameBufferInput?
+  private var assetWriterVideoInput: VideoWriterFrameBufferInput?
+  private var assetWriterAudioInput: VideoWriterAudioInput?
 
-  private var depthDataConverter: HSAVDepthDataToPixelBufferConverter?
+  private var depthDataConverter: AVDepthDataToPixelBufferConverter?
   private var outputSemaphore = DispatchSemaphore(value: maxSimultaneousFrames)
 
   private lazy var clock: CMClock = {
@@ -124,9 +124,9 @@ class HSCameraManager: NSObject {
   }
 
   private func setupAssetWriter(to outputURL: URL) -> HSCameraSetupResult {
-    assetWriter = HSVideoWriter()
+    assetWriter = VideoWriter()
     if depthEnabled, let depthSize = depthResolution {
-      assetWriterDepthInput = HSVideoWriterFrameBufferInput(
+      assetWriterDepthInput = VideoWriterFrameBufferInput(
         videoSize: depthSize,
         pixelFormatType: kCVPixelFormatType_OneComponent8,
         isRealTime: true
@@ -135,12 +135,12 @@ class HSCameraManager: NSObject {
     guard let videoSize = videoResolution else {
       return .failure
     }
-    assetWriterVideoInput = HSVideoWriterFrameBufferInput(
+    assetWriterVideoInput = VideoWriterFrameBufferInput(
       videoSize: videoSize,
       pixelFormatType: videoPixelFormat,
       isRealTime: true
     )
-    assetWriterAudioInput = HSVideoWriterAudioInput(isRealTime: true)
+    assetWriterAudioInput = VideoWriterAudioInput(isRealTime: true)
     // order is important here, if the video track is added first it will be the one visible in Photos app
     guard
       case .success = assetWriter.prepareToRecord(to: outputURL),
@@ -364,7 +364,7 @@ class HSCameraManager: NSObject {
     guard let size = depthResolution else {
       return
     }
-    depthDataConverter = HSAVDepthDataToPixelBufferConverter(
+    depthDataConverter = AVDepthDataToPixelBufferConverter(
       size: size,
       input: depthPixelFormat,
       output: kCVPixelFormatType_OneComponent8,
@@ -764,7 +764,7 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
     // output video data
     if let synchronizedVideoData = collection.synchronizedData(for: videoOutput) as? AVCaptureSynchronizedSampleBufferData {
       if !synchronizedVideoData.sampleBufferWasDropped {
-        let videoPixelBuffer = HSPixelBuffer(sampleBuffer: synchronizedVideoData.sampleBuffer)
+        let videoPixelBuffer = PixelBuffer(sampleBuffer: synchronizedVideoData.sampleBuffer)
 
         if let videoPixelBuffer = videoPixelBuffer {
           depthDataObservers.forEach {
@@ -803,15 +803,15 @@ extension HSCameraManager: AVCaptureDataOutputSynchronizerDelegate {
     }
   }
 
-  private func record(disparityPixelBuffer: HSPixelBuffer, at presentationTime: CMTime) {
-    let frameBuffer = HSVideoFrameBuffer(
+  private func record(disparityPixelBuffer: PixelBuffer, at presentationTime: CMTime) {
+    let frameBuffer = VideoFrameBuffer(
       pixelBuffer: disparityPixelBuffer, presentationTime: presentationTime
     )
     assetWriterDepthInput?.append(frameBuffer)
   }
 
-  private func record(videoPixelBuffer: HSPixelBuffer, at presentationTime: CMTime) {
-    let frameBuffer = HSVideoFrameBuffer(
+  private func record(videoPixelBuffer: PixelBuffer, at presentationTime: CMTime) {
+    let frameBuffer = VideoFrameBuffer(
       pixelBuffer: videoPixelBuffer, presentationTime: presentationTime
     )
     assetWriterVideoInput?.append(frameBuffer)

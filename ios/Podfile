@@ -1,0 +1,51 @@
+source 'https://github.com/CocoaPods/Specs.git'
+source 'https://github.com/jonbrennecke/private-pod-specs.git'
+
+platform :ios, '11.0'
+
+use_frameworks!
+
+project_root = '.'
+
+require_relative "#{project_root}/../node_modules/@react-native-community/cli-platform-ios/native_modules"
+
+def react_pods
+  project_root = '.'
+
+  pod 'FBLazyVector', :path => "#{project_root}/../node_modules/react-native/Libraries/FBLazyVector"
+  pod 'FBReactNativeSpec', :path => "#{project_root}/../node_modules/react-native/Libraries/FBReactNativeSpec"
+  pod 'RCTRequired', :path => "#{project_root}/../node_modules/react-native/Libraries/RCTRequired"
+  pod 'RCTTypeSafety', :path => "#{project_root}/../node_modules/react-native/Libraries/TypeSafety"
+  pod 'React', :path => "#{project_root}/../node_modules/react-native/"
+  pod 'React-Core', :path => "#{project_root}/../node_modules/react-native/"
+  pod 'React-CoreModules', :path => "#{project_root}/../node_modules/react-native/React/CoreModules"
+  pod 'React-Core/DevSupport', :path => "#{project_root}/../node_modules/react-native/"
+  pod 'React-RCTActionSheet', :path => "#{project_root}/../node_modules/react-native/Libraries/ActionSheetIOS"
+  pod 'React-RCTAnimation', :path => "#{project_root}/../node_modules/react-native/Libraries/NativeAnimation"
+  pod 'React-RCTBlob', :path => "#{project_root}/../node_modules/react-native/Libraries/Blob"
+  pod 'React-RCTImage', :path => "#{project_root}/../node_modules/react-native/Libraries/Image"
+  pod 'React-RCTLinking', :path => "#{project_root}/../node_modules/react-native/Libraries/LinkingIOS"
+  pod 'React-RCTNetwork', :path => "#{project_root}/../node_modules/react-native/Libraries/Network"
+  pod 'React-RCTSettings', :path => "#{project_root}/../node_modules/react-native/Libraries/Settings"
+  pod 'React-RCTText', :path => "#{project_root}/../node_modules/react-native/Libraries/Text"
+  pod 'React-RCTVibration', :path => "#{project_root}/../node_modules/react-native/Libraries/Vibration"
+  pod 'React-Core/RCTWebSocket', :path => "#{project_root}/../node_modules/react-native/"
+
+  pod 'React-cxxreact', :path => "#{project_root}/../node_modules/react-native/ReactCommon/cxxreact"
+  pod 'React-jsi', :path => "#{project_root}/../node_modules/react-native/ReactCommon/jsi"
+  pod 'React-jsiexecutor', :path => "#{project_root}/../node_modules/react-native/ReactCommon/jsiexecutor"
+  pod 'React-jsinspector', :path => "#{project_root}/../node_modules/react-native/ReactCommon/jsinspector"
+  pod 'ReactCommon/jscallinvoker', :path => "#{project_root}/../node_modules/react-native/ReactCommon"
+  pod 'ReactCommon/turbomodule/core', :path => "#{project_root}/../node_modules/react-native/ReactCommon"
+  pod 'Yoga', :path => "#{project_root}/../node_modules/react-native/ReactCommon/yoga"
+
+  pod 'DoubleConversion', :podspec => "#{project_root}/../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
+  pod 'glog', :podspec => "#{project_root}/../node_modules/react-native/third-party-podspecs/glog.podspec"
+  pod 'Folly', :podspec => "#{project_root}/../node_modules/react-native/third-party-podspecs/Folly.podspec"
+end
+
+target 'HSReactNativeCamera' do
+  react_pods
+
+  pod 'ImageUtils', '0.0.5'
+end

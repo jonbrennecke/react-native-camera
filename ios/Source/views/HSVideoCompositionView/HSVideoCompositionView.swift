@@ -1,5 +1,5 @@
 import AVFoundation
-import HSCameraUtils
+import ImageUtils
 import Photos
 import UIKit
 

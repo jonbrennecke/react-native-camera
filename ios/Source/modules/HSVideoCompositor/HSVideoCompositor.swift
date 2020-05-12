@@ -1,6 +1,6 @@
 import AVFoundation
 import CoreImage
-import HSCameraUtils
+import ImageUtils
 import Metal
 
 class HSVideoCompositor: NSObject, AVVideoCompositing {
@@ -90,8 +90,8 @@ class HSVideoCompositor: NSObject, AVVideoCompositing {
       guard
         let effectImage = depthBlurEffect.makeEffectImageWithoutScaling(
           previewMode: previewMode == .depth ? .depth : .portraitBlur,
-          disparityPixelBuffer: HSPixelBuffer(pixelBuffer: disparityCVPixelBuffer),
-          videoPixelBuffer: HSPixelBuffer(pixelBuffer: videoCVPixelBuffer),
+          disparityPixelBuffer: PixelBuffer(pixelBuffer: disparityCVPixelBuffer),
+          videoPixelBuffer: PixelBuffer(pixelBuffer: videoCVPixelBuffer),
           watermarkProperties: watermarkProperties,
           calibrationData: nil,
           blurAperture: blurAperture,

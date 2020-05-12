@@ -1,5 +1,5 @@
 import Foundation
-import HSCameraUtils
+import ImageUtils
 
 class HSCameraResolutionObserver: HSObserver {
   private weak var delegate: HSCameraManagerResolutionDelegate?

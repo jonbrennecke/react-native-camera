@@ -1,10 +1,10 @@
 import Accelerate
 import Foundation
-import HSCameraUtils
+import ImageUtils
 
 class HSImageBufferResizer {
   private let isGrayscale: Bool
-  private let bufferInfo: HSBufferInfo
+  private let bufferInfo: BufferInfo
 
   private var destinationDataPointer: UnsafeMutableRawPointer
   private var pixelBufferPool: CVPixelBufferPool?
@@ -13,7 +13,7 @@ class HSImageBufferResizer {
 
   public init?(
     size: Size<Int>,
-    bufferInfo: HSBufferInfo,
+    bufferInfo: BufferInfo,
     isGrayscale: Bool = false
   ) {
     let totalBytes = size.height * size.width * bufferInfo.bytesPerPixel
@@ -35,8 +35,8 @@ class HSImageBufferResizer {
   }
 
   public func resize(
-    imageBuffer: HSImageBuffer
-  ) -> HSImageBuffer? {
+    imageBuffer: ImageBuffer
+  ) -> ImageBuffer? {
     var sourceBuffer = imageBuffer.makeVImageBuffer()
     let destBytesPerRow = size.width * bufferInfo.bytesPerPixel
     var destinationImageBuffer = vImage_Buffer(
@@ -106,7 +106,7 @@ class HSImageBufferResizer {
     if copyError != kvImageNoError {
       return nil
     }
-    return HSImageBuffer(cvPixelBuffer: destinationPixelBuffer)
+    return ImageBuffer(cvPixelBuffer: destinationPixelBuffer)
   }
 
   private func createPool(size: Size<Int>) -> CVPixelBufferPool? {

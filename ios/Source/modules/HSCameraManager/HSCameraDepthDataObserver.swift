@@ -1,5 +1,5 @@
 import AVFoundation
-import HSCameraUtils
+import ImageUtils
 
 class HSCameraDepthDataObserver: HSObserver {
   private weak var delegate: HSCameraManagerDepthDataDelegate?
@@ -8,14 +8,14 @@ class HSCameraDepthDataObserver: HSObserver {
     self.delegate = delegate
   }
 
-  func cameraManagerDidOutput(disparityPixelBuffer: HSPixelBuffer, calibrationData: AVCameraCalibrationData?) {
+  func cameraManagerDidOutput(disparityPixelBuffer: PixelBuffer, calibrationData: AVCameraCalibrationData?) {
     delegate?.cameraManagerDidOutput(
       disparityPixelBuffer: disparityPixelBuffer,
       calibrationData: calibrationData
     )
   }
 
-  func cameraManagerDidOutput(videoPixelBuffer: HSPixelBuffer) {
+  func cameraManagerDidOutput(videoPixelBuffer: PixelBuffer) {
     delegate?.cameraManagerDidOutput(
       videoPixelBuffer: videoPixelBuffer
     )

@@ -1,20 +1,20 @@
 import CoreImage
-import HSCameraUtils
+import ImageUtils
 
 struct HSPortraitMask {
-  private let depthBuffer: HSPixelBuffer
-  private let cameraBuffer: HSPixelBuffer
-  private let maskBuffer: HSPixelBuffer
+  private let depthBuffer: PixelBuffer
+  private let cameraBuffer: PixelBuffer
+  private let maskBuffer: PixelBuffer
 
-  public init(depthBuffer: HSPixelBuffer, cameraBuffer: HSPixelBuffer, maskBuffer: HSPixelBuffer) {
+  public init(depthBuffer: PixelBuffer, cameraBuffer: PixelBuffer, maskBuffer: PixelBuffer) {
     self.depthBuffer = depthBuffer
     self.cameraBuffer = cameraBuffer
     self.maskBuffer = maskBuffer
   }
 
   public func imageByApplyingMask(toBackground backgroundImage: CIImage) -> CIImage? {
-    let maskImageBuffer = HSImageBuffer(pixelBuffer: maskBuffer)
-    let cameraImageBuffer = HSImageBuffer(pixelBuffer: cameraBuffer)
+    let maskImageBuffer = ImageBuffer(pixelBuffer: maskBuffer)
+    let cameraImageBuffer = ImageBuffer(pixelBuffer: cameraBuffer)
     guard
       let maskImage = maskImageBuffer.makeCIImage(),
       let cameraImage = cameraImageBuffer.makeCIImage()

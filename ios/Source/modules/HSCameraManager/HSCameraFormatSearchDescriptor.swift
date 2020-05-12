@@ -1,5 +1,5 @@
 import AVFoundation
-import HSCameraUtils
+import ImageUtils
 
 public struct HSCameraFormatSearchDescriptor {
   internal enum PixelFormatTypeRule {

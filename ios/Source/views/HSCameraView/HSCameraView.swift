@@ -1,5 +1,5 @@
 import AVFoundation
-import HSCameraUtils
+import ImageUtils
 import UIKit
 
 @available(iOS 11.1, *)

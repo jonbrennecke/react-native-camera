@@ -1,13 +1,13 @@
 import Accelerate
 import CoreML
-import HSCameraUtils
+import ImageUtils
 
 internal func createSegmentationMask(
   model: HSSegmentationModel,
-  colorBuffer: HSPixelBuffer,
-  depthBuffer: HSPixelBuffer,
+  colorBuffer: PixelBuffer,
+  depthBuffer: PixelBuffer,
   pixelBufferPool: CVPixelBufferPool
-) throws -> HSPixelBuffer? {
+) throws -> PixelBuffer? {
   let input = HSSegmentationModelInput(
     color_image_input: colorBuffer.buffer,
     depth_image_input: depthBuffer.buffer
@@ -25,7 +25,7 @@ internal func createSegmentationMask(
   var pixels = convertMultiArrayToPixels(multiArray)
 
   // create vImage_Buffer with data
-  let bufferInfo = HSBufferInfo(pixelFormatType: kCVPixelFormatType_OneComponent8)
+  let bufferInfo = BufferInfo(pixelFormatType: kCVPixelFormatType_OneComponent8)
   let bytesPerPixel = bufferInfo.bytesPerPixel
   let destBytesPerRow = size.width * bytesPerPixel
   var destBuffer = vImage_Buffer(
@@ -40,7 +40,7 @@ internal func createSegmentationMask(
   else {
     return nil
   }
-  return HSPixelBuffer(pixelBuffer: destPixelBuffer)
+  return PixelBuffer(pixelBuffer: destPixelBuffer)
 }
 
 fileprivate func convertMultiArrayToPixels(_ multiArray: MLMultiArray) -> [UInt8] {

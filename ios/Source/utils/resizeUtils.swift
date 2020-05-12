@@ -1,4 +1,5 @@
 import Foundation
+import CoreGraphics
 
 public func scaleForResizing(_ originalSize: CGSize, to size: CGSize, resizeMode: HSResizeMode) -> CGFloat {
   let aspectRatio = originalSize.width / originalSize.height
