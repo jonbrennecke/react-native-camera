@@ -3,6 +3,7 @@
 #import <Photos/Photos.h>
 #import <React/RCTConvert.h>
 #import <React/RCTUtils.h>
+#import "HSReactNativeCamera-Swift.h"
 
 @implementation HSVideoCompositionExportManagerBridgeModule {
   bool hasListeners;
