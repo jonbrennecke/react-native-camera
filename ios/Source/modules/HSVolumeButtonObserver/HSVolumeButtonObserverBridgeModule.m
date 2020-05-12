@@ -1,4 +1,5 @@
 #import "HSVolumeButtonObserverBridgeModule.h"
+#import "HSReactNativeCamera-Swift.h"
 #import <Foundation/Foundation.h>
 #import <React/RCTConvert.h>
 #import <React/RCTUtils.h>

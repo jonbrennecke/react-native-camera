@@ -1,7 +1,8 @@
 #pragma once
 
-#import "HSReactNativeCamera-Swift.h"
 #import <React/RCTViewManager.h>
+
+@protocol HSVideoCompositionViewPlaybackDelegate;
 
 @class HSVideoCompositionViewManager;
 @interface HSVideoCompositionViewManager

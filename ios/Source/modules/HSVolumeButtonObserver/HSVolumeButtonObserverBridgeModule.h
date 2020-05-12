@@ -1,8 +1,10 @@
 #pragma once
 
-#import "HSReactNativeCamera-Swift.h"
 #import <React/RCTBridgeModule.h>
 #import <React/RCTEventEmitter.h>
+
+@protocol HSVolumeButtonObserverDelegate;
+@class HSVolumeButtonObserver;
 
 @class HSVolumeButtonObserverBridgeModule;
 @interface HSVolumeButtonObserverBridgeModule

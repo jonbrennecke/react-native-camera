@@ -1,6 +1,5 @@
 #pragma once
 
-#import "HSReactNativeCamera-Swift.h"
 #import <React/RCTBridgeModule.h>
 
 @class HSCameraManagerBridgeModule;
