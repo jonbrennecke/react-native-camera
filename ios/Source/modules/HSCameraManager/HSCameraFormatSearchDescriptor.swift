@@ -89,11 +89,11 @@ public struct HSCameraFormatSearchDescriptor {
   internal func search(formats: [AVCaptureDevice.Format]) -> SearchResult? {
     let filteredFormats = formats
       .filter { format in
-        return frameRateRule.matches(format: format)
+        frameRateRule.matches(format: format)
           && videoDimensionsRule.matches(format: format)
       }
       .filter { format in
-        return format.supportedDepthDataFormats.contains { depthFormat in
+        format.supportedDepthDataFormats.contains { depthFormat in
           depthPixelFormatTypeRule.matches(format: depthFormat)
             && depthDimensionsRule.matches(format: format)
         }

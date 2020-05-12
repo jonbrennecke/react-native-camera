@@ -15,7 +15,7 @@ internal func makeEmptyVideoOutputFile() throws -> URL {
   return outputURL
 }
 
-fileprivate func makeRandomFileName() -> String {
+private func makeRandomFileName() -> String {
   let random_int = arc4random_uniform(.max)
   return NSString(format: "%x", random_int) as String
 }

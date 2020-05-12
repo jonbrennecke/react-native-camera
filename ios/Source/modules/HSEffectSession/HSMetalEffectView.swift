@@ -4,7 +4,7 @@ import MetalKit
 import UIKit
 
 // the max number of concurrent drawables supported by CoreAnimation
-fileprivate let maxSimultaneousFrames: Int = 3
+private let maxSimultaneousFrames: Int = 3
 
 class HSMetalEffectView: MTKView, HSDebuggable {
   private lazy var commandQueue: MTLCommandQueue! = {

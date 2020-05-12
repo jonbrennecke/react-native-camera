@@ -108,7 +108,7 @@ class HSVideoComposition: NSObject {
 }
 
 // TODO: needs improvement; this is a super hacky way to check whether or not a track is color
-fileprivate func isGrayscaleVideoTrack(_ track: AVAssetTrack) -> Bool {
+private func isGrayscaleVideoTrack(_ track: AVAssetTrack) -> Bool {
   guard
     track.mediaType == .video,
     let formatDescription = track.formatDescriptions.first,
@@ -120,7 +120,7 @@ fileprivate func isGrayscaleVideoTrack(_ track: AVAssetTrack) -> Bool {
   return true
 }
 
-fileprivate func isColorVideoTrack(_ track: AVAssetTrack) -> Bool {
+private func isColorVideoTrack(_ track: AVAssetTrack) -> Bool {
   guard
     track.mediaType == .video,
     let formatDescription = track.formatDescriptions.first,

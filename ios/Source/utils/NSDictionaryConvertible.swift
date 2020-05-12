@@ -6,7 +6,7 @@ protocol NSDictionaryConvertible {
 }
 
 extension Array where Element: NSDictionaryConvertible {
-  func asDictionaries() -> Array<NSDictionary> {
+  func asDictionaries() -> [NSDictionary] {
     return map { $0.asDictionary() }
   }
 }

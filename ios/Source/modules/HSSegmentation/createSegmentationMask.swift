@@ -43,7 +43,7 @@ internal func createSegmentationMask(
   return PixelBuffer(pixelBuffer: destPixelBuffer)
 }
 
-fileprivate func convertMultiArrayToPixels(_ multiArray: MLMultiArray) -> [UInt8] {
+private func convertMultiArrayToPixels(_ multiArray: MLMultiArray) -> [UInt8] {
   let height = multiArray.shape[1].intValue
   let width = multiArray.shape[2].intValue
   let size = Size<Int>(width: width, height: height)

@@ -21,7 +21,7 @@ internal func requestPermissions(for permissions: [PermissionVariant], _ callbac
   }
 }
 
-fileprivate func requestPermission(for permission: PermissionVariant, _ callback: @escaping (Bool) -> Void) {
+private func requestPermission(for permission: PermissionVariant, _ callback: @escaping (Bool) -> Void) {
   switch permission {
   case let .captureDevice(mediaType: mediaType):
     authorizeCaptureDevice(with: mediaType, callback)
@@ -32,7 +32,7 @@ fileprivate func requestPermission(for permission: PermissionVariant, _ callback
   }
 }
 
-fileprivate func authorizeCaptureDevice(with mediaType: AVMediaType, _ callback: @escaping (Bool) -> Void) {
+private func authorizeCaptureDevice(with mediaType: AVMediaType, _ callback: @escaping (Bool) -> Void) {
   switch AVCaptureDevice.authorizationStatus(for: mediaType) {
   case .authorized:
     return callback(true)
@@ -53,7 +53,7 @@ fileprivate func authorizeCaptureDevice(with mediaType: AVMediaType, _ callback:
   }
 }
 
-fileprivate func authorizeMediaLibrary(_ callback: @escaping (Bool) -> Void) {
+private func authorizeMediaLibrary(_ callback: @escaping (Bool) -> Void) {
   PHPhotoLibrary.requestAuthorization { status in
     switch status {
     case .authorized:
@@ -70,7 +70,7 @@ fileprivate func authorizeMediaLibrary(_ callback: @escaping (Bool) -> Void) {
   }
 }
 
-fileprivate func authorizeMicrophone(_ callback: @escaping (Bool) -> Void) {
+private func authorizeMicrophone(_ callback: @escaping (Bool) -> Void) {
   switch AVCaptureDevice.authorizationStatus(for: .audio) {
   case .authorized:
     return callback(true)
@@ -91,7 +91,7 @@ fileprivate func authorizeMicrophone(_ callback: @escaping (Bool) -> Void) {
   }
 }
 
-fileprivate func isAuthorized() -> Bool {
+private func isAuthorized() -> Bool {
   if case .authorized = AVCaptureDevice.authorizationStatus(for: .video),
     case .authorized = AVCaptureDevice.authorizationStatus(for: .audio) {
     return true
@@ -106,13 +106,13 @@ internal func permissionStatus(for permissions: [PermissionVariant]) -> Bool {
 internal func permissionStatus(for permission: PermissionVariant) -> Bool {
   switch permission {
   case .captureDevice(mediaType: .audio):
-    return .authorized == AVCaptureDevice.authorizationStatus(for: .audio)
+    return AVCaptureDevice.authorizationStatus(for: .audio) == .authorized
   case .captureDevice(mediaType: .video):
-    return .authorized == AVCaptureDevice.authorizationStatus(for: .video)
+    return AVCaptureDevice.authorizationStatus(for: .video) == .authorized
   case .mediaLibrary:
-    return .authorized == PHPhotoLibrary.authorizationStatus()
+    return PHPhotoLibrary.authorizationStatus() == .authorized
   case .microphone:
-    return .authorized == AVCaptureDevice.authorizationStatus(for: .audio)
+    return AVCaptureDevice.authorizationStatus(for: .audio) == .authorized
   case .captureDevice:
     return false
   }

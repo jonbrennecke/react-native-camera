@@ -1,5 +1,5 @@
 extension HSMinMaxInterval: FromDictionary {
-  public static func from(dictionary: Dictionary<String, Any>) -> HSMinMaxInterval? {
+  public static func from(dictionary: [String: Any]) -> HSMinMaxInterval? {
     guard
       let minValue = dictionary["min"] as? Float,
       let maxValue = dictionary["max"] as? Float

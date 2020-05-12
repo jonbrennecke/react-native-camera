@@ -1,7 +1,7 @@
 import Foundation
 
 public protocol ToDictionary {
-  func toDictionary() -> Dictionary<String, Any>
+  func toDictionary() -> [String: Any]
 }
 
 @objc

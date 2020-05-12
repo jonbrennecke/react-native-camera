@@ -26,7 +26,7 @@ internal func getDepthEnabledCaptureDevices(withPosition position: AVCaptureDevi
   return discoverySession.devices
 }
 
-fileprivate func getOppositeCameraPosition(session: AVCaptureSession, defaultPosition: AVCaptureDevice.Position = .front) -> AVCaptureDevice.Position {
+private func getOppositeCameraPosition(session: AVCaptureSession, defaultPosition: AVCaptureDevice.Position = .front) -> AVCaptureDevice.Position {
   let device = activeCaptureDevice(session: session)
   switch device?.position {
   case .some(.back):
@@ -43,7 +43,7 @@ internal func activeCaptureDevicePosition(session: AVCaptureSession) -> AVCaptur
   return device?.position
 }
 
-fileprivate func activeCaptureDevice(session: AVCaptureSession) -> AVCaptureDevice? {
+private func activeCaptureDevice(session: AVCaptureSession) -> AVCaptureDevice? {
   return session.inputs.reduce(nil) { (device, input) -> AVCaptureDevice? in
     if input.isKind(of: AVCaptureDeviceInput.classForCoder()) {
       let device = (input as! AVCaptureDeviceInput).device

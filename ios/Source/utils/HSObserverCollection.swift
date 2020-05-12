@@ -1,7 +1,7 @@
 import Foundation
 
 class HSObserverCollection<T: HSObserver> {
-  private var observers = Array<WeakReference<T>>()
+  private var observers = [WeakReference<T>]()
 
   public var count: Int {
     return observers.count

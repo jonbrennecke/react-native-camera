@@ -2,12 +2,12 @@ import AVFoundation
 import ImageUtils
 import Photos
 
-fileprivate let depthMinFramesPerSecond = Int(20)
-fileprivate let videoMinFramesPerSecond = Int(20)
-fileprivate let videoMaxFramesPerSecond = Int(30)
+private let depthMinFramesPerSecond = Int(20)
+private let videoMinFramesPerSecond = Int(20)
+private let videoMaxFramesPerSecond = Int(30)
 
 // the max number of concurrent drawables supported by CoreAnimation
-fileprivate let maxSimultaneousFrames: Int = 3
+private let maxSimultaneousFrames: Int = 3
 
 @available(iOS 11, *)
 @objc
@@ -563,15 +563,15 @@ class HSCameraManager: NSObject {
         : captureDevice(withPosition: position)
       return videoCaptureDevice?
         .formats
-        .filter({ $0.mediaType == .video })
-        .map({ HSCameraFormat(format: $0) })
+        .filter { $0.mediaType == .video }
+        .map { HSCameraFormat(format: $0) }
         ?? []
     }
     let videoCaptureDevice = captureDevice(withPosition: position)
     return videoCaptureDevice?
       .formats
-      .filter({ $0.mediaType == .video })
-      .map({ HSCameraFormat(format: $0) })
+      .filter { $0.mediaType == .video }
+      .map { HSCameraFormat(format: $0) }
       ?? []
   }
 
@@ -683,10 +683,10 @@ class HSCameraManager: NSObject {
         strongSelf.state = .stopped(startTime: startTime, endTime: endTime)
         strongSelf.assetWriter.stopRecording(at: endTime) { url in
           if saveToCameraRoll {
-            PHPhotoLibrary.shared().performChanges({
+            PHPhotoLibrary.shared().performChanges {
               PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
               completionHandler(true, url)
-            })
+            }
           } else {
             completionHandler(true, url)
           }

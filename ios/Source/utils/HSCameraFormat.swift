@@ -54,17 +54,17 @@ public final class HSCameraFormat: NSObject {
 }
 
 extension HSCameraFormat: FromDictionary {
-  public static func from(dictionary: Dictionary<String, Any>) -> HSCameraFormat? {
+  public static func from(dictionary: [String: Any]) -> HSCameraFormat? {
     guard
-      let dimensionsDict = dictionary["dimensions"] as? Dictionary<String, Any>,
+      let dimensionsDict = dictionary["dimensions"] as? [String: Any],
       let dimensions = Size<Int>.from(dictionary: dimensionsDict),
       let mediaTypeString = dictionary["mediaType"] as? String,
       let mediaType = fourCharCode(fromString: mediaTypeString),
       let mediaSubTypeString = dictionary["mediaSubType"] as? String,
       let mediaSubType = fourCharCode(fromString: mediaSubTypeString),
-      let supportedFrameRatesArray = dictionary["supportedFrameRates"] as? Array<Dictionary<String, Any>>,
+      let supportedFrameRatesArray = dictionary["supportedFrameRates"] as? [[String: Any]],
       let supportedFrameRates = Array<HSMinMaxInterval>.from(arrayOfDictionaries: supportedFrameRatesArray),
-      let supportedDepthFormatsArray = dictionary["supportedDepthFormats"] as? Array<Dictionary<String, Any>>,
+      let supportedDepthFormatsArray = dictionary["supportedDepthFormats"] as? [[String: Any]],
       let supportedDepthFormats = Array<HSCameraFormat>.from(arrayOfDictionaries: supportedDepthFormatsArray)
     else {
       return nil
@@ -81,7 +81,7 @@ extension HSCameraFormat: FromDictionary {
 
 extension HSCameraFormat: FromNSDictionary {
   public static func from(dictionary: NSDictionary) -> FromNSDictionary? {
-    guard let swiftDict = dictionary as? Dictionary<String, Any> else {
+    guard let swiftDict = dictionary as? [String: Any] else {
       return nil
     }
     return from(dictionary: swiftDict)
@@ -89,7 +89,7 @@ extension HSCameraFormat: FromNSDictionary {
 }
 
 extension HSCameraFormat: ToDictionary, ToNSDictionary {
-  public func toDictionary() -> Dictionary<String, Any> {
+  public func toDictionary() -> [String: Any] {
     return [
       "dimensions": [
         "height": dimensions.height,
@@ -123,7 +123,7 @@ extension HSCameraFormat: NSDictionaryConvertible {
   }
 }
 
-fileprivate func string(fromFourCharCode code: FourCharCode) -> String {
+private func string(fromFourCharCode code: FourCharCode) -> String {
   let cString: [CChar] = [
     CChar(code >> 24 & 0xFF),
     CChar(code >> 16 & 0xFF),
@@ -135,7 +135,7 @@ fileprivate func string(fromFourCharCode code: FourCharCode) -> String {
 }
 
 // See: https://gist.github.com/patrickjuchli/d1b07f97e0ea1da5db09
-fileprivate func fourCharCode(fromString string: String) -> FourCharCode? {
+private func fourCharCode(fromString string: String) -> FourCharCode? {
   var code: FourCharCode = 0
   if string.count == 4, string.utf8.count == 4 {
     for byte in string.utf8 {

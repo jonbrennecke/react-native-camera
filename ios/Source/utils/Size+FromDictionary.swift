@@ -1,7 +1,7 @@
 import ImageUtils
 
 extension Size: FromDictionary {
-  public static func from(dictionary: Dictionary<String, Any>) -> Size? {
+  public static func from(dictionary: [String: Any]) -> Size? {
     guard
       let height = dictionary["height"] as? T,
       let width = dictionary["width"] as? T

@@ -1,9 +1,9 @@
 #import "HSVideoCompositionExportManagerBridgeModule.h"
+#import "HSReactNativeCamera-Swift.h"
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
 #import <React/RCTConvert.h>
 #import <React/RCTUtils.h>
-#import "HSReactNativeCamera-Swift.h"
 
 @implementation HSVideoCompositionExportManagerBridgeModule {
   bool hasListeners;

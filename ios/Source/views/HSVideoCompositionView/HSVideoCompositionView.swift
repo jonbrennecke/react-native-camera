@@ -348,7 +348,7 @@ class HSVideoCompositionView: UIView {
   }
 }
 
-fileprivate func loadVideoAsset(assetID: String, _ callback: @escaping (AVAsset?) -> Void) -> PHImageRequestID? {
+private func loadVideoAsset(assetID: String, _ callback: @escaping (AVAsset?) -> Void) -> PHImageRequestID? {
   let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil)
   guard let asset = fetchResult.firstObject else {
     callback(nil)
@@ -363,7 +363,7 @@ fileprivate func loadVideoAsset(assetID: String, _ callback: @escaping (AVAsset?
 }
 
 // TODO: this is a super hacky way to check if a track is color or not
-fileprivate func isGrayscaleVideoTrack(_ track: AVAssetTrack) -> Bool {
+private func isGrayscaleVideoTrack(_ track: AVAssetTrack) -> Bool {
   guard
     track.mediaType == .video,
     let formatDescription = track.formatDescriptions.first,
@@ -375,7 +375,7 @@ fileprivate func isGrayscaleVideoTrack(_ track: AVAssetTrack) -> Bool {
   return true
 }
 
-fileprivate func isColorVideoTrack(_ track: AVAssetTrack) -> Bool {
+private func isColorVideoTrack(_ track: AVAssetTrack) -> Bool {
   guard
     track.mediaType == .video,
     let formatDescription = track.formatDescriptions.first,
@@ -387,7 +387,7 @@ fileprivate func isColorVideoTrack(_ track: AVAssetTrack) -> Bool {
   return true
 }
 
-fileprivate func dimensions(of track: AVAssetTrack) -> Size<Int>? {
+private func dimensions(of track: AVAssetTrack) -> Size<Int>? {
   guard
     track.mediaType == .video,
     let formatDescription = track.formatDescriptions.first
@@ -397,7 +397,7 @@ fileprivate func dimensions(of track: AVAssetTrack) -> Size<Int>? {
   return dimensions(with: formatDescription as! CMFormatDescription)
 }
 
-fileprivate func dimensions(with formatDescription: CMFormatDescription) -> Size<Int> {
+private func dimensions(with formatDescription: CMFormatDescription) -> Size<Int> {
   let dim = CMVideoFormatDescriptionGetDimensions(formatDescription)
   return Size(width: Int(dim.width), height: Int(dim.height))
 }

@@ -1,7 +1,7 @@
 import Foundation
 
 public protocol FromDictionary {
-  static func from(dictionary: Dictionary<String, Any>) -> Self?
+  static func from(dictionary: [String: Any]) -> Self?
 }
 
 @objc
@@ -11,7 +11,7 @@ public protocol FromNSDictionary {
 
 extension FromNSDictionary where Self: FromDictionary {
   public static func from(dictionary: NSDictionary) -> FromDictionary? {
-    guard let swiftDict = dictionary as? Dictionary<String, Any> else {
+    guard let swiftDict = dictionary as? [String: Any] else {
       return nil
     }
     return Self.from(dictionary: swiftDict)
@@ -19,7 +19,7 @@ extension FromNSDictionary where Self: FromDictionary {
 }
 
 extension Array where Element: FromDictionary {
-  public static func from(arrayOfDictionaries: Array<Dictionary<String, Any>>) -> [Element]? {
+  public static func from(arrayOfDictionaries: [[String: Any]]) -> [Element]? {
     var newArray = [Element]()
     for dictionary in arrayOfDictionaries {
       guard let element = Element.from(dictionary: dictionary) else {
