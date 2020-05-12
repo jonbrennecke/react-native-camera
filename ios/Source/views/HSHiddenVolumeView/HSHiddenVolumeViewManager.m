@@ -1,4 +1,5 @@
 #import "HSHiddenVolumeViewManager.h"
+#import "HSReactNativeCamera-Swift.h"
 
 @implementation HSHiddenVolumeViewManager
 

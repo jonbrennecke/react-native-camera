@@ -683,10 +683,14 @@ class HSCameraManager: NSObject {
         strongSelf.state = .stopped(startTime: startTime, endTime: endTime)
         strongSelf.assetWriter.stopRecording(at: endTime) { url in
           if saveToCameraRoll {
-            PHPhotoLibrary.shared().performChanges {
-              PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
-              completionHandler(true, url)
-            }
+            PHPhotoLibrary.shared().performChanges(
+              {
+                PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: url)
+              },
+              completionHandler: { success, _ in
+                completionHandler(success, url)
+              }
+            )
           } else {
             completionHandler(true, url)
           }
