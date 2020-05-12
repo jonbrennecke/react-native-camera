@@ -16,5 +16,6 @@ Pod::Spec.new do |s|
   s.source_files           = 'Source/**/*.{swift,h,m}'
   s.swift_versions          = '5'
   s.dependency 'React'
+  s.dependency 'ImageUtils', '0.0.5'
   s.static_framework = true
 end
