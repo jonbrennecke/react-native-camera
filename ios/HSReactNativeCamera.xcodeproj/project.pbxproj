@@ -101,7 +101,8 @@
 		FC03B63122DFEA0000E283B3 /* HSVideoCompositionView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSVideoCompositionView.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC03B64B22DFF1F000E283B3 /* HSVideoCompositionViewManager.m */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.c.objc; path = HSVideoCompositionViewManager.m; sourceTree = "<group>"; tabWidth = 2; };
 		FC03B64E22DFF25500E283B3 /* HSVideoCompositionViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSVideoCompositionViewManager.h; sourceTree = "<group>"; };
-		FC1D5F48246B409600928614 /* libHSReactNativeCamera.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libHSReactNativeCamera.a; path = "/Users/jon/Projects/highstreet/@jonbrennecke/react-native-camera/ios/build/Debug-iphoneos/libHSReactNativeCamera.a"; sourceTree = "<absolute>"; };
+		FC1D5F94246B4D3100928614 /* libHSReactNativeCamera.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libHSReactNativeCamera.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		FC1D5F95246BB69300928614 /* HSReactNativeCamera-Swift-Umbrella.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HSReactNativeCamera-Swift-Umbrella.h"; sourceTree = "<group>"; };
 		FC20ADFC22E9130000181579 /* HSExportTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSExportTask.swift; sourceTree = "<group>"; };
 		FC29966B230DD9620006366F /* HSVideoCompositionViewPlaybackDelegate.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSVideoCompositionViewPlaybackDelegate.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC299671230DE8310006366F /* HSVideoCompositionBridgeView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSVideoCompositionBridgeView.swift; sourceTree = "<group>"; tabWidth = 2; };
@@ -211,6 +212,7 @@
 				FCDAC44F22AE01A6004A36E7 /* Source */,
 				0EE948F411C6F90B0C9E5A9F /* Pods */,
 				EF57D3F877EFB95902815D99 /* Frameworks */,
+				FC1D5F94246B4D3100928614 /* libHSReactNativeCamera.a */,
 			);
 			sourceTree = "<group>";
 		};
@@ -433,6 +435,7 @@
 				FC73F2F522B02C20009B6D9F /* views */,
 				FCC96F3722FA9DBC00CDCEB2 /* RCTConvert */,
 				FCA0A4C122ACC92700A93C32 /* utils */,
+				FC1D5F95246BB69300928614 /* HSReactNativeCamera-Swift-Umbrella.h */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -466,7 +469,7 @@
 			);
 			name = HSReactNativeCamera;
 			productName = HSReactNativeCamera;
-			productReference = FC1D5F48246B409600928614 /* libHSReactNativeCamera.a */;
+			productReference = FC1D5F94246B4D3100928614 /* libHSReactNativeCamera.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */

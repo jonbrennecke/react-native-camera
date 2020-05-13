@@ -4,7 +4,7 @@
 #import "HSCameraConfigurationProperties+RCTConvert.h"
 
 #import "HSCameraManagerBridgeModule.h"
-#import "HSReactNativeCamera-Swift.h"
+#import "HSReactNativeCamera-Swift-Umbrella.h"
 
 @implementation HSCameraManagerBridgeModule
 

@@ -1,5 +1,5 @@
 #import "HSVideoCompositionExportManagerBridgeModule.h"
-#import "HSReactNativeCamera-Swift.h"
+#import "HSReactNativeCamera-Swift-Umbrella.h"
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
 #import <React/RCTConvert.h>

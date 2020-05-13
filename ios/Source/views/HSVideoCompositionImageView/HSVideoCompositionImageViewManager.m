@@ -1,5 +1,5 @@
 #import "HSVideoCompositionImageViewManager.h"
-#import "HSReactNativeCamera-Swift.h"
+#import "HSReactNativeCamera-Swift-Umbrella.h"
 
 @implementation HSVideoCompositionImageViewManager
 

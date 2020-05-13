@@ -3,7 +3,7 @@
 #import <React/RCTUIManager.h>
 #import <React/RCTUtils.h>
 
-#import "HSReactNativeCamera-Swift.h"
+#import "HSReactNativeCamera-Swift-Umbrella.h"
 #import "HSVideoCompositionViewManager.h"
 #import "HSVideoPlaybackState+RCTConvert.h"
 

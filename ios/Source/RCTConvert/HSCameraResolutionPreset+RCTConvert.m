@@ -1,5 +1,5 @@
 #import "HSCameraResolutionPreset+RCTConvert.h"
-#import "HSReactNativeCamera-Swift.h"
+#import "HSReactNativeCamera-Swift-Umbrella.h"
 
 @implementation RCTConvert (HSCameraResolutionPreset)
 

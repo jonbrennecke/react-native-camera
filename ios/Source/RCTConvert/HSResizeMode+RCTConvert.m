@@ -1,4 +1,4 @@
-#import "HSReactNativeCamera-Swift.h"
+#import "HSReactNativeCamera-Swift-Umbrella.h"
 #import <React/RCTConvert.h>
 
 @implementation RCTConvert (HSResizeMode)
