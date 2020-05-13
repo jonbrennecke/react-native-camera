@@ -121,7 +121,7 @@
 		FC6155A222FCA57600BF446D /* HSMetalEffectView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSMetalEffectView.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC6CB74D2318C75D00310C3D /* HSCameraFormatSearchDescriptor.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSCameraFormatSearchDescriptor.swift; sourceTree = "<group>"; tabWidth = 2; };
 		FC6CB7502319885B00310C3D /* HSVolumeButtonObserver.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSVolumeButtonObserver.swift; sourceTree = "<group>"; tabWidth = 2; };
-		FC6CB75C23198B7400310C3D /* HSVolumeButtonObserverBridgeModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HSVolumeButtonObserverBridgeModule.m; sourceTree = "<group>"; };
+		FC6CB75C23198B7400310C3D /* HSVolumeButtonObserverBridgeModule.m */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.c.objc; path = HSVolumeButtonObserverBridgeModule.m; sourceTree = "<group>"; tabWidth = 2; };
 		FC6CB75E23198B8300310C3D /* HSVolumeButtonObserverBridgeModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSVolumeButtonObserverBridgeModule.h; sourceTree = "<group>"; };
 		FC6CB75F23198C3B00310C3D /* HSVolumeButtonObserverDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSVolumeButtonObserverDelegate.swift; sourceTree = "<group>"; };
 		FC6CB7612319937700310C3D /* HSHiddenVolumeView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = HSHiddenVolumeView.swift; sourceTree = "<group>"; tabWidth = 2; };

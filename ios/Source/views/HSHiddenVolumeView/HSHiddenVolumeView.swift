@@ -10,7 +10,7 @@ class HSHiddenVolumeView: UIView {
     return view
   }()
 
-  override func didMoveToSuperview() {
+  override public func didMoveToSuperview() {
     super.didMoveToSuperview()
     addSubview(volumeView)
   }

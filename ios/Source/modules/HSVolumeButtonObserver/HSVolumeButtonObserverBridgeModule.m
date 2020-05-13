@@ -6,9 +6,8 @@
 
 @implementation HSVolumeButtonObserverBridgeModule {
   bool hasListeners;
+  HSVolumeButtonObserver *volumeButtonObserver;
 }
-
-@synthesize volumeButtonObserver;
 
 - (instancetype)init {
   self = [super init];
